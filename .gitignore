@@ -1,4 +1,2 @@
-# ignore ssh config dir
-/ssh/**
-*.key
-*.pem
+# ignore private config files
+/private/**
