@@ -16,14 +16,16 @@ zsh_import() {
   cd
 }
 
-# Source os specific file and other zsh scripts
-# zsh_import; uname=$(perl -e "print lc('`uname`');")
-# zsh_source "${ZDOTDIR}/source/${uname}.zshrc"; unset uname
+# Load os specific file and other zsh scripts
+zsh_import; uname=$(perl -e "print lc('$(uname)');")
+zsh_source "${ZDOTDIR}/source/${uname}.zshrc"
+unset uname
 
 # Zplug plugins initialization
 # zplug "romkatv/powerlevel10k", use:"powerlevel10k.zsh-theme"
 
-autoload -Uz compinit; compinit # Initialize zsh auto complete
+autoload -Uz compinit
+compinit # Initialize zsh auto complete
 # Disable highlighting of text pasted into the command line.
 zle_highlight=('paste:none')
 
@@ -31,126 +33,41 @@ zle_highlight=('paste:none')
 # function set-term-title() { print -Pn '\e]0;%n@%m: %~\a' }
 # add-zsh-hook precmd set-term-title
 
-ZLE_RPROMPT_INDENT=0           # don't leave an empty space after right prompt
-READNULLCMD="${PAGER}"         # use the default pager instead of `more`
-WORDCHARS=''                   # only alphanums make up words in word-based zle widgets
-ZLE_REMOVE_SUFFIX_CHARS=''     # don't eat space when typing '|' after a tab completion
+ZLE_RPROMPT_INDENT=0          # don't leave an empty space after right prompt
+READNULLCMD="${PAGER}"        # use the default pager instead of `more`
+WORDCHARS=''                  # only alphanums make up words in word-based zle widgets
+ZLE_REMOVE_SUFFIX_CHARS=''    # don't eat space when typing '|' after a tab completion
 
-setopt ALWAYS_TO_END           # full completions move cursor to the end
-setopt AUTO_CD                 # `dirname` is equivalent to `cd dirname`
-setopt AUTO_PUSHD              # `cd` pushes directories to the directory stack
-setopt EXTENDED_GLOB           # (#qx) glob qualifier and more
-setopt GLOB_DOTS               # glob matches files starting with dot; `*` becomes `*(D)`
-setopt HIST_EXPIRE_DUPS_FIRST  # if history needs to be trimmed, evict dups first
-setopt HIST_IGNORE_DUPS        # don't add dups to history
-setopt HIST_IGNORE_SPACE       # don't add commands starting with space to history
-setopt HIST_REDUCE_BLANKS      # remove junk whitespace from commands before adding to history
-setopt HIST_VERIFY             # if a cmd triggers history expansion, show it instead of running
-setopt INTERACTIVE_COMMENTS    # allow comments in command line
-setopt MULTIOS                 # allow multiple redirections for the same fd
-setopt NO_BANG_HIST            # disable old history syntax
-setopt NO_BG_NICE              # don't nice background jobs; not useful and doesn't work on WSL
-setopt PUSHD_IGNORE_DUPS       # don’t push copies of the same directory onto the directory stack
-setopt PUSHD_MINUS             # `cd -3` now means "3 directory deeper in the stack"
-setopt SHARE_HISTORY           # write and import history on every command
-setopt EXTENDED_HISTORY        # write timestamps to history
+setopt ALWAYS_TO_END          # full completions move cursor to the end
+setopt AUTO_CD                # `dirname` is equivalent to `cd dirname`
+setopt AUTO_PUSHD             # `cd` pushes directories to the directory stack
+setopt EXTENDED_GLOB          # (#qx) glob qualifier and more
+setopt GLOB_DOTS              # glob matches files starting with dot; `*` becomes `*(D)`
+setopt HIST_EXPIRE_DUPS_FIRST # if history needs to be trimmed, evict dups first
+setopt HIST_IGNORE_DUPS       # don't add dups to history
+setopt HIST_IGNORE_SPACE      # don't add commands starting with space to history
+setopt HIST_REDUCE_BLANKS     # remove junk whitespace from commands before adding to history
+setopt HIST_VERIFY            # if a cmd triggers history expansion, show it instead of running
+setopt INTERACTIVE_COMMENTS   # allow comments in command line
+setopt MULTIOS                # allow multiple redirections for the same fd
+setopt NO_BANG_HIST           # disable old history syntax
+setopt NO_BG_NICE             # don't nice background jobs; not useful and doesn't work on WSL
+setopt PUSHD_IGNORE_DUPS      # don’t push copies of the same directory onto the directory stack
+setopt PUSHD_MINUS            # `cd -3` now means "3 directory deeper in the stack"
+setopt SHARE_HISTORY          # write and import history on every command
+setopt EXTENDED_HISTORY       # write timestamps to history
 
 # The following lines were added by compinstall
-zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-bindkey -e
-
-source '/usr/share/zsh/scripts/zplug/init.zsh'
-
-# Make sure to use double quotes
-zplug "zsh-users/zsh-history-substring-search"
-
-# Use the package as a command
-# And accept glob patterns (e.g., brace, wildcard, ...)
-zplug "Jxck/dotfiles", as:command, use:"bin/{histuniq,color}"
-
-# Can manage everything e.g., other person's zshrc
-zplug "tcnksm/docker-alias", use:zshrc
-
-# Disable updates using the "frozen" tag
-zplug "k4rthik/git-cal", as:command, frozen:1
-
-# Grab binaries from GitHub Releases
-# and rename with the "rename-to:" tag
-zplug "junegunn/fzf-bin", \
-    from:gh-r, \
-    as:command, \
-    rename-to:fzf, \
-    use:"*darwin*amd64*"
-
-# Supports oh-my-zsh plugins and the like
-zplug "plugins/git",   from:oh-my-zsh
-
-# Also prezto
-zplug "modules/prompt", from:prezto
-
-# Load if "if" tag returns true
-zplug "lib/clipboard", from:oh-my-zsh, if:"[[ $OSTYPE == *darwin* ]]"
-
-# Run a command after a plugin is installed/updated
-# Provided, it requires to set the variable like the following:
-# ZPLUG_SUDO_PASSWORD="********"
-zplug "jhawthorn/fzy", \
-    as:command, \
-    rename-to:fzy, \
-    hook-build:"make && sudo make install"
-
-# Supports checking out a specific branch/tag/commit
-zplug "b4b4r07/enhancd", at:v1
-zplug "mollifier/anyframe", at:4c23cb60
-
-# Can manage gist file just like other packages
-zplug "b4b4r07/79ee61f7c140c63d2786", \
-    from:gist, \
-    as:command, \
-    use:get_last_pane_path.sh
-
-# Support bitbucket
-zplug "b4b4r07/hello_bitbucket", \
-    from:bitbucket, \
-    as:command, \
-    use:"*.sh"
-
-# Rename a command with the string captured with `use` tag
-zplug "b4b4r07/httpstat", \
-    as:command, \
-    use:'(*).sh', \
-    rename-to:'$1'
-
-# Group dependencies
-# Load "emoji-cli" if "jq" is installed in this example
-zplug "stedolan/jq", \
-    from:gh-r, \
-    as:command, \
-    rename-to:jq
-zplug "b4b4r07/emoji-cli", \
-    on:"stedolan/jq"
-# Note: To specify the order in which packages should be loaded, use the defer
-#       tag described in the next section
-
-# Set the priority when loading
-# e.g., zsh-syntax-highlighting must be loaded
-# after executing compinit command and sourcing other plugins
-# (If the defer tag is given 2 or above, run after compinit command)
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
-
-# Can manage local plugins
-zplug "~/.zsh", from:local
-
-# Load theme file
-zplug 'dracula/zsh', as:theme
+# zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+# zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
+  printf "Install? [y/N]: "
+  if read -q; then
+    echo
+    zplug install
+  fi
 fi
 
 # Then, source plugins and add commands to $PATH
