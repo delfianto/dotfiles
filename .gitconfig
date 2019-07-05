@@ -1,5 +1,5 @@
 [include]
-    path = ~/.config/dotfiles/private/my.gitconfig
+    path = ~/.config/dotfiles/private/.gitconfig
 [core]
 	autocrlf = input
 [diff]
