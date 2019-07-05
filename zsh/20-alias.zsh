@@ -5,7 +5,7 @@ zsh_init_ls() {
   local ls_args='--color=auto'
 
   # Check which variant of ls that we use
-  case $(zsh_ls_type) in
+  case $(zsh_ls_name) in
   'gnu')
     ls_args="${ls_args} -hFX --group-directories-first"
     ;;

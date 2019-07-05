@@ -1,6 +1,6 @@
-# File 10-utils.zsh; common functions used by all shell script
+# File 10_utils.zsh; common functions used by all shell script
 # Most of the function I wrote will have 'zsh_' prefix on them
-# (just my personal prefs) to make it easier to identify in the shell.
+# (just my personal prefs) to make them easier to identify.
 
 # Up, the Plugin
 # Author: Peter Hurford
@@ -10,7 +10,7 @@
 up() {
   if [[ "$#" -ne 1 ]]; then
     cd ..
-  elif ! [[ "${1}" =~ '^[0-9]+$' ]]; then
+  elif ! [[ "${1}" =~ '^[0_9]+$' ]]; then
     echo "Error: up should be called with the number of directories to go up. The default is 1."
   else
     local d=""
@@ -32,7 +32,7 @@ zsh_emoji() {
   fi
 }
 
-zsh_ls_type() {
+zsh_ls_name() {
   if $(ls --color -d "${HOME}" >/dev/null 2>&1); then
     echo 'gnu'
   elif $(ls -G -d "${HOME}" >/dev/null 2>&1); then
@@ -42,7 +42,7 @@ zsh_ls_type() {
   fi
 }
 
-zsh_os_type() {
+zsh_os_name() {
   case "${OSTYPE}" in
   solaris*)
     echo 'Solaris'
@@ -93,7 +93,7 @@ zsh_is_not_empty() {
 }
 
 zsh_is_macos() {
-  [[ $(zsh_os_type) == 'macOS' ]]
+  [[ $(zsh_os_name) == 'macOS' ]]
 }
 
 zsh_is_homebrew() {
@@ -101,7 +101,7 @@ zsh_is_homebrew() {
 }
 
 zsh_is_linux() {
-  [[ $(zsh_os_type) == 'Linux' ]]
+  [[ $(zsh_os_name) == 'Linux' ]]
 }
 
 zsh_is_linux_arch() {

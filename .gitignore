@@ -1,2 +1,5 @@
 # ignore private config files
 /private/**
+
+# zsh history file
+.histfile

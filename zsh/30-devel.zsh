@@ -9,16 +9,20 @@ export DEV_PREFIX="${DEV_PREFIX-/usr/local}"
 export DEV_USE_HOME='true'
 
 zsh_dev_prefix() {
-  if [[ "${DEV_USE_HOME}" == 'true' ]] &&
-    echo "${LOCAL_HOME}" || echo "${DEV_PREFIX}"
+  local prefix=''
+
+  if [[ "${DEV_USE_HOME}" == 'true' ]]; then
+    prefix="${LOCAL_HOME}"
+  else
+    prefix="${DEV_PREFIX}"
+  fi
+
+  # Use readlink instead of realpath because the path may not be exists
+  # when we construct them (e.g. perl, sdkman, gradle cache dir, etc)
+  echo $(readlink -m "${prefix}/${1}")
 }
 
-# Initialize Google Cloud SDK toolkit
-zsh_init_gcloud() {
-
-}
-
-# Initialize NodeJS prefix path
+# Initialize nodejs prefix path
 zsh_init_node() {
   if $(zsh_has_cmd node); then
     alias nls='npm ls --depth=0'
@@ -26,24 +30,23 @@ zsh_init_node() {
   fi
 }
 
-# Initialize Ruby gem location
+# Initialize ruby gem location
 zsh_init_ruby() {
   if $(zsh_has_cmd ruby); then
-    local full_ver="$(ruby -e 'print RUBY_VERSION')"
-
     # Replace minor rev with zero
+    local full_ver="$(ruby -e 'print RUBY_VERSION')"
     local ruby_ver="${full_ver%?}0"
 
-    export GEM_HOME="$(zsh_dev_prefix)/ruby/${ruby_ver}"
+    export GEM_HOME="$(zsh_dev_prefix ruby/${ruby_ver})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
     export GEM_PATH="${GEM_HOME}:/usr/lib/ruby/gem/${ruby_ver}"
   fi
 }
 
-# Initialize Perl lib directory
+# Initialize perl lib directory
 zsh_init_perl5() {
   if $(zsh_has_cmd perl); then
-    local base="$(zsh_dev_prefix)/lib/perl5"
+    local base="$(zsh_dev_prefix lib/perl5)"
 
     if $(zsh_is_readable "${base}"); then
       export PATH="${base}/bin${PATH:+:${PATH}}"
@@ -55,6 +58,7 @@ zsh_init_perl5() {
   fi
 }
 
+# Initialize python env and aliases
 zsh_init_python() {
   if $(zsh_has_cmd python); then
     alias py='python'
@@ -67,10 +71,12 @@ zsh_init_python() {
     export PYTHONUSERBASE="$(zsh_dev_prefix)"
 
     jsoncat() {
-      if $(file_not_empty "${1}"); then
+      if $(zsh_is_not_empty "${1}"); then
         cat "${1}" | pyjson
+      else
+        echo 'File is empty.'
       fi
-    }    
+    }
   fi
 
   # Used by chromium build script
@@ -79,16 +85,39 @@ zsh_init_python() {
   fi
 }
 
-# Initialize SDK Manager (JVM devtools)
+# Initialize google cloud sdk toolkit
+zsh_init_gcloud() {
+  export GCLOUD_SDK_DIR="$(zsh_dev_prefix lib/google-cloud-sdk)"
+
+  if $(zsh_is_readable "${GCLOUD_SDK_DIR}"); then
+    local shell=$(basename "${0}")
+    zsh_source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
+    zsh_source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
+
+    alias gcs="gcloud"
+    alias gcb="gcs beta"
+    alias gcm="gcs components"
+    alias gsp="cloud_sql_proxy"
+  fi
+}
+
+# Initialize sdk manager
 zsh_init_sdkman() {
-  local sdk_dir="${DEV_PREFIX}/lib/sdkman"
+  export SDKMAN_DIR="$(zsh_dev_prefix lib/sdkman)"
   local init_script="${sdk_dir}/bin/sdkman-init.sh"
 
-  if $(zsh_is_file "${init_script}"); then
-    export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
-    export GRADLE_USER_HOME="${LOCAL_HOME}/share/gradle"
+  case "${1}" in
+    'install')
+      curl -s "https://get.sdkman.io" | zsh
+    ;;
+    *)
+      if $(zsh_is_file "${init_script}"); then
+        export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
+        export GRADLE_USER_HOME="${LOCAL_HOME}/share/gradle"
 
-    mkdir -p "${SDKMAN_DIR}/ext"
-    source "${init_script}"
-  fi
+        mkdir -p "${SDKMAN_DIR}/ext"
+        source "${init_script}"
+      fi
+    ;;
+  esac
 }

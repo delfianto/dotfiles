@@ -7,8 +7,9 @@ export ZDOTDIR="${ZDOTDIR-"${HOME}/.config/dotfiles"}"
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
 export HISTIGNORE="&:history*:rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
-export HISTCONTROL='ignoreboth:erasedups'
-export PROMPT_COMMAND="history -n; history -w; history -c; history -r; ${PROMPT_COMMAND}"
+export HISTFILE="${ZDOTDIR}/.histfile"
+export HISTSIZE=1000
+export SAVEHIST=1000
 
 export EDITOR='/usr/bin/nano'
 export PAGER='less'
