@@ -89,7 +89,7 @@ zsh_is_writeable() {
 }
 
 zsh_is_not_empty() {
-  is_file "${1}" && [[ -s "${1}" ]]
+  zsh_is_file "${1}" && [[ -s "${1}" ]]
 }
 
 zsh_is_macos() {

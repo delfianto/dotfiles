@@ -63,6 +63,13 @@ zsh_init_python() {
   if $(zsh_has_cmd python2); then
     export PNACLPYTHON="$(command -v python2)"
   fi
+
+  # Pretty print json file
+  jsoncat() {
+    if $(foo "${1}"); then
+      cat "${1}" | pyjson
+    fi
+  }
 }
 
 # Initialize SDK Manager (JVM devtools)

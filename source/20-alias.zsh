@@ -2,35 +2,35 @@
 # Functions and aliases used by all operating systems
 
 zsh_init_ls() {
-  # check what kind of ls that we use
-  local ls_type=$(zsh_ls_type)
+  local ls_args='--color=auto'
 
-  if [[ "${ls_type}" == 'gnu' ]]; then
-    # gnu ls
-    local ls_args='-hFX --group-directories-first'
-  elif [[ "${ls_type}" == "bsd" ]]; then
-    # bsd ls
-    ls_args='-hFG'
-  else
-    # solaris ls
-    ls_args=''
-  fi
+  # Check which variant of ls that we use
+  case $(zsh_ls_type) in
+    'gnu')
+      ls_args="${ls_args} -hFX --group-directories-first"
+    ;;
+    'bsd')
+      ls_args='${ls_args} -hFG'
+    ;;
+    *)
+      ls_args=''
+    ;;
+  esac
 
-  # improved ls outout
   alias ls="ls ${ls_args}"
   alias ll="ls ${ls_args} -l"
   alias la="ls ${ls_args} -a"
 }
 
-# initialize ls alias based on os
+# Add ls args based on os
 zsh_init_ls
 
-# shell command alias
+# Shell command alias
 alias c="clear && printf '\e[3J'"
 alias cls='c'
 alias which='command -v'
 
-# disk usage in human readable format
+# Disk usage in human readable format
 alias du='du -h'
 alias ds='du -s'
 alias df='df -h'
@@ -43,27 +43,30 @@ cdf() {
   )
 }
 
-# make some of the file manipulation programs verbose
+# Make some of the file manipulation programs verbose
 alias mv='mv -v'
 alias cp='cp -v'
 
-# use safe-rm if present
+# Use safe-rm if present
 if $(zsh_has_cmd 'safe-rm'); then
   alias rf='safe-rm'
 fi
 
-# colorize the grep command output for ease of use (good for log files)
+# Colorize the grep command output;
+# Good for your eyes when reading long log files
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
-# enable aliases to be sudo’ed
+# Allow aliases to be sudo’ed
 alias sudo='sudo '
 
-# reloads the current shell
+# Reloads the current shell
 alias reload='exec zsh -l'
 
-# aliases for compression utility
+# Aliases for parallel version of compression utility
+# Some of this apperently broke package manager in Manjaro
+#
 # $(zsh_has_cmd 'pbzip2') && alias bzip2='pbzip2'
 # $(zsh_has_cmd 'pigz') && alias gzip='pigz'
 # $(zsh_has_cmd 'pixz') && alias xz='pixz'
