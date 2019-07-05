@@ -6,14 +6,14 @@ zsh_init_ls() {
 
   # Check which variant of ls that we use
   case $(zsh_ls_type) in
-    'gnu')
-      ls_args="${ls_args} -hFX --group-directories-first"
+  'gnu')
+    ls_args="${ls_args} -hFX --group-directories-first"
     ;;
-    'bsd')
-      ls_args='${ls_args} -hFG'
+  'bsd')
+    ls_args='${ls_args} -hFG'
     ;;
-    *)
-      ls_args=''
+  *)
+    ls_args=''
     ;;
   esac
 
@@ -71,33 +71,9 @@ alias reload='exec zsh -l'
 # $(zsh_has_cmd 'pigz') && alias gzip='pigz'
 # $(zsh_has_cmd 'pixz') && alias xz='pixz'
 
-# npm command alias
-if $(zsh_has_cmd 'npm'); then
-  alias nls='npm ls --depth=0'
-fi
-
 # database command alias
 if $(zsh_has_cmd 'mysql'); then
   alias sql="mysql -u root -p"
-fi
-
-# python command aliases
-if $(zsh_has_cmd 'python3'); then
-  export PIP_CONFIG_FILE="${conf_dir}/pip.conf"
-
-  alias py='python3'
-  alias pyhttp='python3 -m http.server' # starts a python lightweight http server
-  alias pyjson='python3 -m json.tool'   # pipe to this alias to format json with python
-
-  alias pyinst='pip3 install'
-  alias pyupgd='pip3 install --upgrade'
-  alias pytool='pip3 install --upgrade pip setuptools wheel'
-
-  jsoncat() {
-    if $(file_not_empty "${1}"); then
-      cat "${1}" | pyjson
-    fi
-  }
 fi
 
 # add .local/bin to PATH

@@ -21,6 +21,7 @@ zsh_init_gcloud() {
 # Initialize NodeJS prefix path
 zsh_init_node() {
   if $(zsh_has_cmd node); then
+    alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(zsh_dev_prefix)"
   fi
 }
@@ -56,20 +57,26 @@ zsh_init_perl5() {
 
 zsh_init_python() {
   if $(zsh_has_cmd python); then
+    alias py='python'
+    alias pyinst='pip install'
+    alias pyupgd='pip install --upgrade'
+    alias pytool='pip install --upgrade pip setuptools wheel'
+    alias pyhttp='python -m http.server' # starts a python lightweight http server
+    alias pyjson='python -m json.tool'   # pipe to this alias to format json with python
+
     export PYTHONUSERBASE="$(zsh_dev_prefix)"
+
+    jsoncat() {
+      if $(file_not_empty "${1}"); then
+        cat "${1}" | pyjson
+      fi
+    }    
   fi
 
   # Used by chromium build script
   if $(zsh_has_cmd python2); then
     export PNACLPYTHON="$(command -v python2)"
   fi
-
-  # Pretty print json file
-  jsoncat() {
-    if $(foo "${1}"); then
-      cat "${1}" | pyjson
-    fi
-  }
 }
 
 # Initialize SDK Manager (JVM devtools)
