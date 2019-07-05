@@ -6,3 +6,6 @@
 
 # zsh history file
 .histfile
+
+# completion cache
+.zcompdump

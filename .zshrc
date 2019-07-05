@@ -61,14 +61,16 @@ setopt EXTENDED_HISTORY       # write timestamps to history
 # zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 # zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-# Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
-  printf "Install? [y/N]: "
-  if read -q; then
-    echo
-    zplug install
+if $(zsh_has_cmd zplug); then
+  # Install plugins if there are plugins that have not been installed
+  if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+      echo
+      zplug install
+    fi
   fi
-fi
 
-# Then, source plugins and add commands to $PATH
-zplug load --verbose
+  # Then, source plugins and add commands to $PATH
+  zplug load --verbose
+fi
