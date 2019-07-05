@@ -1,8 +1,9 @@
 # File .zshenv; zsh environment config
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
-# Set zsh dotfile location
+# Set zsh dotfile location and zplug home
 export ZDOTDIR="${ZDOTDIR-"${HOME}/.config/dotfiles"}"
+export ZPLUG_HOME="${ZDOTDIR}/zplug"
 
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
