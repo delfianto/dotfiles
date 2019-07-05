@@ -1,10 +1,17 @@
-# zsh environment file; based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
+# File .zshenv; zsh environment config
+# Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
-# set zsh dotfile location
-export ZDOTDIR=${ZDOTDIR-$HOME/.config/dotfiles}
+# Set zsh dotfile location
+export ZDOTDIR="${ZDOTDIR-"${HOME}/.config/dotfiles"}"
 
-export EDITOR=/usr/bin/nano
-export PAGER=less
+# Don't keep duplicates and ignore specific sets of command from history
+# https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
+export HISTIGNORE="&:history*:rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
+export HISTCONTROL='ignoreboth:erasedups'
+export PROMPT_COMMAND="history -n; history -w; history -c; history -r; ${PROMPT_COMMAND}"
+
+export EDITOR='/usr/bin/nano'
+export PAGER='less'
 
 # This affects every invocation of `less`.
 #
@@ -14,10 +21,10 @@ export PAGER=less
 #   -X   keep content on screen after exit
 #   -M   show more info at the bottom prompt line
 #   -x4  tabs are 4 instead of 8
-export LESS=-iRFXMx4
+export LESS='-iRFXMx4'
 
 if (( $#commands[(i)lesspipe(|.sh)] )); then
-  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
+  export LESSOPEN="| /usr/bin/env ${commands}[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
-eval $(dircolors -b)
+# eval $(dircolors -b)
