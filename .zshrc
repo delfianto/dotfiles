@@ -64,9 +64,15 @@ setopt EXTENDED_HISTORY       # write timestamps to history
 # zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 # zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
+# Zplug plugins initialization
 if $(fn.has-cmd zplug); then
-  # Zplug plugins initialization
-  zplug "romkatv/powerlevel10k", use:"powerlevel10k.zsh-theme"
+  # powerlevel10k
+  zplug 'romkatv/powerlevel10k', use:powerlevel10k.zsh-theme
+
+  # oh-my-zsh plugins
+  zplug 'plugins/sudo', from:oh-my-zsh, ignore:oh-my-zsh.sh, if:"(($+commands[sudo]))"
+  zplug 'plugins/systemd', from:oh-my-zsh, ignore:oh-my-zsh.sh, if:"(($+commands[systemctl]))"
+  # zplug 'plugins/ssh-agent', from:oh-my-zsh, ignore:oh-my-zsh.sh, if:"[[ $OSTYPE != darwin* ]]"
 
   # Install plugins if there are plugins that have not been installed
   if ! zplug check --verbose; then

@@ -2,6 +2,7 @@
 # Also applicable to most other Arch-based Linux distro
 
 # Set git credentials helper
+export SSH_ASKPASS="$(which ksshaskpass)"
 export GIT_ASKPASS="${SSH_ASKPASS}"
 
 if [[ $(fn.os-like) == 'arch' ]]; then
