@@ -8,7 +8,7 @@ export LOCAL_HOME="${HOME}/.local"
 export DEV_PREFIX="${DEV_PREFIX-/usr/local}"
 export DEV_USE_HOME='true'
 
-zsh_dev_prefix() {
+fn.dev-prefix() {
   local prefix=''
 
   if [[ "${DEV_USE_HOME}" == 'true' ]]; then
@@ -23,32 +23,32 @@ zsh_dev_prefix() {
 }
 
 # Initialize nodejs prefix path
-zsh_init_node() {
-  if $(zsh_has_cmd node); then
+fn.setup-node() {
+  if $(fn.has-cmd node); then
     alias nls='npm ls --depth=0'
-    export NPM_CONFIG_PREFIX="$(zsh_dev_prefix)"
+    export NPM_CONFIG_PREFIX="$(fn.dev-prefix)"
   fi
 }
 
 # Initialize ruby gem location
-zsh_init_ruby() {
-  if $(zsh_has_cmd ruby); then
+fn.setup-ruby() {
+  if $(fn.has-cmd ruby); then
     # Replace minor rev with zero
     local full_ver="$(ruby -e 'print RUBY_VERSION')"
     local ruby_ver="${full_ver%?}0"
 
-    export GEM_HOME="$(zsh_dev_prefix ruby/${ruby_ver})"
+    export GEM_HOME="$(fn.dev-prefix ruby/${ruby_ver})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
     export GEM_PATH="${GEM_HOME}:/usr/lib/ruby/gem/${ruby_ver}"
   fi
 }
 
 # Initialize perl lib directory
-zsh_init_perl5() {
-  if $(zsh_has_cmd perl); then
-    local base="$(zsh_dev_prefix lib/perl5)"
+fn.setup-perl5() {
+  if $(fn.has-cmd perl); then
+    local base="$(fn.dev-prefix lib/perl5)"
 
-    if $(zsh_is_readable "${base}"); then
+    if $(fn.is-readable "${base}"); then
       export PATH="${base}/bin${PATH:+:${PATH}}"
       export PERL5LIB="${base}${PERL5LIB:+:${PERL5LIB}}"
       export PERL_LOCAL_LIB_ROOT="${base}${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"
@@ -59,8 +59,8 @@ zsh_init_perl5() {
 }
 
 # Initialize python env and aliases
-zsh_init_python() {
-  if $(zsh_has_cmd python); then
+fn.setup-python() {
+  if $(fn.has-cmd python); then
     alias py='python'
     alias pyinst='pip install'
     alias pyupgd='pip install --upgrade'
@@ -68,10 +68,10 @@ zsh_init_python() {
     alias pyhttp='python -m http.server' # starts a python lightweight http server
     alias pyjson='python -m json.tool'   # pipe to this alias to format json with python
 
-    export PYTHONUSERBASE="$(zsh_dev_prefix)"
+    export PYTHONUSERBASE="$(fn.dev-prefix)"
 
     jsoncat() {
-      if $(zsh_is_not_empty "${1}"); then
+      if $(fn.is-not-empty "${1}"); then
         cat "${1}" | pyjson
       else
         echo 'File is empty.'
@@ -80,19 +80,19 @@ zsh_init_python() {
   fi
 
   # Used by chromium build script
-  if $(zsh_has_cmd python2); then
+  if $(fn.has-cmd python2); then
     export PNACLPYTHON="$(command -v python2)"
   fi
 }
 
 # Initialize google cloud sdk toolkit
-zsh_init_gcloud() {
-  export GCLOUD_SDK_DIR="$(zsh_dev_prefix lib/google-cloud-sdk)"
+fn.setup-gcloud() {
+  export GCLOUD_SDK_DIR="$(fn.dev-prefix lib/google-cloud-sdk)"
 
-  if $(zsh_is_readable "${GCLOUD_SDK_DIR}"); then
+  if $(fn.is-readable "${GCLOUD_SDK_DIR}"); then
     local shell=$(basename "${0}")
-    zsh_source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
-    zsh_source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
+    fn.source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
+    fn.source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
 
     alias gcs="gcloud"
     alias gcb="gcs beta"
@@ -102,21 +102,21 @@ zsh_init_gcloud() {
 }
 
 # Initialize sdk manager
-zsh_init_sdkman() {
-  export SDKMAN_DIR="$(zsh_dev_prefix lib/sdkman)"
-  local init_script="${sdk_dir}/bin/sdkman-init.sh"
+fn.setup-sdkman() {
+  export SDKMAN_DIR="$(fn.dev-prefix lib/sdkman)"
+  local init-script="${sdk_dir}/bin/sdkman-init.sh"
 
   case "${1}" in
     'install')
       curl -s "https://get.sdkman.io" | zsh
     ;;
     *)
-      if $(zsh_is_file "${init_script}"); then
+      if $(fn.is-file "${init-script}"); then
         export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
         export GRADLE_USER_HOME="${LOCAL_HOME}/share/gradle"
 
         mkdir -p "${SDKMAN_DIR}/ext"
-        source "${init_script}"
+        source "${init-script}"
       fi
     ;;
   esac

@@ -1,11 +1,13 @@
 # File 20-alias.zsh; common alias initialization
+#
 # Functions and aliases used by all operating systems
 
-zsh_init_ls() {
+# Add ls args based on os
+_fn.set-ls-args() {
   local ls_args='--color=auto'
 
   # Check which variant of ls that we use
-  case $(zsh_ls_name) in
+  case $(fn.ls-type) in
   'gnu')
     ls_args="${ls_args} -hFX --group-directories-first"
     ;;
@@ -20,10 +22,7 @@ zsh_init_ls() {
   alias ls="ls ${ls_args}"
   alias ll="ls ${ls_args} -l"
   alias la="ls ${ls_args} -a"
-}
-
-# Add ls args based on os
-zsh_init_ls
+}; _fn.set-ls-args
 
 # Shell command alias
 alias c="clear && printf '\e[3J'"
@@ -48,7 +47,7 @@ alias mv='mv -v'
 alias cp='cp -v'
 
 # Use safe-rm if present
-if $(zsh_has_cmd 'safe-rm'); then
+if $(fn.has-cmd 'safe-rm'); then
   alias rf='safe-rm'
 fi
 
@@ -67,12 +66,12 @@ alias reload='exec zsh -l'
 # Aliases for parallel version of compression utility
 # Some of this apperently broke package manager in Manjaro
 #
-# $(zsh_has_cmd 'pbzip2') && alias bzip2='pbzip2'
-# $(zsh_has_cmd 'pigz') && alias gzip='pigz'
-# $(zsh_has_cmd 'pixz') && alias xz='pixz'
+# $(fn.has-cmd 'pbzip2') && alias bzip2='pbzip2'
+# $(fn.has-cmd 'pigz') && alias gzip='pigz'
+# $(fn.has-cmd 'pixz') && alias xz='pixz'
 
 # database command alias
-if $(zsh_has_cmd 'mysql'); then
+if $(fn.has-cmd 'mysql'); then
   alias sql="mysql -u root -p"
 fi
 

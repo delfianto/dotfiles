@@ -1,6 +1,7 @@
 # File 10_utils.zsh; common functions used by all shell script
-# Most of the function I wrote will have 'zsh_' prefix on them
-# (just my personal prefs) to make them easier to identify.
+#
+# Most of the function I wrote will have 'fn.' prefix on them
+# (just my personal perference) to make them easier to identify.
 
 # Up, the Plugin
 # Author: Peter Hurford
@@ -10,11 +11,11 @@
 up() {
   if [[ "$#" -ne 1 ]]; then
     cd ..
-  elif ! [[ "${1}" =~ '^[0_9]+$' ]]; then
+  elif ! [[ "$1" =~ '^[0_9]+$' ]]; then
     echo "Error: up should be called with the number of directories to go up. The default is 1."
   else
     local d=""
-    limit="${1}"
+    limit="$1"
     for ((i=1 ; i <= limit ; i++))
       do
         d="${d}/.."
@@ -24,15 +25,15 @@ up() {
   fi
 }
 
-zsh_emoji() {
-  if [[ "${?}" == 0 ]]; then
+fn.emoji() {
+  if [[ "$?" == 0 ]]; then
     echo '🍄'
   else
     echo '💀'
   fi
 }
 
-zsh_ls_name() {
+fn.ls-type() {
   if $(ls --color -d "${HOME}" >/dev/null 2>&1); then
     echo 'gnu'
   elif $(ls -G -d "${HOME}" >/dev/null 2>&1); then
@@ -42,89 +43,82 @@ zsh_ls_name() {
   fi
 }
 
-zsh_os_name() {
+fn.os-name() {
   case "${OSTYPE}" in
-  solaris*)
-    echo 'Solaris'
-    ;;
-  darwin*)
-    echo 'macOS'
-    ;;
-  linux*)
-    echo 'Linux'
-    ;;
-  bsd*)
-    echo 'BSD'
-    ;;
-  *)
-    echo "Unknown: ${OSTYPE}"
-    ;;
+    bsd*)
+      echo 'bsd'
+      ;;
+    darwin*)
+      echo 'macos'
+      ;;
+    linux*)
+      echo 'linux'
+      ;;
+    solaris*)
+      echo 'solaris'
+      ;;
+    *)
+      echo "Unknown: ${OSTYPE}"
+      ;;
   esac
 }
 
-zsh_has_cmd() {
-  command -v "${1}" &>/dev/null
-  [[ ${?} == '0' ]]
+fn.os-like() {
+  [[ $(fn.os-name) != 'linux' ]] && echo $(fn.os-name) ||
+  echo $(grep 'ID_LIKE=*' /etc/os-release | cut -f2- -d=)
 }
 
-zsh_has_env() {
+fn.has-cmd() {
+  command -v "$1" &>/dev/null
+  [[ "$?" == '0' ]]
+}
+
+fn.has-env() {
   env_check "${1}" &>/dev/null
-  [[ ${?} == '0' ]]
+  [[ "$?" == '0' ]]
 }
 
-zsh_is_dir() {
-  [[ -d "${1}" ]]
+fn.is-dir() {
+  [[ -d "$1" ]]
 }
 
-zsh_is_file() {
-  [[ -f "${1}" ]]
+fn.is-file() {
+  [[ -f "$1" ]]
 }
 
-zsh_is_readable() {
-  [[ -r "${1}" ]]
+fn.is-readable() {
+  [[ -r "$1" ]]
 }
 
-zsh_is_writeable() {
-  [[ -w "${1}" ]]
+fn.is-writeable() {
+  [[ -w "$1" ]]
 }
 
-zsh_is_not_empty() {
-  zsh_is_file "${1}" && [[ -s "${1}" ]]
+fn.is-not-empty() {
+  fn.is-file "$1" && [[ -s "$1" ]]
 }
 
-zsh_is_macos() {
-  [[ $(zsh_os_name) == 'macOS' ]]
+fn.is-macos() {
+  [[ $(fn.os-name) == 'macos' ]]
 }
 
-zsh_is_homebrew() {
-  zsh_is_macos && zsh_is_file '/usr/local/bin/brew'
+fn.is-linux() {
+  [[ $(fn.os-name) == 'linux' ]]
 }
 
-zsh_is_linux() {
-  [[ $(zsh_os_name) == 'Linux' ]]
+fn.list-fun() {
+  print -l ${(ok)functions}
 }
 
-zsh_is_linux_arch() {
-  zsh_is_linux && zsh_has_cmd 'pacman'
-}
-
-zsh_is_linux_rhel() {
-  zsh_is_linux && zsh_has_cmd 'dnf'
-}
-
-zsh_is_linux_debian() {
-  zsh_is_linux && zsh_has_cmd 'apt'
-}
-
-zsh_env() {
-  if [[ -z "${1}" ]]; then
+fn.list-env() {
+  if [[ -z "$1" ]]; then
     printenv
   else
-    printenv | grep --color=auto "${1}.*="
+    printenv | grep --color=auto "$1.*="
   fi
 }
 
-zsh_path() {
+fn.list-path() {
   local paths=(${(@s/:/)PATH})
 
   for entry in ${paths}; do
@@ -132,8 +126,8 @@ zsh_path() {
   done
 }
 
-zsh_path_add() {
-  if $(zsh_is_dir "${1}") && $(zsh_is_readable "${1}"); then
+fn.path_add() {
+  if $(fn.is-dir "$1") && $(fn.is-readable "$1"); then
     case ":$PATH:" in
       *":${1}:"*) : ;; # already there
       *) PATH="${1}:${PATH}" ;; # or PATH="$PATH:$1"

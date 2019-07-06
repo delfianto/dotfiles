@@ -4,10 +4,10 @@
 # Set git credentials helper
 export GIT_ASKPASS="${SSH_ASKPASS}"
 
-if $(zsh_is_linux_arch); then
+if [[ $(fn.os-like) == 'arch' ]]; then
   # Initialize zplug
-  zsh_source '/usr/share/zsh/scripts/zplug/init.zsh'
+  fn.source '/usr/share/zsh/scripts/zplug/init.zsh'
 
   # Import LS_Colors definition
-  zsh_source '/usr/share/LS_COLORS/dircolors.sh'
+  fn.source '/usr/share/LS_COLORS/dircolors.sh'
 fi

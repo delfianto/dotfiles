@@ -1,28 +1,31 @@
 # File .zshrc; zsh initialization script
+#
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshrc
 
 # Helper functions for sourcing file
-zsh_source() {
+fn.source() {
   [[ -f "${1}" ]] && source "${1}" || echo "Cannot source: ${1}"
 }
 
-zsh_import() {
+_fn.import() {
   cd "${ZDOTDIR}/source"
 
   for file in $(ls *.zsh); do
-    source "${file}"
-  done
+    local prefix=$(echo "${prefix}" | cut -f1 -d-)
 
-  cd
+    # 99- prefix is reserved for os specific script and will be imported last.
+    # Refer to the fn.os-name function to get the possible os name.
+    if (( prefix < 99 )); then
+      source "${file}"
+    fi
+  done; cd
 }
 
 # Load os specific file and other zsh scripts
-zsh_import; uname=$(perl -e "print lc('$(uname)');")
-zsh_source "${ZDOTDIR}/source/${uname}.zshrc"
-unset uname
-
-# Zplug plugins initialization
-# zplug "romkatv/powerlevel10k", use:"powerlevel10k.zsh-theme"
+# Order of imports will be sequential accorting to prefix number
+# of *.zsh files in /source directory and finally os-specific file
+# (with prefix number 99)
+_fn.import; fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
 
 autoload -Uz compinit
 compinit # Initialize zsh auto complete
@@ -61,7 +64,10 @@ setopt EXTENDED_HISTORY       # write timestamps to history
 # zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 # zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-if $(zsh_has_cmd zplug); then
+if $(fn.has-cmd zplug); then
+  # Zplug plugins initialization
+  zplug "romkatv/powerlevel10k", use:"powerlevel10k.zsh-theme"
+
   # Install plugins if there are plugins that have not been installed
   if ! zplug check --verbose; then
     printf "Install? [y/N]: "
@@ -74,3 +80,8 @@ if $(zsh_has_cmd zplug); then
   # Then, source plugins and add commands to $PATH
   zplug load --verbose
 fi
+
+# Cleanup any declared private functions (prefixed with _)
+for fn in $(fn.list-fun | grep _fn); do
+  unset -f "${fn}"
+done
