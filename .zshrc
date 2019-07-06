@@ -11,21 +11,26 @@ _fn.import() {
   cd "${ZDOTDIR}/source"
 
   for file in $(ls *.zsh); do
-    local prefix=$(echo "${prefix}" | cut -f1 -d-)
+    local prefix=$(echo "${file}" | cut -f1 -d-)
 
     # 99- prefix is reserved for os specific script and will be imported last.
     # Refer to the fn.os-name function to get the possible os name.
-    if (( prefix < 99 )); then
+    if ((prefix < 99)); then
       source "${file}"
     fi
-  done; cd
+  done
+  cd
 }
 
 # Load os specific file and other zsh scripts
 # Order of imports will be sequential accorting to prefix number
 # of *.zsh files in /source directory and finally os-specific file
 # (with prefix number 99)
-_fn.import; fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
+_fn.import && fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
+
+if [[ $(fn.os-name) == 'linux' ]]; then
+  fn.source "${ZDOTDIR}/source/99-$(fn.os-like).zsh"
+fi
 
 autoload -Uz compinit
 compinit # Initialize zsh auto complete
