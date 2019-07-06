@@ -3,16 +3,19 @@
 # Linux users might want to check the permission of their '/usr/local' path and chown
 # it as needed, or if you're not so confident in doing this then set the DEV_PREFIX
 # to set the directory where you would like to store your devtools (libs, sdks, etc).
+#
+# Another option is to set the value of DEV_USE_LOCAL to 'true' which will use
+# $HOME/.local as the prefix for your development tools.
 
-export LOCAL_HOME="${HOME}/.local"
-export DEV_PREFIX="${DEV_PREFIX-/usr/local}"
-export DEV_USE_HOME='true'
+export DEV_LOCAL="${HOME}/.local"
+export DEV_PREFIX="${DEVTOOLS_PREFIX-/usr/local}"
+export DEV_USE_LOCAL="${DEV_USE_LOCAL:-'false'}"
 
 fn.dev-prefix() {
   local prefix=''
 
-  if [[ "${DEV_USE_HOME}" == 'true' ]]; then
-    prefix="${LOCAL_HOME}"
+  if [[ "${DEV_USE_LOCAL}" == 'true' ]]; then
+    prefix="${DEV_LOCAL}"
   else
     prefix="${DEV_PREFIX}"
   fi
@@ -37,14 +40,16 @@ fn.setup-ruby() {
     local full_ver="$(ruby -e 'print RUBY_VERSION')"
     local ruby_ver="${full_ver%?}0"
 
-    export GEM_HOME="$(fn.dev-prefix ruby/${ruby_ver})"
+    export GEM_HOME="$(fn.dev-prefix lib/ruby/${ruby_ver})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
     export GEM_PATH="${GEM_HOME}:/usr/lib/ruby/gem/${ruby_ver}"
+
+    fn.path-add "${GEM_HOME}/bin"
   fi
 }
 
 # Initialize perl lib directory
-fn.setup-perl5() {
+fn.setup-perl() {
   if $(fn.has-cmd perl); then
     local base="$(fn.dev-prefix lib/perl5)"
 
@@ -104,20 +109,31 @@ fn.setup-gcloud() {
 # Initialize sdk manager
 fn.setup-sdkman() {
   export SDKMAN_DIR="$(fn.dev-prefix lib/sdkman)"
-  local init-script="${sdk_dir}/bin/sdkman-init.sh"
+  local init_script="${SDKMAN_DIR}/bin/sdkman-init.sh"
 
   case "${1}" in
-    'install')
-      curl -s "https://get.sdkman.io" | zsh
+  'install')
+    curl -s "https://get.sdkman.io" | zsh
     ;;
-    *)
-      if $(fn.is-file "${init-script}"); then
-        export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
-        export GRADLE_USER_HOME="${LOCAL_HOME}/share/gradle"
+  *)
+    if $(fn.is-readable "${init_script}"); then
+      export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
+      export GRADLE_USER_HOME="${LOCAL_HOME}/share/gradle"
 
-        mkdir -p "${SDKMAN_DIR}/ext"
-        source "${init-script}"
-      fi
+      mkdir -p "${SDKMAN_DIR}/ext"
+      source "${init_script}"
+    fi
     ;;
   esac
 }
+
+fn.setup-dev() {
+  fn.setup-ruby
+  fn.setup-node
+  fn.setup-perl
+  fn.setup-python
+  fn.setup-gcloud
+  fn.setup-sdkman
+}
+
+fn.setup-dev

@@ -141,7 +141,7 @@ fn.list-path() {
   done
 }
 
-fn.path_add() {
+fn.path-add() {
   if $(fn.is-dir "$1") && $(fn.is-readable "$1"); then
     case ":$PATH:" in
       *":${1}:"*) : ;; # already there
