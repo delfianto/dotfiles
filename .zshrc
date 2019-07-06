@@ -84,7 +84,7 @@ if $(fn.has-cmd zplug); then
   fi
 
   # Then, source plugins and add commands to $PATH
-  zplug load --verbose
+  zplug load
 fi
 
 # Cleanup any declared private functions (prefixed with _)
