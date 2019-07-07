@@ -6,6 +6,7 @@ export ZSH_TRACE='false'
 # Set zsh dotfile location and zplug home
 export ZDOTDIR="${ZDOTDIR-"${HOME}/.config/dotfiles"}"
 export ZPLUG_HOME="${ZDOTDIR}/zplug"
+export ZPLUG_LOADFILE="${ZPLUG_HOME}/packages.zsh"
 
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
