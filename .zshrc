@@ -2,6 +2,19 @@
 #
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshrc
 
+# Start zsh profiling (if enabled)
+if [[ "${ZSH_TRACE}" == 'true' ]]; then
+  zmodload zsh/datetime
+  setopt PROMPT_SUBST
+  PS4='+$EPOCHREALTIME %N:%i> '
+
+  logfile=$(mktemp zsh_profile.XXXXXXXX)
+  echo "Logging to $logfile"
+  exec 3>&2 2>$logfile
+
+  setopt XTRACE
+fi
+
 # Helper functions for sourcing file
 fn.source() {
   [[ -f "${1}" ]] && source "${1}" || echo "Cannot source: ${1}"
@@ -26,7 +39,7 @@ _fn.import() {
 # Order of imports will be sequential accorting to prefix number
 # of *.zsh files in /source directory and finally os-specific file
 # (with prefix number 99)
-_fn.import && fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
+_fn.import; fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
 
 if [[ $(fn.os-name) == 'linux' ]]; then
   fn.source "${ZDOTDIR}/source/99-$(fn.os-like).zsh"
@@ -93,6 +106,12 @@ if $(fn.has-cmd zplug); then
 fi
 
 # Cleanup any declared private functions (prefixed with _)
-for fn in $(fn.list-fun | grep _fn); do
-  unset -f "${fn}"
-done
+# for fn in $(fn.list-fun | grep _fn); do
+#   unset -f "${fn}"
+# done
+
+# Stop zsh profiling (if enabled)
+if [[ "${ZSH_TRACE}" == 'true' ]]; then
+  unsetopt XTRACE
+  exec 2>&3 3>&-
+fi
