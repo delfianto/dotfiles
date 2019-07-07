@@ -27,7 +27,7 @@ fn.dev-prefix() {
 
 # Initialize nodejs prefix path
 fn.setup-node() {
-  if $(fn.has-cmd node); then
+  if (( $+commands[node] )); then
     alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(fn.dev-prefix)"
   fi
@@ -35,7 +35,7 @@ fn.setup-node() {
 
 # Initialize ruby gem location
 fn.setup-ruby() {
-  if $(fn.has-cmd ruby); then
+  if (( $+commands[ruby] )); then
     # Replace minor rev with zero
     local full_ver="$(ruby -e 'print RUBY_VERSION')"
     local ruby_ver="${full_ver%?}0"
@@ -50,7 +50,7 @@ fn.setup-ruby() {
 
 # Initialize perl lib directory
 fn.setup-perl() {
-  if $(fn.has-cmd perl); then
+  if (( $+commands[perl] )); then
     local base="$(fn.dev-prefix lib/perl5)"
 
     if $(fn.is-readable "${base}"); then
@@ -65,7 +65,7 @@ fn.setup-perl() {
 
 # Initialize python env and aliases
 fn.setup-python() {
-  if $(fn.has-cmd python); then
+  if (( $+commands[python] )); then
     alias py='python'
     alias pyinst='pip install'
     alias pyupgd='pip install --upgrade'
@@ -85,7 +85,7 @@ fn.setup-python() {
   fi
 
   # Used by chromium build script
-  if $(fn.has-cmd python2); then
+  if (( $+commands[python2] )); then
     export PNACLPYTHON="$(command -v python2)"
   fi
 }

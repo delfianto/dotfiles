@@ -23,7 +23,7 @@ fn.brew-setup() {
   local prefix="${1:-'/usr/local'}"
   export HOMEBREW_PREFIX="${prefix}"
 
-  if $(fn.has-cmd brew); then
+  if (( $+commands[brew] )); then
   else
     echo "WARNING: Homebrew is not installed" && return 1
   fi

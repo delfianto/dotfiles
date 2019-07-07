@@ -47,7 +47,7 @@ alias mv='mv -v'
 alias cp='cp -v'
 
 # Use safe-rm if present
-if $(fn.has-cmd 'safe-rm'); then
+if (( $+commands[safe-rm] )); then
   alias rf='safe-rm'
 fi
 
@@ -66,12 +66,12 @@ alias reload='exec zsh -l'
 # Aliases for parallel version of compression utility
 # Some of this apperently broke package manager in Manjaro
 #
-# $(fn.has-cmd 'pbzip2') && alias bzip2='pbzip2'
-# $(fn.has-cmd 'pigz') && alias gzip='pigz'
-# $(fn.has-cmd 'pixz') && alias xz='pixz'
+# (( $+commands[pbzip2] )) && alias bzip2='pbzip2'
+# (( $+commands[pigz] )) && alias gzip='pigz'
+# (( $+commands[pixz] )) && alias xz='pixz'
 
 # database command alias
-if $(fn.has-cmd 'mysql'); then
+if (( $+commands[mysql] )); then
   alias sql="mysql -u root -p"
 fi
 
