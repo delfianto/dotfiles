@@ -1,6 +1,6 @@
 # File zshrc-darwin; macOS specific zsh setup
 #
-# Setup homebrew and development evironment specific to macOS
+# Setup homebrew and environment variables specific to macOS
 
 # Runtime env check, bail out if os does not match
 fn.os-match 'macos'
@@ -19,13 +19,14 @@ fn.clean-store() {
   find . -name ".DS_Store" -delete
 }
 
-fn.brew-setup() {
-  local prefix="${1:-'/usr/local'}"
+fn.init-brew() {
+  local prefix="${1:-/usr/local}"
   export HOMEBREW_PREFIX="${prefix}"
 
-  if (( $+commands[brew] )); then
-  else
-    echo "WARNING: Homebrew is not installed" && return 1
+  if (( ! $+commands[brew] )); then
+    echo "WARNING: Homebrew is not installed"
+    echo "WARNING: Run 'fn.brew install' first"
+    return 1
   fi
 
   # Wrapper for homebrew service
@@ -49,11 +50,11 @@ fn.brew-setup() {
 
   # gnu tools and manpage from homebrew
   for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar'); do
-    local path="${prefix}/opt/${gnu}/libexec"
+    local gnu_lib="${prefix}/opt/${gnu}/libexec"
 
-    if $(fn.is-readable "${path}"); then
-      local gnubin="${path}/gnubin"
-      local gnuman="${path}/gnuman"
+    if [[ -r "${gnu_lib}" ]]; then
+      local gnubin="${gnu_lib}/gnubin"
+      local gnuman="${gnu_lib}/gnuman"
 
       $(fn.is-readable "${gnubin}") && export PATH="${gnubin}:${PATH}"
       $(fn.is-readable "${gnuman}") && export MANPATH="${gnuman}:${MANPATH}"
@@ -61,40 +62,47 @@ fn.brew-setup() {
   done
 
   # Ruby from homebrew
-  $(fn.is-readable "${prefix}/opt/ruby/bin") &&
-    export PATH="${prefix}/opt/ruby/bin:${PATH}" &&
-    fn.setup-ruby
+  local ruby_bin="${prefix}/opt/ruby/bin"
+  [[ -r "${ruby_bin}" ]] && export PATH="${ruby_bin}:${PATH}"
 
   # Apache Tomcat from homebrew
-  $(fn.is-readable "${prefix}/opt/tomcat") &&
-    export CATALINA_HOME="${prefix}/opt/tomcat/libexec"
+  local catalina_home="${prefix}/opt/tomcat"
+  [[ -r "${catalina_home}" ]] && export CATALINA_HOME="${catalina_home}"
 
   # Homebrew cask options
-  fn.source "${ZDOTDIR}/private/homebrew.zsh"
+  local homebrew_cask="${ZDOTDIR}/private/homebrew.zsh"
+  [[ -r "${homebrew_cask}" ]] && source "${homebrew_cask}"
   export HOMEBREW_CASK_OPTS='--appdir=/Applications'
-
-  # Use same package management alias with linux
-  alias pkg='brew'
 }
 
 # Homebrew setup (useful for new machine)
-fn.brew() {
-  local rb='/usr/bin/ruby -e'
-
+pkg() {
   case "${1}" in
-  'install')
+  'setup')
     "${rb} $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     ;;
-  'uninstall')
+  'purge')
     "${rb} $(curl -fsSL https://raw.githubusercontent.com/homebrew/install/master/uninstall)"
     ;;
-  'setup')
-    $(fn.brew-setup)
+  'init')
+    fn.init-brew
     ;;
-  '')
-    echo "${0} [install | uninstall | setup]"
+  'i')
+    brew install "$@"
+    ;;
+  't')
+    brew update "$@"
+    ;;    
+  'u')
+    brew upgrade "$@"
+    ;;
+  'rm')
+    brew uninstall "$@"
+    ;;
+   *)
+    brew "$@"
     ;;
   esac
 }
 
-fn.brew 'setup'
+pkg 'init'
