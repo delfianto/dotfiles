@@ -3,8 +3,10 @@
 # This file should be applicable to most of Linux distribution, any
 # other distro specific script should be placed in (os-family).zsh
 
-if [[ $(fn.os-name) != 'linux' ]]; then
+if [[ "${OS_NAME}" != 'linux' ]]; then
   return 1
+else
+  fn.source "20-${OS_NAME}-${OS_LIKE}.zsh"
 fi
 
 # Set git credentials helper

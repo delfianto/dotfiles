@@ -99,8 +99,8 @@ fn.init-gcloud() {
 
   if $(fn.is-readable "${GCLOUD_SDK_DIR}"); then
     local shell=$(basename "${0}")
-    fn.source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
-    fn.source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
+    source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
+    source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
 
     alias gcs="gcloud"
     alias gcb="gcs beta"

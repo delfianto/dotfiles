@@ -28,7 +28,7 @@ fn.source() {
 _fn.import() {
   cd "${ZDOTDIR}/source"
 
-  for file in $(ls *.zsh); do
+  for file in $(ls -I 20-linux-*.zsh); do
     source "${file}"
   done; cd
 }

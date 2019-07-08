@@ -82,12 +82,16 @@ fn.os-like() {
   echo $(grep 'ID_LIKE=*' /etc/os-release | cut -f2- -d=)
 }
 
+# This thing is damn slow to run multiple time, better put it here
+export OS_NAME="$(fn.os-name)"
+export OS_LIKE="$(fn.os-like)"
+
 fn.is-macos() {
-  [[ $(fn.os-name) == 'macos' ]]
+  [[ "${OS_NAME}" == 'macos' ]]
 }
 
 fn.is-linux() {
-  [[ $(fn.os-name) == 'linux' ]]
+  [[ "${OS_NAME}" == 'linux' ]]
 }
 
 fn.is-fun() {

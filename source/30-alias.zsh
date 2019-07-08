@@ -3,29 +3,29 @@
 # Functions and aliases used by all operating systems
 
 # Lazy load function to add ls arguments
-ls() {
-  unset -f "$0"
-  local ls_args='--color=auto'
+# ls() {
+#   unset -f "$0"
+#   export LS_ARGS="--color='auto'"
 
-  # Check which variant of ls that we use
-  case $(fn.ls-type) in
-  'gnu')
-    ls_args="${ls_args} -hFX --group-directories-first"
-    ;;
-  'bsd')
-    ls_args='${ls_args} -hFG'
-    ;;
-  *)
-    ls_args=''
-    ;;
-  esac
+#   # Check which variant of ls that we use
+#   case $(fn.ls-type) in
+#   'gnu')
+#     LS_ARGS="-hFX --group-directories-first"
+#     ;;
+#   'bsd')
+#     LS_ARGS="-hFG"
+#     ;;
+#   *)
+#     LS_ARGS=''
+#     ;;
+#   esac
 
-  alias ls="ls ${ls_args}"
-  alias ll="ls ${ls_args} -l"
-  alias la="ls ${ls_args} -a"
+#   alias ls="ls ${LS_ARGS}"
+#   alias ll="ls ${LS_ARGS} -l"
+#   alias la="ls ${LS_ARGS} -a"
 
-  ls "$@"
-}
+#   ls ${@}${LS_ARGS}
+# }
 
 # Shell command alias
 alias c="clear && printf '\e[3J'"

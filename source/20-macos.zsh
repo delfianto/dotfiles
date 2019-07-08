@@ -2,7 +2,7 @@
 #
 # Setup homebrew and environment variables specific to macOS
 
-if [[ $(fn.os-name) != 'macos' ]]; then
+if [[ "${OS_NAME}" != 'macos' ]]; then
   return 1
 fi
 
