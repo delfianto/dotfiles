@@ -33,6 +33,9 @@ _fn.import() {
   done; cd
 }
 
+# Set path as array-unique-special (no duplicates)
+typeset -aU path
+
 # Load os specific file and other zsh scripts
 # Order of imports will be sequential according to prefix number
 _fn.import
@@ -75,18 +78,20 @@ setopt EXTENDED_HISTORY       # write timestamps to history
 # zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 # zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-# Zplug plugins initialization
+# Zplug plugin initialization
 if $(fn.is-fun zplug); then
-  # powerlevel10k
-  zplug 'romkatv/powerlevel10k', use:powerlevel10k.zsh-theme
+  # powerlevel10k!
+  zplug 'romkatv/powerlevel10k', use:'powerlevel10k.zsh-theme'
 
   # oh-my-zsh plugins
-  zplug 'plugins/sudo', from:oh-my-zsh, ignore:oh-my-zsh.sh, if:"(($+commands[sudo]))"
-  zplug 'plugins/systemd', from:oh-my-zsh, ignore:oh-my-zsh.sh, if:"(($+commands[systemctl]))"
-  # zplug 'plugins/ssh-agent', from:oh-my-zsh, ignore:oh-my-zsh.sh, if:"[[ $OSTYPE != darwin* ]]"
+  zplug 'plugins/sudo', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"(($+commands[sudo]))"
+  zplug 'plugins/systemd', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"(($+commands[systemctl]))"
+
+  # Seems broken on Manjaro Linux KDE, will spawn tons of ssh-add process until ulimit is reached
+  # zplug 'plugins/ssh-agent', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"[[ $OSTYPE != darwin* ]]"
 
   # Install plugins if there are plugins that have not been installed
-  if ! zplug check --verbose; then
+  if [[ "${ZPLUG_AUTO_PKG}" == 'true' ]] && ! zplug check --verbose; then
     printf "Install? [y/N]: "
     if read -q; then
       echo
@@ -96,6 +101,13 @@ if $(fn.is-fun zplug); then
 
   # Then, source plugins and add commands to $PATH
   zplug load
+
+  # Workaround for issue https://github.com/zplug/zplug/issues/427 which sometimes still happen
+  # because zplug cannot find the loadfile, causing __zplug::log::write::info consuming up to
+  # 70% of the shell initialization time.
+  if [[ "${ZPLUG_LOAD_FIX}" == 'true' ]]; then
+    touch "$ZPLUG_LOADFILE"
+  fi
 fi
 
 # Cleanup any declared private functions (prefixed with _)

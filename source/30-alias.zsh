@@ -57,7 +57,7 @@ alias fgrep='fgrep --color=auto'
 alias sudo='sudo '
 
 # Reloads the current shell
-alias reload='exec zsh -l'
+alias reload="exec ${SHELL} -l"
 
 # Aliases for parallel version of compression utility
 # Some of this apperently broke package manager in Manjaro
@@ -73,6 +73,3 @@ fi
 
 # add .local/bin to PATH
 # export PATH="$(echo "${HOME}" | tr '[:upper:]' '[:lower:]')/.local/bin:${PATH}"
-
-# clean up duplicates entry in PATH
-# export PATH=$(printf "%s" "${PATH}" | awk -v RS=':' '!a[$1]++ { if (NR > 1) printf RS; printf $1 }')
