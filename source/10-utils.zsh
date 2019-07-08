@@ -82,21 +82,6 @@ fn.os-like() {
   echo $(grep 'ID_LIKE=*' /etc/os-release | cut -f2- -d=)
 }
 
-fn.os-match() {
-  local os="$(fn.os-name)"
-  local fm="$(fn.os-like)"
-
-  if [[ "${os}" == "$1" ]] ||
-     [[ "${os}" == "linux" &&
-        "${fm}" == "$1" ]]
-  then
-    return 0
-  else
-    echo "Current os: ${os} does not match os target: $1" >&2
-    return 1
-  fi
-}
-
 fn.is-macos() {
   [[ $(fn.os-name) == 'macos' ]]
 }
