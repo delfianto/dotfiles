@@ -34,7 +34,7 @@ _fn.import() {
 }
 
 # Load os specific file and other zsh scripts
-# Order of imports will be sequential accorting to prefix number
+# Order of imports will be sequential according to prefix number
 _fn.import
 
 # Initialize zsh auto complete
