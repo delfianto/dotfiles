@@ -7,6 +7,7 @@
 # Another option is to set the value of DEV_USE_LOCAL to 'true' which will use
 # $HOME/.local as the prefix for your development tools.
 
+return 1
 export DEV_LOCAL="${HOME}/.local"
 export DEV_PREFIX="${DEVTOOLS_PREFIX-/usr/local}"
 export DEV_USE_LOCAL="${DEV_USE_LOCAL:-'false'}"
@@ -22,11 +23,11 @@ fn.dev-prefix() {
 
   # Use readlink instead of realpath because the path may not be exists
   # when we construct them (e.g. perl, sdkman, gradle cache dir, etc)
-  echo $(readlink -m "${prefix}/${1}")
+  echo $(readlink "${prefix}/${1}")
 }
 
 # Initialize nodejs prefix path
-fn.setup-node() {
+fn.init-node() {
   if (( $+commands[node] )); then
     alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(fn.dev-prefix)"
@@ -34,7 +35,7 @@ fn.setup-node() {
 }
 
 # Initialize ruby gem location
-fn.setup-ruby() {
+fn.init-ruby() {
   if (( $+commands[ruby] )); then
     # Replace minor rev with zero
     local full_ver="$(ruby -e 'print RUBY_VERSION')"
@@ -49,7 +50,7 @@ fn.setup-ruby() {
 }
 
 # Initialize perl lib directory
-fn.setup-perl() {
+fn.init-perl() {
   if (( $+commands[perl] )); then
     local base="$(fn.dev-prefix lib/perl5)"
 
@@ -64,12 +65,12 @@ fn.setup-perl() {
 }
 
 # Initialize python env and aliases
-fn.setup-python() {
+fn.init-python() {
   if (( $+commands[python] )); then
     alias py='python'
     alias pyinst='pip install'
     alias pyupgd='pip install --upgrade'
-    alias pytool='pip install --upgrade pip setuptools wheel'
+    alias pytool='pip install --upgrade pip inittools wheel'
     alias pyhttp='python -m http.server' # starts a python lightweight http server
     alias pyjson='python -m json.tool'   # pipe to this alias to format json with python
 
@@ -91,7 +92,7 @@ fn.setup-python() {
 }
 
 # Initialize google cloud sdk toolkit
-fn.setup-gcloud() {
+fn.init-gcloud() {
   export GCLOUD_SDK_DIR="$(fn.dev-prefix lib/google-cloud-sdk)"
 
   if $(fn.is-readable "${GCLOUD_SDK_DIR}"); then
@@ -107,7 +108,7 @@ fn.setup-gcloud() {
 }
 
 # Initialize sdk manager
-fn.setup-sdkman() {
+fn.init-sdkman() {
   export SDKMAN_DIR="$(fn.dev-prefix lib/sdkman)"
   local init_script="${SDKMAN_DIR}/bin/sdkman-init.sh"
 
@@ -127,13 +128,13 @@ fn.setup-sdkman() {
   esac
 }
 
-fn.setup-dev() {
-  fn.setup-ruby
-  fn.setup-node
-  fn.setup-perl
-  fn.setup-python
-  fn.setup-gcloud
-  fn.setup-sdkman
+fn.init-dev() {
+  fn.init-ruby
+  fn.init-node
+  fn.init-perl
+  fn.init-python
+  fn.init-gcloud
+  fn.init-sdkman
 }
 
-fn.setup-dev
+fn.init-dev
