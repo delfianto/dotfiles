@@ -1,8 +1,6 @@
-# ignore private configs
-private/**
-
-# zplug installation files
-zplug/**
+# ignored folders
+private/
+zplug/
 
 # zsh dynamic files
 .histfile
