@@ -20,9 +20,8 @@ fn.dev-prefix() {
     prefix="${DEV_PREFIX}"
   fi
 
-  # Use readlink instead of realpath because the path may not be exists
-  # when we construct them (e.g. perl, sdkman, gradle cache dir, etc)
-  echo $(readlink -fn "${prefix}/${1}")
+  # Resolve the directory path
+  echo $(realpath "${prefix}/${1}")
 }
 
 # Initialize nodejs prefix path
