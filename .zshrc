@@ -29,32 +29,17 @@ _fn.import() {
   cd "${ZDOTDIR}/source"
 
   for file in $(ls *.zsh); do
-    local prefix=$(echo "${file}" | cut -f1 -d-)
-
-    # 99- prefix is reserved for os specific script and will be imported last.
-    # Refer to the fn.os-name function to get the possible os name.
-    # if ((prefix == 20)); then
-    #   source "${file}"
-    # fi
     source "${file}"
-  done
-  cd
+  done; cd
 }
 
 # Load os specific file and other zsh scripts
 # Order of imports will be sequential accorting to prefix number
-# of *.zsh files in /source directory and finally os-specific file
-# (with prefix number 99)
 _fn.import
 
-# fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
+# Initialize zsh auto complete
+autoload -Uz compinit; compinit
 
-# if [[ $(fn.os-name) == 'linux' ]]; then
-#   fn.source "${ZDOTDIR}/source/99-$(fn.os-like).zsh"
-# fi
-
-autoload -Uz compinit
-compinit # Initialize zsh auto complete
 # Disable highlighting of text pasted into the command line.
 zle_highlight=('paste:none')
 
@@ -91,7 +76,7 @@ setopt EXTENDED_HISTORY       # write timestamps to history
 # zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # Zplug plugins initialization
-if $(fn.has-cmd zplug); then
+if $(fn.is-fun zplug); then
   # powerlevel10k
   zplug 'romkatv/powerlevel10k', use:powerlevel10k.zsh-theme
 

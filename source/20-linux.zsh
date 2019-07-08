@@ -3,9 +3,7 @@
 # This file should be applicable to most of Linux distribution, any
 # other distro specific script should be placed in (os-family).zsh
 
-# Runtime env check, bail out if os does not match
-fn.os-match 'linux'
-if [[ "$?" != 0 ]]; then
+if [[ $(fn.os-name) != 'linux' ]]; then
   return 1
 fi
 

@@ -25,6 +25,20 @@ up() {
   fi
 }
 
+cdf() {
+  df -h | grep -v ^none | (
+    read header
+    echo "$header"
+    sort -n -k 1
+  )
+}
+
+fn.bench() {
+  for i in $(seq 1 10); do
+    time $SHELL -i -c exit
+  done
+}
+
 fn.emoji() {
   if [[ "$?" == 0 ]]; then
     echo '🍄'
@@ -83,14 +97,21 @@ fn.os-match() {
   fi
 }
 
-fn.has-cmd() {
-  command -v "$1" &>/dev/null
-  [[ "$?" == '0' ]]
+fn.is-macos() {
+  [[ $(fn.os-name) == 'macos' ]]
 }
 
-fn.has-env() {
-  env_check "${1}" &>/dev/null
-  [[ "$?" == '0' ]]
+fn.is-linux() {
+  [[ $(fn.os-name) == 'linux' ]]
+}
+
+fn.is-fun() {
+  typeset -f "$1" > /dev/null
+  return "$?"
+}
+
+fn.is-set() {
+  [[ -v "$1" ]]
 }
 
 fn.is-dir() {
@@ -110,22 +131,14 @@ fn.is-writeable() {
 }
 
 fn.is-not-empty() {
-  fn.is-file "$1" && [[ -s "$1" ]]
+  [[ -f "$1" && -s "$1" ]]
 }
 
-fn.is-macos() {
-  [[ $(fn.os-name) == 'macos' ]]
-}
-
-fn.is-linux() {
-  [[ $(fn.os-name) == 'linux' ]]
-}
-
-fn.list-fun() {
+fn.ls-fun() {
   print -l ${(ok)functions}
 }
 
-fn.list-env() {
+fn.ls-env() {
   if [[ -z "$1" ]]; then
     printenv
   else
@@ -133,7 +146,7 @@ fn.list-env() {
   fi
 }
 
-fn.list-path() {
+fn.ls-path() {
   local paths=(${(@s/:/)PATH})
 
   for entry in ${paths}; do

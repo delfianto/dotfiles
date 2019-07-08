@@ -2,9 +2,7 @@
 #
 # Setup homebrew and environment variables specific to macOS
 
-# Runtime env check, bail out if os does not match
-fn.os-match 'macos'
-if [[ "$?" != 0 ]]; then
+if [[ $(fn.os-name) != 'macos' ]]; then
   return 1
 fi
 
@@ -92,7 +90,7 @@ pkg() {
     ;;
   't')
     brew update "$@"
-    ;;    
+    ;;
   'u')
     brew upgrade "$@"
     ;;

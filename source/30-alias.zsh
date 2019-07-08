@@ -2,8 +2,9 @@
 #
 # Functions and aliases used by all operating systems
 
-# Add ls args based on os
-_fn.set-ls-args() {
+# Lazy load function to add ls arguments
+ls() {
+  unset -f "$0"
   local ls_args='--color=auto'
 
   # Check which variant of ls that we use
@@ -22,7 +23,9 @@ _fn.set-ls-args() {
   alias ls="ls ${ls_args}"
   alias ll="ls ${ls_args} -l"
   alias la="ls ${ls_args} -a"
-}; _fn.set-ls-args
+
+  ls "$@"
+}
 
 # Shell command alias
 alias c="clear && printf '\e[3J'"
@@ -34,14 +37,6 @@ alias zshdir="cd ${ZDOTDIR}"
 alias du='du -h'
 alias ds='du -s'
 alias df='df -h'
-
-cdf() {
-  df -h | grep -v ^none | (
-    read header
-    echo "$header"
-    sort -n -k 1
-  )
-}
 
 # Make some of the file manipulation programs verbose
 alias mv='mv -v'

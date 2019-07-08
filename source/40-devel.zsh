@@ -10,7 +10,7 @@
 return 1
 export DEV_LOCAL="${HOME}/.local"
 export DEV_PREFIX="${DEVTOOLS_PREFIX-/usr/local}"
-export DEV_USE_LOCAL="${DEV_USE_LOCAL:-'false'}"
+export DEV_USE_LOCAL="${DEV_USE_LOCAL:-false}"
 
 fn.dev-prefix() {
   local prefix=''

@@ -3,12 +3,6 @@
 # Actually written on Manjaro, but this file should be
 # compatible with any Arch-based distro out there
 
-# Runtime env check, bail out if os does not match
-fn.os-match 'arch'
-if [[ "$?" != 0 ]]; then
-  return 1
-fi
-
 # Initialize zplug
 fn.source '/usr/share/zsh/scripts/zplug/init.zsh'
 
