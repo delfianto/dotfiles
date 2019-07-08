@@ -139,4 +139,8 @@ fn.init-dev() {
   fn.init-sdkman
 }
 
+# Init everything
 fn.init-dev
+
+# Add .local/bin to PATH
+export PATH="${DEV_DOTDIR}/bin:${PATH}"
