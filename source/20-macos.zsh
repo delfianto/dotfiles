@@ -46,6 +46,9 @@ fn.init-brew() {
     esac
   }
 
+  # Zplug for macOS
+  fn.source "${prefix}/opt/zplug/init.zsh"
+
   # gnu tools and manpage from homebrew
   for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar'); do
     local gnu_lib="${prefix}/opt/${gnu}/libexec"
@@ -75,27 +78,31 @@ fn.init-brew() {
 
 # Homebrew setup (useful for new machine)
 pkg() {
+  # Homebrew was designed to work with the default macOS ruby
+  local bin='/usr/bin/ruby'
+  local git='https://raw.githubusercontent.com/Homebrew/install/master'
+
   case "${1}" in
   'setup')
-    "${rb} $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    "${bin}" $(curl -fsSL "${git}/install")
     ;;
   'purge')
-    "${rb} $(curl -fsSL https://raw.githubusercontent.com/homebrew/install/master/uninstall)"
+    "${bin}" $(curl -fsSL "${git}/uninstall")
     ;;
   'init')
     fn.init-brew
     ;;
   'i')
-    brew install "$@"
+    brew install "${@:2}"
     ;;
   't')
-    brew update "$@"
+    brew update "${@:2}"
     ;;
   'u')
-    brew upgrade "$@"
+    brew upgrade "${@:2}"
     ;;
   'rm')
-    brew uninstall "$@"
+    brew uninstall "${@:2}"
     ;;
    *)
     brew "$@"
