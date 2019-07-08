@@ -96,3 +96,5 @@ fn.brew() {
     ;;
   esac
 }
+
+fn.brew 'setup'
