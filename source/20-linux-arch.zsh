@@ -24,7 +24,7 @@ alias pkgremove='pkg remove'
 
 # Wrapper function for package manager
 pkg() {
-  if (( $+commands[yay] )); then
+if (( ${+commands[yay]} )); then
     echo -n ''
   else
     sudo pacman --noconfirm -S yay

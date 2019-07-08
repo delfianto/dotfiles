@@ -7,28 +7,27 @@
 # Another option is to set the value of DEV_USE_LOCAL to 'true' which will use
 # $HOME/.local as the prefix for your development tools.
 
-return 1
-export DEV_LOCAL="${HOME}/.local"
-export DEV_PREFIX="${DEVTOOLS_PREFIX-/usr/local}"
+export DEV_DOTDIR="${HOME}/.local"
+export DEV_PREFIX="${DEV_PREFIX-/usr/local}"
 export DEV_USE_LOCAL="${DEV_USE_LOCAL:-false}"
 
 fn.dev-prefix() {
   local prefix=''
 
   if [[ "${DEV_USE_LOCAL}" == 'true' ]]; then
-    prefix="${DEV_LOCAL}"
+    prefix="${DEV_DOTDIR}"
   else
     prefix="${DEV_PREFIX}"
   fi
 
   # Use readlink instead of realpath because the path may not be exists
   # when we construct them (e.g. perl, sdkman, gradle cache dir, etc)
-  echo $(readlink "${prefix}/${1}")
+  echo $(readlink -fn "${prefix}/${1}")
 }
 
 # Initialize nodejs prefix path
 fn.init-node() {
-  if (( $+commands[node] )); then
+  if (( ${+commands[node]} )); then
     alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(fn.dev-prefix)"
   fi
@@ -36,10 +35,13 @@ fn.init-node() {
 
 # Initialize ruby gem location
 fn.init-ruby() {
-  if (( $+commands[ruby] )); then
-    # Replace minor rev with zero
-    local full_ver="$(ruby -e 'print RUBY_VERSION')"
-    local ruby_ver="${full_ver%?}0"
+  if (( ${+commands[ruby]} )); then
+    # Replace minor rev with zero; this is super slow
+    # local full_ver="$(ruby -e 'print RUBY_VERSION')"
+    # local ruby_ver="${full_ver%?}0"
+
+    # do this for now until we can speed up ruby version detection
+    local ruby_ver='2.6.0'
 
     export GEM_HOME="$(fn.dev-prefix lib/ruby/${ruby_ver})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
@@ -51,7 +53,7 @@ fn.init-ruby() {
 
 # Initialize perl lib directory
 fn.init-perl() {
-  if (( $+commands[perl] )); then
+  if (( ${+commands[perl]} )); then
     local base="$(fn.dev-prefix lib/perl5)"
 
     if $(fn.is-readable "${base}"); then
@@ -66,7 +68,7 @@ fn.init-perl() {
 
 # Initialize python env and aliases
 fn.init-python() {
-  if (( $+commands[python] )); then
+  if (( ${+commands[python]} )); then
     alias py='python'
     alias pyinst='pip install'
     alias pyupgd='pip install --upgrade'
@@ -86,7 +88,7 @@ fn.init-python() {
   fi
 
   # Used by chromium build script
-  if (( $+commands[python2] )); then
+  if (( ${+commands[python2]} )); then
     export PNACLPYTHON="$(command -v python2)"
   fi
 }
