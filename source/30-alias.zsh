@@ -28,6 +28,7 @@ _fn.set-ls-args() {
 alias c="clear && printf '\e[3J'"
 alias cls='c'
 alias which='command -v'
+alias zshdir="cd ${ZDOTDIR}"
 
 # Disk usage in human readable format
 alias du='du -h'
