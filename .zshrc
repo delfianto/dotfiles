@@ -2,7 +2,7 @@
 #
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshrc
 
-# Start zsh profiling (if enabled)
+# Start zsh tracing (if enabled)
 if [[ "${ZSH_TRACE}" == 'true' ]]; then
   zmodload zsh/datetime
   setopt PROMPT_SUBST
@@ -13,6 +13,11 @@ if [[ "${ZSH_TRACE}" == 'true' ]]; then
   exec 3>&2 2>$logfile
 
   setopt XTRACE
+fi
+
+# Start zsh profiling (if enabled)
+if [[ "${ZSH_ZPROF}" == 'true' ]]; then
+  zmodload zsh/zprof
 fi
 
 # Helper functions for sourcing file
@@ -114,6 +119,11 @@ fi
 # done
 
 # Stop zsh profiling (if enabled)
+if [[ "${ZSH_ZPROF}" == 'true' ]]; then
+  zprof
+fi
+
+# Stop zsh tracing (if enabled)
 if [[ "${ZSH_TRACE}" == 'true' ]]; then
   unsetopt XTRACE
   exec 2>&3 3>&-

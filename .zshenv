@@ -2,7 +2,7 @@
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
 export ZSH_TRACE="${ZSH_TRACE:-false}"
-export ZSH_TIMER="${ZSH_TIMER:-false}"
+export ZSH_ZPROF="${ZSH_ZPROF:-false}"
 
 # Set zsh dotfile location and zplug home
 export ZDOTDIR="${ZDOTDIR:-"${HOME}/.config/dotfiles"}"
