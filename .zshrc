@@ -28,9 +28,10 @@ _fn.import() {
 
     # 99- prefix is reserved for os specific script and will be imported last.
     # Refer to the fn.os-name function to get the possible os name.
-    if ((prefix < 99)); then
-      source "${file}"
-    fi
+    # if ((prefix == 20)); then
+    #   source "${file}"
+    # fi
+    source "${file}"
   done
   cd
 }
@@ -39,11 +40,13 @@ _fn.import() {
 # Order of imports will be sequential accorting to prefix number
 # of *.zsh files in /source directory and finally os-specific file
 # (with prefix number 99)
-_fn.import; fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
+_fn.import
 
-if [[ $(fn.os-name) == 'linux' ]]; then
-  fn.source "${ZDOTDIR}/source/99-$(fn.os-like).zsh"
-fi
+# fn.source "${ZDOTDIR}/source/99-$(fn.os-name).zsh"
+
+# if [[ $(fn.os-name) == 'linux' ]]; then
+#   fn.source "${ZDOTDIR}/source/99-$(fn.os-like).zsh"
+# fi
 
 autoload -Uz compinit
 compinit # Initialize zsh auto complete
