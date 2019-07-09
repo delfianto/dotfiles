@@ -191,7 +191,7 @@ fi
   fi
 
   if (( ${PURE_POWER_USE_P10K_EXTENSIONS:-1} )); then
-    typeset -g POWERLEVEL9K_SHOW_RULER=true
+    typeset -g POWERLEVEL9K_SHOW_RULER=false
     typeset -g POWERLEVEL9K_RULER_CHAR=$(_pp_s '-' '─')
     typeset -g POWERLEVEL9K_RULER_BACKGROUND=none
     typeset -g POWERLEVEL9K_RULER_FOREGROUND=$(_pp_c 7 237)
