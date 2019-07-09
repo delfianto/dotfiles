@@ -46,6 +46,9 @@ _fn.import
 # Initialize zsh auto complete
 autoload -Uz compinit; compinit
 
+# Load regex module
+autoload -U regexp-replace
+
 # Disable highlighting of text pasted into the command line.
 zle_highlight=('paste:none')
 

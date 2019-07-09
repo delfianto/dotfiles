@@ -97,16 +97,46 @@ fn.init-gcloud() {
   export GCLOUD_SDK_DIR="$(fn.dev-prefix lib/google-cloud-sdk)"
 
   if $(fn.is-readable "${GCLOUD_SDK_DIR}"); then
-    local shell=$(basename "${0}")
+    local shell=$(basename "${SHELL}")
     source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
     source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
 
     alias gcs="gcloud"
     alias gcb="gcs beta"
-    alias gcm="gcs components"
     alias gsp="cloud_sql_proxy"
   fi
 }
+
+# Wrapper function for google cloud components
+if (( ${+commands[gcloud]} )); then
+  gcm() {
+    typeset -A args
+
+    args[i]='install'
+    args[u]='update'
+    args[ls]='list'
+    args[rm]='remove'
+    args[rs]='restore'
+    args[re]='reinstall'
+    args[repo]='repositories'
+    args[help]='--help'
+
+    # Iterate key-val for debugging
+    #
+    # for key val in ${(kv)args}; do
+    #   echo "$key -> $val"
+    # done
+
+    local arg="${args[$1]}"
+    local cmd='gcloud components'
+
+    if [[ -z "${arg}" ]]; then
+      eval "${cmd} ${@}"
+    else
+      eval "${cmd} ${arg} ${@:2}"
+    fi
+  }
+fi
 
 # Initialize sdk manager
 fn.init-sdkman() {
@@ -129,6 +159,7 @@ fn.init-sdkman() {
   esac
 }
 
+# Initialize all devtools
 fn.init-dev() {
   fn.init-ruby
   fn.init-node
