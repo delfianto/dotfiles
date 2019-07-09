@@ -20,6 +20,8 @@ if [[ "${ZSH_ZPROF}" == 'true' ]]; then
   zmodload zsh/zprof
 fi
 
+[[ "${TERM}" == xterm* ]] || : ${PURE_POWER_MODE:=portable}
+
 # Helper functions for sourcing file
 fn.source() {
   [[ -f "${1}" ]] && source "${1}" || echo "Cannot source: ${1}"
