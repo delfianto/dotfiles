@@ -103,10 +103,48 @@ fn.init-gcloud() {
 
     alias gcs="gcloud"
     alias gcb="gcs beta"
-    alias gcm="gcs components"
     alias gsp="cloud_sql_proxy"
   fi
 }
+
+# Wrapper function for google cloud components
+if (( ${+commands[gcloud]} )); then
+  function gcm() {
+    local cmd=''
+
+    case "$1" in
+      'repo')
+        cmd='repositories'
+        ;;
+      'ls')
+        cmd='list'
+        ;;
+      'rm')
+        cmd='remove'
+        ;;
+      'rs')
+        cmd='restore'
+        ;;
+      're')
+        cmd='reinstall'
+        ;;
+      'i')
+        cmd='install'
+        ;;
+      'u')
+        cmd='update'
+        ;;
+      'h' | 'help')
+        cmd='--help'
+        ;;
+      *)
+        cmd=''
+        ;;
+    esac
+
+    gcloud components ${cmd} ${@:2}
+  }
+fi
 
 # Initialize sdk manager
 fn.init-sdkman() {
