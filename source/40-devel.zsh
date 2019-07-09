@@ -98,7 +98,7 @@ fn.init-gcloud() {
   export GCLOUD_SDK_DIR="$(fn.dev-prefix lib/google-cloud-sdk)"
 
   if $(fn.is-readable "${GCLOUD_SDK_DIR}"); then
-    local shell=$(basename "${0}")
+    local shell=$(basename "${SHELL}")
     source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
     source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
 
@@ -130,6 +130,7 @@ fn.init-sdkman() {
   esac
 }
 
+# Initialize all devtools
 fn.init-dev() {
   fn.init-ruby
   fn.init-node
