@@ -28,7 +28,8 @@ fn.source() {
 _fn.import() {
   cd "${ZDOTDIR}/source"
 
-  for file in $(ls -I 20-linux-*.zsh); do
+  # Exclude linux-specific distro file from sourced
+  for file in $(find . -type f ! -name '20-linux-*.zsh' | sort); do
     source "${file}"
   done; cd
 }
