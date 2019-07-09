@@ -107,13 +107,6 @@ fn.init-gcloud() {
   fi
 }
 
-foo() {
-  echo "testing replace: $1"
-  local FOO="$1"
-  regexp-replace FOO 'repo' 'foo'
-  echo "${FOO}"
-}
-
 # Wrapper function for google cloud components
 if (( ${+commands[gcloud]} )); then
   gcm() {
