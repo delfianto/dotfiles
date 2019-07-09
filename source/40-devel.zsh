@@ -107,42 +107,41 @@ fn.init-gcloud() {
   fi
 }
 
+foo() {
+  echo "testing replace: $1"
+  local FOO="$1"
+  regexp-replace FOO 'repo' 'foo'
+  echo "${FOO}"
+}
+
 # Wrapper function for google cloud components
 if (( ${+commands[gcloud]} )); then
-  function gcm() {
-    local cmd=''
+  gcm() {
+    typeset -A args
 
-    case "$1" in
-      'repo')
-        cmd='repositories'
-        ;;
-      'ls')
-        cmd='list'
-        ;;
-      'rm')
-        cmd='remove'
-        ;;
-      'rs')
-        cmd='restore'
-        ;;
-      're')
-        cmd='reinstall'
-        ;;
-      'i')
-        cmd='install'
-        ;;
-      'u')
-        cmd='update'
-        ;;
-      'h' | 'help')
-        cmd='--help'
-        ;;
-      *)
-        cmd=''
-        ;;
-    esac
+    args[i]='install'
+    args[u]='update'
+    args[ls]='list'
+    args[rm]='remove'
+    args[rs]='restore'
+    args[re]='reinstall'
+    args[repo]='repositories'
+    args[help]='--help'
 
-    gcloud components ${cmd} ${@:2}
+    # Iterate key-val for debugging
+    #
+    # for key val in ${(kv)args}; do
+    #   echo "$key -> $val"
+    # done
+
+    local arg="${args[$1]}"
+    local cmd='gcloud components'
+
+    if [[ -z "${arg}" ]]; then
+      eval "${cmd} ${@}"
+    else
+      eval "${cmd} ${arg} ${@:2}"
+    fi
   }
 fi
 
