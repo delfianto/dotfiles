@@ -60,12 +60,30 @@ ex() {
 iommu() {
   case "${1}" in
   'g' | 'group')
-    for d in /sys/kernel/iommu_groups/*/devices/*; do
-      n=${d#*/iommu_groups/*}
-      n=${n%%/*}
-      printf 'IOMMU Group %02d ' "$n"
-      lspci -nns "${d##*/}"
-    done | sort -V
+    local iommu='/usr/bin/ls -dv /sys/kernel/iommu_groups/*'
+
+    for group in $(eval "${iommu}"); do
+      printf 'IOMMU Group %02d: \n' "${group##*/}"
+      for device in ${group}/devices/*; do
+        local out=$(lspci -nns "${device##*/}")
+        local pci="${out%% *}" # Extract first word (pci-id)
+
+        printf ' - '
+        # Remove some of the vendor name output (shorter line)
+        regexp-replace out 'Advanced Micro Devices, Inc. ' ''
+        regexp-replace out 'Technology Inc. ' ''
+        regexp-replace out 'Corporation ' ''
+
+        # Combine the 'pretty print' output, exclude nvme device
+        # from output processing; some pcie ssd from Adata does
+        # not show any meaningful info other than 'device (rev xx)'.
+        if [[ -z $(echo "${out}" | grep 'Volatile') ]]; then
+          echo "${pci} ${out#*: }"
+        else
+          echo "${out}"
+        fi
+      done; echo
+    done
     ;;
   'u' | 'usb')
     for usb_ctrl in $(find /sys/bus/usb/devices/usb* -maxdepth 0 -type l); do
