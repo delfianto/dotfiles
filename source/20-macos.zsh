@@ -28,25 +28,6 @@ fn.init-brew() {
     return 1
   fi
 
-  # Wrapper for homebrew service
-  svc() {
-    case "$1" in
-    'run' | 'start' | 'stop' | 'restart')
-      [[ ! -z "$2" ]] && brew services "$1" "$2" || "${FUNCNAME[0]}" 'help'
-      ;;
-    'ls' | 'list' | 'cleanup')
-      brew services "$1"
-      ;;
-    'help')
-      echo "Usage: ${FUNCNAME[0]} [list | run | start | stop | restart | cleanup] [...]"
-      echo "Running without any param will list all available services"
-      ;;
-    *)
-      "${FUNCNAME[0]}" 'ls'
-      ;;
-    esac
-  }
-
   # Zplug for macOS
   fn.source "${prefix}/opt/zplug/init.zsh"
 
@@ -62,7 +43,7 @@ fn.init-brew() {
         $(fn.is-readable "${gnubin}") && export PATH="${gnubin}:${PATH}"
         $(fn.is-readable "${gnuman}") && export MANPATH="${gnuman}:${MANPATH}"
       fi
-    done  
+    done
   fi
 
   # Ruby from homebrew
@@ -79,38 +60,50 @@ fn.init-brew() {
   export HOMEBREW_CASK_OPTS='--appdir=/Applications'
 }
 
-# Homebrew setup (useful for new machine)
+# Homebrew command wrapper
 pkg() {
-  # Homebrew was designed to work with the default macOS ruby
-  local bin='/usr/bin/ruby'
-  local git='https://raw.githubusercontent.com/Homebrew/install/master'
+  typeset -A args
 
-  case "${1}" in
-  'setup')
-    "${bin}" $(curl -fsSL "${git}/install")
+  local brew='brew'
+  local curl='curl -fsSL'
+  local ruby='/usr/bin/ruby -e' # Use ruby bin that shipped with macOS
+  local repo='https://raw.githubusercontent.com/Homebrew/install/master'
+
+  args[setup]="${bin} $(${curl} ${git}/install)"
+  args[purge]="${bin} $(${curl} ${git}/uninstall)"
+
+  args[i]="${brew} install"
+  args[p]="${brew} update"
+  args[u]="${brew} upgrade"
+  args[rm]="${brew} uninstall"
+  args[ls]="${brew} list"
+
+  local cmd="${args[$1]}"
+
+  if [[ -z "${cmd}" ]]; then
+    eval "${cmd} ${@:2}"
+  else
+    eval "${brew} $@"
+  fi
+}
+
+# Wrapper for homebrew service
+svc() {
+  case "$1" in
+  'run' | 'start' | 'stop' | 'restart')
+    [[ ! -z "$2" ]] && brew services "$1" "$2" || "${FUNCNAME[0]}" 'help'
     ;;
-  'purge')
-    "${bin}" $(curl -fsSL "${git}/uninstall")
+  'ls' | 'list' | 'cleanup')
+    brew services "$1"
     ;;
-  'init')
-    fn.init-brew
+  'help')
+    echo "Usage: ${FUNCNAME[0]} [list | run | start | stop | restart | cleanup] [...]"
+    echo "Running without any param will list all available services"
     ;;
-  'i')
-    brew install "${@:2}"
-    ;;
-  't')
-    brew update "${@:2}"
-    ;;
-  'u')
-    brew upgrade "${@:2}"
-    ;;
-  'rm')
-    brew uninstall "${@:2}"
-    ;;
-   *)
-    brew "$@"
+  *)
+    "${FUNCNAME[0]}" 'ls'
     ;;
   esac
 }
 
-pkg 'init'
+fn.init-brew
