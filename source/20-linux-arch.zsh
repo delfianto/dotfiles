@@ -9,19 +9,6 @@ fn.source '/usr/share/zsh/scripts/zplug/init.zsh'
 # Import LS_Colors definition
 fn.source '/usr/share/LS_COLORS/dircolors.sh'
 
-# Package manager aliases
-alias pa='sudo pacman'
-
-# Single command alias for package manager
-alias pkglist='pkg list'
-alias pkginfo='pkg info'
-alias pkgfind='pkg find'
-alias pkgpeek='pkg peek'
-alias pkglogs='pkg logs'
-alias pkghelp='pkg help'
-alias pkginstall='pkg install'
-alias pkgremove='pkg remove'
-
 # Wrapper function for package manager
 pkg() {
 if (( ${+commands[yay]} )); then
