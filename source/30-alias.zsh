@@ -27,6 +27,9 @@
 #   ls ${@}${LS_ARGS}
 # }
 
+alias ls='ls --color=auto --group-directories-first -hFX'
+alias ll='ls -l'
+
 # Shell command alias
 alias c="clear && printf '\e[3J'"
 alias cls='c'
