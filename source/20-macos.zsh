@@ -20,6 +20,7 @@ fn.clean-store() {
 fn.init-brew() {
   local prefix="${1:-/usr/local}"
   export HOMEBREW_PREFIX="${prefix}"
+  export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-false}"
 
   if (( ! $+commands[brew] )); then
     echo "WARNING: Homebrew is not installed"
@@ -49,18 +50,20 @@ fn.init-brew() {
   # Zplug for macOS
   fn.source "${prefix}/opt/zplug/init.zsh"
 
-  # gnu tools and manpage from homebrew
-  for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar'); do
-    local gnu_lib="${prefix}/opt/${gnu}/libexec"
+  if [[ "${HOMEBREW_GNU_UTILS}" == 'true' ]]; then
+    # gnu tools and manpage from homebrew
+    for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar'); do
+      local gnu_lib="${prefix}/opt/${gnu}/libexec"
 
-    if [[ -r "${gnu_lib}" ]]; then
-      local gnubin="${gnu_lib}/gnubin"
-      local gnuman="${gnu_lib}/gnuman"
+      if [[ -r "${gnu_lib}" ]]; then
+        local gnubin="${gnu_lib}/gnubin"
+        local gnuman="${gnu_lib}/gnuman"
 
-      $(fn.is-readable "${gnubin}") && export PATH="${gnubin}:${PATH}"
-      $(fn.is-readable "${gnuman}") && export MANPATH="${gnuman}:${MANPATH}"
-    fi
-  done
+        $(fn.is-readable "${gnubin}") && export PATH="${gnubin}:${PATH}"
+        $(fn.is-readable "${gnuman}") && export MANPATH="${gnuman}:${MANPATH}"
+      fi
+    done  
+  fi
 
   # Ruby from homebrew
   local ruby_bin="${prefix}/opt/ruby/bin"
