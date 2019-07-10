@@ -55,6 +55,11 @@ ex() {
   fi
 }
 
+# Show gcc flags current cpu
+gcc-flags() {
+  gcc -c -Q -march=native --help=target
+}
+
 # Show iommu grouping and other hardware info.
 # Very useful when running pci passthrough using vfio
 iommu() {
