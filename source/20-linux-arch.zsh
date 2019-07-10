@@ -3,6 +3,15 @@
 # Actually written on Manjaro, but this file should be
 # compatible with any Arch-based distro out there
 
+# Set makepkg environment variables
+export PKGEXT='.pkg.tar.xz'
+export COMPRESSXZ=(xz -T 0 -c -z -)
+export MAKEFLAGS='-j20'
+
+# Set compiler flags
+export CFLAGS='-march=native -O2 -pipe -fstack-protector-strong -fno-plt'
+export CXXFLAGS="${CFLAGS}"
+
 # Initialize zplug
 fn.source '/usr/share/zsh/scripts/zplug/init.zsh'
 
