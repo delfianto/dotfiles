@@ -12,6 +12,9 @@ export MAKEFLAGS='-j20'
 export CFLAGS='-march=native -O2 -pipe -fstack-protector-strong -fno-plt'
 export CXXFLAGS="${CFLAGS}"
 
+# Set additional cflags for building ffmpeg
+export _cflags='-I/usr/include/tensorflow'
+
 # Initialize zplug
 fn.source '/usr/share/zsh/scripts/zplug/init.zsh'
 
