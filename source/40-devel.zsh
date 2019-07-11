@@ -1,23 +1,23 @@
 # File 40-devel.sh; initialize path and environment variable for development tools
 #
 # Linux users might want to check the permission of their '/usr/local' path and chown
-# it as needed, or if you're not so confident in doing this then set the DEV_PREFIX
+# it as needed, or if you're not so confident in doing this then set the DEV_HOME
 # to set the directory where you would like to store your devtools (libs, sdks, etc).
 #
-# Another option is to set the value of DEV_USE_LOCAL to 'true' which will use
+# Another option is to set the value of DEV_USER_HOME_ACTIVE to 'true' which will use
 # $HOME/.local as the prefix for your development tools.
 
-export DEV_DOTDIR="${HOME}/.local"
-export DEV_PREFIX="${DEV_PREFIX-/usr/local}"
-export DEV_USE_LOCAL="${DEV_USE_LOCAL:-false}"
+export DEV_HOME="${DEV_HOME-/usr/local}"
+export DEV_USER_HOME="${DEV_USER_HOME:-${HOME}/.local}"
+export DEV_USER_HOME_ACTIVE="${DEV_USER_HOME_ACTIVE:-false}"
 
 fn.dev-prefix() {
   local prefix=''
 
-  if [[ "${DEV_USE_LOCAL}" == 'true' ]]; then
-    prefix="${DEV_DOTDIR}"
+  if [[ "${DEV_USER_HOME_ACTIVE}" == 'true' ]]; then
+    prefix="${DEV_USER_HOME}"
   else
-    prefix="${DEV_PREFIX}"
+    prefix="${DEV_HOME}"
   fi
 
   # Resolve the directory path
@@ -150,7 +150,7 @@ fn.init-sdkman() {
   *)
     if $(fn.is-readable "${init_script}"); then
       export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
-      export GRADLE_USER_HOME="${LOCAL_HOME}/share/gradle"
+      export GRADLE_USER_HOME="${DEV_USER_HOME}/share/gradle"
 
       mkdir -p "${SDKMAN_DIR}/ext"
       source "${init_script}"
@@ -173,4 +173,4 @@ fn.init-dev() {
 fn.init-dev
 
 # Add .local/bin to PATH
-export PATH="${DEV_DOTDIR}/bin:${PATH}"
+export PATH="${DEV_USER_HOME}/bin:${PATH}"
