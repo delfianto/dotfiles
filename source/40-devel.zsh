@@ -13,6 +13,7 @@ export DEV_USER_HOME_ACTIVE="${DEV_USER_HOME_ACTIVE:-false}"
 
 fn.dev-prefix() {
   local prefix=''
+  local result=''
 
   if [[ "${DEV_USER_HOME_ACTIVE}" == 'true' ]]; then
     prefix="${DEV_USER_HOME}"
@@ -40,11 +41,11 @@ fn.init-ruby() {
     # local ruby_ver="${full_ver%?}0"
 
     # do this for now until we can speed up ruby version detection
-    local ruby_ver='2.6.0'
+    local gem_path='ruby/gems/2.6.0'
 
-    export GEM_HOME="$(fn.dev-prefix lib/ruby/${ruby_ver})"
+    export GEM_HOME="$(fn.dev-prefix lib/${gem_path})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
-    export GEM_PATH="${GEM_HOME}:/usr/lib/ruby/gem/${ruby_ver}"
+    export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_path}"
 
     fn.path-add "${GEM_HOME}/bin"
   fi
