@@ -64,6 +64,9 @@ gcc-flags() {
 # Very useful when running pci passthrough using vfio
 iommu() {
   case "${1}" in
+  's' | 'dev')
+    sudo lspci -vv -s "${2}"
+    ;;
   'g' | 'group')
     local iommu='/usr/bin/ls -dv /sys/kernel/iommu_groups/*'
 
@@ -100,7 +103,7 @@ iommu() {
     done
     ;;
   *)
-    # todo: wrote something here
+    # todo: put some help text here
     echo 'Fus Ro Dah!'
     ;;
   esac
