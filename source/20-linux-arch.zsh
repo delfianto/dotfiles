@@ -60,6 +60,9 @@ pkg() {
   'info')
     yay -Qi "${@:2}"
     ;;
+  'stat')
+    yay -Ps
+    ;;
   'orphans')
     yay -Qdtq
     ;;
