@@ -5,3 +5,6 @@ zplug/
 # zsh dynamic files
 .histfile
 .zcompdump
+
+# systemd target directory
+systemd/user/*.wants
