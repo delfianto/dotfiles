@@ -91,7 +91,7 @@ class MyCLI < Thor
 
   private
   def check_path(path)
-    raise Error, "ERROR: Path #{path} is not an absoluta path." if !Pathname.new(path).absolute?
+    raise Error, "ERROR: Path #{path} is not an absolute path." if !Pathname.new(path).absolute?
     raise Error, "ERROR: Path #{path} does not exist." if !File.exist?(path)
   end
 
