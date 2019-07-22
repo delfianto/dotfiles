@@ -1,0 +1,10 @@
+[Unit]
+Description=Scream Virtual Sound Card
+
+[Service]
+Type=simple
+Environment=SCREAM_IVSHMEM=/dev/shm/scream-ivshmem
+ExecStart=/usr/bin/scream-ivshmem-pulse $SCREAM_IVSHMEM
+
+[Install]
+WantedBy=default.target
