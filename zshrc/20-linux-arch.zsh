@@ -34,19 +34,8 @@ pkg() {
   'check')
     yay "${@:2}"
     ;;
-  'cache')
-    echo 'y' | yay -Sc
-    ;;
   'clean')
-    if [[ ! -z $(pkg orphans) ]]; then
-      tput setaf 1 #
-      echo 'WARNING: Removing all unneeded dependencies...'
-      tput sgr0
-
-      yay -Yc
-    else
-      echo 'No unneeded dependencies in the system.'
-    fi
+    echo 'y' | yay -Sc
     ;;
   'deps')
     pactree -d 1 "${@:2}"
@@ -63,8 +52,19 @@ pkg() {
   'stat')
     yay -Ps
     ;;
-  'orphans')
+  'orphan')
     yay -Qdtq
+    ;;
+  'nodeps')
+    if [[ ! -z $(pkg orphans) ]]; then
+      tput setaf 1 #
+      echo 'WARNING: Removing all unneeded dependencies...'
+      tput sgr0
+
+      yay -Yc
+    else
+      echo 'No unneeded dependencies in the system.'
+    fi
     ;;
   'l' | 'ls' | 'list')
     yay -Qs ${@:2}
