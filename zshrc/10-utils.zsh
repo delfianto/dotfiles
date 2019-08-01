@@ -25,12 +25,10 @@ up() {
   fi
 }
 
-cdf() {
-  df -h | grep -v ^none | (
-    read header
-    echo "$header"
-    sort -n -k 1
-  )
+# Enable call of an existing function using sudo
+# https://unix.stackexchange.com/questions/317687/command-not-found-when-sudoing-function-from-zshrc
+fn.sudo() {
+  sudo zsh -c "$functions[$1]" "$@"
 }
 
 fn.bench() {
