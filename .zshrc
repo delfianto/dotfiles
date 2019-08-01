@@ -84,6 +84,10 @@ setopt EXTENDED_HISTORY       # write timestamps to history
 # zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 # zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
+# This tells zsh that small letters will match small and capital letters.
+# (i.e. capital letters match only capital letters.)
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
 # Zplug plugin initialization
 if $(fn.is-fun zplug); then
   # powerlevel10k!
