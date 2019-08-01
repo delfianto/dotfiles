@@ -109,30 +109,49 @@ iommu() {
   esac
 }
 
-# Wrapper function for systemd related command, since those things
-# is super goddamn tedious to type thus we name the function SUX!
+# Wrapper function for systemd related command.
+#
+# Why they have to make the command super long
+# and thus so goddamn tedious to type...
 sux() {
   local cmd=''
+  local usr='--user'
+  local fun=$funcstack[1]
 
-  case "$1" in
+  if [[ "$1" == "${usr}" ]]; then
+    local arg="$2"
+  else
+    local arg="$1"
+  fi
+
+  case "${arg}" in
   'ls' | 'list')
-    cmd='systemctl list-units --no-pager --type service'
+    cmd='systemctl list-units --type service'
     [[ ! -z "$2" ]] && cmd="${cmd} --all"
     ;;
   'start' | 'stop' | 'restart' | 'status' | 'enable' | 'disable')
-    [ ! -z "$2" ] && cmd="sudo systemctl --no-pager $1 $2"
+    [ ! -z "$2" ] && cmd="systemctl ${@:2}"
     ;;
   'log')
-    [[ ! -z "$2" ]] && cmd="journalctl --no-pager -u $2"
+    [[ ! -z "$2" ]] && cmd="journalctl -u ${@:2}"
     ;;
   'help')
-    echo "Usage: ${FUNCNAME[0]} [list] [unit-state]"
-    echo "Usage: ${FUNCNAME[0]} [log|start|stop|restart] [unit-name]"
+    echo "Usage: ${fun} [list] [unit-state]"
+    echo "Usage: ${fun} [log|start|stop|restart] [unit-name]"
     ;;
   *)
-    cmd="${FUNCNAME[0]} help"
+    cmd="${fun} help"
     ;;
   esac
 
-  [[ ! -z "${cmd}" ]] && "${cmd}"
+
+  if [[ "$1" == "${usr}" ]]; then
+    cmd="${cmd} ${usr}"
+  fi
+
+  [[ ! -z "${cmd}" ]] && eval "${cmd}"
 }
+
+# Alias for systemd wrapper
+alias scu='sux --user'
+alias scx='fn.sudo sux'
