@@ -47,6 +47,7 @@ class MyCLI < Thor
 
       check_path src_path
       check_path mnt_path
+      raise Error, "ERROR: #{mnt_path} is already mounted" if !Dir.empty?(mnt_path)
 
       password = conf_map['password'] || pass
       app_type = conf_map['app_type'] # internal app type, 0 is encfs, 1 is gocryptfs
@@ -65,8 +66,8 @@ class MyCLI < Thor
             !File.exist?("#{src_path}/.encfs6.xml")
 
           opt = "-S"
-          opt += " -o #{mnt_opts}" if mnt_opts != nil
-          opt += " volname=#{vol_name}" if vol_name != nil
+          opt += " -o #{mnt_opts}" if mnt_opts
+          opt += " volname=#{vol_name}" if vol_name
         when 1
           bin = get_bin('gocryptfs')
           raise Error, "ERROR: #{conf_key} is not a #{bin} directory" if
@@ -75,16 +76,13 @@ class MyCLI < Thor
           opt = "-quiet "
           opt += "-allow_other " if OS.mac?
           opt += "-ko local"
-          opt += ",volname=#{vol_name}" if vol_name != nil
-          opt += ",#{mod_opts}" if mod_opts != nil
-          opt += " -o #{mnt_opts}" if mnt_opts != nil
+          opt += ",volname=#{vol_name}" if vol_name
+          opt += ",#{mod_opts}" if mod_opts
+          opt += " -o #{mnt_opts}" if mnt_opts
       end
 
-      raise Error, "ERROR: #{bin} executable is not available in PATH" if !bin
-      raise Error, "ERROR: #{mnt_path} is already mounted" if !Dir.empty?(mnt_path)
-
       # type the password using echo
-      password != nil ? cmd = "echo \'#{password}\' | " : cmd = ''
+      password ? cmd = "echo \'#{password}\' | " : cmd = ''
       cmd += "#{bin} #{opt} '#{src_path}' '#{mnt_path}'".strip
 
       system fuse_bin
@@ -95,7 +93,7 @@ class MyCLI < Thor
   private
   def get_bin(name)
     bin = File.which(name)
-    raise Error, "Error: #{bin} is not installed or not available in PATH" if bin == nil
+    raise Error, "Error: #{bin} is not installed or not available in PATH" if bin.nil?
     return bin
   end
 
