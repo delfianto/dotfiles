@@ -1,4 +1,4 @@
-# File zshrc-darwin; macOS specific zsh setup
+# File 20-macos.zsh; macOS specific zsh setup
 #
 # Setup homebrew and environment variables specific to macOS
 
@@ -17,7 +17,7 @@ fn.clean-store() {
   find . -name ".DS_Store" -delete
 }
 
-fn.init-brew() {
+fn.brew-init() {
   local prefix="${1:-/usr/local}"
   export HOMEBREW_PREFIX="${prefix}"
   export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-false}"
@@ -60,30 +60,44 @@ fn.init-brew() {
   export HOMEBREW_CASK_OPTS='--appdir=/Applications'
 }
 
+fn.brew-install() {
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+}
+
+fn.brew-uninstall() {
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+}
+
+fn.brew() {
+  typeset -A args
+  local fn='fn.brew'
+
+  args[init]="${fn}-init"
+  args[inst]="${fn}-install"
+  args[purge]="${fn}-uninstall"
+
+  eval "${args[$1]}"
+}
+
 # Homebrew command wrapper
 pkg() {
   typeset -A args
-
   local brew='brew'
-  local curl='curl -fsSL'
-  local ruby='/usr/bin/ruby -e' # Use ruby bin that shipped with macOS
-  local repo='https://raw.githubusercontent.com/Homebrew/install/master'
 
-  args[setup]="${bin} $(${curl} ${git}/install)"
-  args[purge]="${bin} $(${curl} ${git}/uninstall)"
-
+  args[c]="${brew} cleanup"
   args[i]="${brew} install"
-  args[p]="${brew} update"
+  args[f]="${brew} update"
+  args[o]="${brew} outdated"
   args[u]="${brew} upgrade"
   args[rm]="${brew} uninstall"
   args[ls]="${brew} list"
 
   local cmd="${args[$1]}"
 
-  if [[ -z "${cmd}" ]]; then
-    eval "${cmd} ${@:2}"
-  else
+  if [[ -z "${1}" ]]; then
     eval "${brew} $@"
+  else
+    eval "${cmd} ${@:2}"
   fi
 }
 
@@ -106,4 +120,4 @@ svc() {
   esac
 }
 
-fn.init-brew
+fn.brew init

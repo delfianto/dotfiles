@@ -1,4 +1,4 @@
-# File 40-devel.sh; initialize path and environment variable for development tools
+# File 40-devel.zsh; initialize path and environment variable for development tools
 #
 # Linux users might want to check the permission of their '/usr/local' path and chown
 # it as needed, or if you're not so confident in doing this then set the DEV_HOME

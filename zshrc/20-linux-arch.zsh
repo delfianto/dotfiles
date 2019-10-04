@@ -1,4 +1,4 @@
-# File 99-arch.zsh; Arch family specific zsh setup
+# File 20-linux-arch.zsh; Arch family specific zsh setup
 #
 # Actually written on Manjaro, but this file should be
 # compatible with any Arch-based distro out there

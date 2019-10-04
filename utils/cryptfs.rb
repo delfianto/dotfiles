@@ -23,15 +23,17 @@ require 'parseconfig'
 require 'pathname'
 require 'ptools'
 require 'thor'
+require 'os'
 
 class MyCLI < Thor
 
   desc 'mount [CRYPT_DIR]', 'Mount an encrypted volume.'
   def mount(conf_key, pass = nil)
     key_file = ENV['LOCKER_SECRET_KEY'] || "#{Dir.home}/.config/cryptfs.conf"
-    basename = Pathname.new(conf_key).absolute? ? (File.basename conf_key) : conf_key
+    raise Error, "Config file does not exist." if !File.exists?(key_file)
 
     reserved = 'global'
+    basename = Pathname.new(conf_key).absolute? ? (File.basename conf_key) : conf_key
     raise Error, "ERROR: #{reserved} is a reserved config key." if basename == reserved
 
     read_file(key_file) { |file, config|
@@ -47,9 +49,10 @@ class MyCLI < Thor
       check_path mnt_path
 
       password = conf_map['password'] || pass
-      app_type = conf_map['app_type']
-      fuse_opt = conf_map['fuse_opt']
-      vol_name = conf_map['vol_name']
+      app_type = conf_map['app_type'] # internal app type, 0 is encfs, 1 is gocryptfs
+      vol_name = conf_map['vol_name'] # optional custom volume name
+      mod_opts = conf_map['mod_opts'] # fuse module options
+      mnt_opts = conf_map['mnt_opts'] # mount options
 
       raise Error, "ERROR: cannot read volume password for #{conf_key}" if !password
       raise Error, "ERROR: cannot read volume type config for #{conf_key}" if
@@ -57,26 +60,43 @@ class MyCLI < Thor
 
       case app_type.to_i
         when 0
-          bin = File.which('encfs')
-          opt = "-o #{fuse_opt} volname=#{vol_name} -S"
+          bin = get_bin('encfs')
           raise Error, "ERROR: #{conf_key} is not a #{bin} directory" if
             !File.exist?("#{src_path}/.encfs6.xml")
+
+          opt = "-S"
+          opt += " -o #{mnt_opts}" if mnt_opts != nil
+          opt += " volname=#{vol_name}" if vol_name != nil
         when 1
-          bin = File.which('gocryptfs')
-          opt = "-ko #{fuse_opt} -o allow_other"
+          bin = get_bin('gocryptfs')
           raise Error, "ERROR: #{conf_key} is not a #{bin} directory" if
             !File.exist?("#{src_path}/gocryptfs.diriv")
+
+          opt = "-quiet "
+          opt += "-allow_other " if OS.mac?
+          opt += "-ko local"
+          opt += ",volname=#{vol_name}" if vol_name != nil
+          opt += ",#{mod_opts}" if mod_opts != nil
+          opt += " -o #{mnt_opts}" if mnt_opts != nil
       end
 
       raise Error, "ERROR: #{bin} executable is not available in PATH" if !bin
       raise Error, "ERROR: #{mnt_path} is already mounted" if !Dir.empty?(mnt_path)
 
+      # type the password using echo
       password != nil ? cmd = "echo \'#{password}\' | " : cmd = ''
-      cmd += "#{bin} #{opt} #{src_path} #{mnt_path}".strip
+      cmd += "#{bin} #{opt} '#{src_path}' '#{mnt_path}'".strip
 
       system fuse_bin
       Process.detach(spawn(cmd))
     }
+  end
+
+  private
+  def get_bin(name)
+    bin = File.which(name)
+    raise Error, "Error: #{bin} is not installed or not available in PATH" if bin == nil
+    return bin
   end
 
   private

@@ -1,4 +1,4 @@
-# File 20-alias.zsh; common alias initialization
+# File 30-alias.zsh; common alias initialization
 #
 # Functions and aliases used by all operating systems
 

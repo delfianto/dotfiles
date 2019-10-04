@@ -1,4 +1,4 @@
-# File 99-linux.zsh; Linux specific zsh setup
+# File 20-linux.zsh; Linux specific zsh setup
 #
 # This file should be applicable to most of Linux distribution, any
 # other distro specific script should be placed in (os-family).zsh

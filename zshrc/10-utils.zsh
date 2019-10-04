@@ -1,4 +1,4 @@
-# File 10_utils.zsh; common functions used by all shell script
+# File 10-utils.zsh; common functions used by all shell script
 #
 # Most of the function I wrote will have 'fn.' prefix on them
 # (just my personal perference) to make them easier to identify.
@@ -127,7 +127,7 @@ fn.ls-fun() {
 
 fn.ls-env() {
   if [[ -z "$1" ]]; then
-    printenv
+    printenv | sort
   else
     printenv | grep --color=auto "$1.*="
   fi
