@@ -28,6 +28,10 @@
 [submodule]
 	recurse = true
 	fetchJobs = 0
+##########################################
+# a nice sets of git aliases, taken from
+# https://gist.github.com/pksunkara/988716
+##########################################
 [alias]
 	a = add --all
 	ai = add -i
