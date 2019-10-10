@@ -61,21 +61,28 @@ fn.brew-init() {
 }
 
 fn.brew-install() {
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  if (( ${+commands[brew]} )); then
+    echo 'Homebrew is already installed.'
+    exit 1
+  else
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  fi
 }
 
 fn.brew-uninstall() {
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+  if (( ${+commands[brew]} )); then
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+  else
+    echo 'Homebrew is not installed.'
+    exit 1
+  fi
 }
 
 fn.brew() {
   typeset -A args
-  local fn='fn.brew'
-
-  args[init]="${fn}-init"
-  args[inst]="${fn}-install"
-  args[purge]="${fn}-uninstall"
-
+  args[init]="fn.brew-init"
+  args[install]="fn.brew-install"
+  args[uninstall]="fn.brew-uninstall"
   eval "${args[$1]}"
 }
 
