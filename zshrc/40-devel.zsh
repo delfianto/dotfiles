@@ -55,7 +55,7 @@ fn.init-ruby() {
       eval "mkdir -p ${GEM_HOME}/{specifications,bin}"
     fi
 
-    fn.path-add "${GEM_HOME}/bin"
+    fn.pathmunge "${GEM_HOME}/bin"
   fi
 }
 
@@ -182,4 +182,4 @@ fn.init-dev() {
 fn.init-dev
 
 # Add .local/bin to PATH
-export PATH="${DEV_USER_HOME}/bin:${PATH}"
+fn.pathmunge "${DEV_USER_HOME}/bin"

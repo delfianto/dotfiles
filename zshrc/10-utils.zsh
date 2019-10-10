@@ -141,11 +141,13 @@ fn.ls-path() {
   done
 }
 
-fn.path-add() {
-  if $(fn.is-dir "$1") && $(fn.is-readable "$1"); then
-    case ":$PATH:" in
-      *":${1}:"*) : ;; # already there
-      *) PATH="${1}:${PATH}" ;; # or PATH="$PATH:$1"
-    esac
+fn.pathmunge() {
+  if $(fn.is-dir "$1") && $(fn.is-readable "$1") && 
+      ! echo $PATH | grep -Eq "(^|:)$1($|:)"; then
+    if [ "$2" = "after" ] ; then
+      PATH=$PATH:$1
+    else
+      PATH=$1:$PATH
+    fi
   fi
 }

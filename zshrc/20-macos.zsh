@@ -20,7 +20,7 @@ fn.clean-store() {
 fn.brew-init() {
   local prefix="${1:-/usr/local}"
   export HOMEBREW_PREFIX="${prefix}"
-  export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-false}"
+  export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-true}"
 
   if (( ! $+commands[brew] )); then
     echo "WARNING: Homebrew is not installed"
@@ -33,15 +33,11 @@ fn.brew-init() {
 
   if [[ "${HOMEBREW_GNU_UTILS}" == 'true' ]]; then
     # gnu tools and manpage from homebrew
-    for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar'); do
+    for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar gnu-indent gnu-which'); do
       local gnu_lib="${prefix}/opt/${gnu}/libexec"
 
       if [[ -r "${gnu_lib}" ]]; then
-        local gnubin="${gnu_lib}/gnubin"
-        local gnuman="${gnu_lib}/gnuman"
-
-        $(fn.is-readable "${gnubin}") && export PATH="${gnubin}:${PATH}"
-        $(fn.is-readable "${gnuman}") && export MANPATH="${gnuman}:${MANPATH}"
+        fn.pathmunge "${gnu_lib}/gnubin"
       fi
     done
   fi
