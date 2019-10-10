@@ -8,8 +8,8 @@ export ZSH_ZPROF="${ZSH_ZPROF:-false}"
 export ZDOTDIR="${ZDOTDIR:-"${HOME}/.config/dotfiles"}"
 export ZPLUG_HOME="${ZDOTDIR}/zplug"
 export ZPLUG_LOADFILE="${ZPLUG_HOME}/packages.zsh"
-export ZPLUG_AUTO_PKG="${ZPLUG_AUTO_PKG:-false}"
-export ZPLUG_LOAD_FIX="${ZPLUG_LOAD_FIX:-false}"
+export ZPLUG_AUTO_PKG="${ZPLUG_AUTO_PKG:-true}"
+export ZPLUG_LOAD_FIX="${ZPLUG_LOAD_FIX:-true}"
 
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
@@ -22,7 +22,6 @@ export EDITOR='/usr/bin/nano'
 export PAGER='less'
 
 # This affects every invocation of `less`.
-#
 #   -i   case-insensitive search unless search string contains uppercase letters
 #   -R   color
 #   -F   exit if there is less than one page of content

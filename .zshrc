@@ -53,8 +53,8 @@ autoload -U regexp-replace
 zle_highlight=('paste:none')
 
 # On every prompt, set terminal title to "user@host: cwd".
-# function set-term-title() { print -Pn '\e]0;%n@%m: %~\a' }
-# add-zsh-hook precmd set-term-title
+function set-term-title() { print -Pn '\e]0;%n@%m: %~\a' }
+add-zsh-hook precmd set-term-title
 
 ZLE_RPROMPT_INDENT=0          # don't leave an empty space after right prompt
 READNULLCMD="${PAGER}"        # use the default pager instead of `more`
@@ -81,8 +81,8 @@ setopt SHARE_HISTORY          # write and import history on every command
 setopt EXTENDED_HISTORY       # write timestamps to history
 
 # The following lines were added by compinstall
-# zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
-# zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # This tells zsh that small letters will match small and capital letters.
 # (i.e. capital letters match only capital letters.)
@@ -91,7 +91,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 # Zplug plugin initialization
 if $(fn.is-fun zplug); then
   # powerlevel10k!
-  zplug 'romkatv/powerlevel10k', use:'powerlevel10k.zsh-theme'
+  zplug 'romkatv/powerlevel10k', as:theme, depth:1
 
   # oh-my-zsh plugins
   zplug 'plugins/sudo', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"(($+commands[sudo]))"
