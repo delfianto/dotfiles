@@ -6,5 +6,9 @@ zplug/
 .histfile
 .zcompdump
 
+# powerlevel10k theme config, since most probably
+# every machine will have a different preferences
+.p10k.zsh
+
 # systemd target directory
 systemd/user/*.wants
