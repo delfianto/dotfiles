@@ -22,7 +22,7 @@ fn.dev-prefix() {
 
   # Resolve the directory path
   if (( ${+commands[realpath]} )); then
-    echo $(realpath "${prefix}/${1}")
+    echo $(realpath -m "${prefix}/${1}")
   else
     # Workaround for macOS without gnu coreutils from homebrew
     echo $(python "${ZDOTDIR}/utils/realpath.py" "${prefix}/${1}")
@@ -32,7 +32,6 @@ fn.dev-prefix() {
 # Initialize nodejs prefix path
 fn.init-node() {
   if (( ${+commands[node]} )); then
-    echo "node"
     alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(fn.dev-prefix)"
   fi
@@ -51,6 +50,10 @@ fn.init-ruby() {
     export GEM_HOME="$(fn.dev-prefix lib/${gem_path})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
     export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_path}"
+
+    if [[ ! -d "${GEM_HOME}" ]]; then
+      eval "mkdir -p ${GEM_HOME}/{specifications,bin}"
+    fi
 
     fn.path-add "${GEM_HOME}/bin"
   fi
