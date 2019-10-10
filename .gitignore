@@ -1,14 +1,12 @@
-# ignored folders
+# ignored directories
+private
 private/
 zplug/
 
 # zsh dynamic files
 .histfile
 .zcompdump
-
-# powerlevel10k theme config, since most probably
-# every machine will have a different preferences
-.p10k.zsh
+.zsh_history
 
 # systemd target directory
 systemd/user/*.wants
