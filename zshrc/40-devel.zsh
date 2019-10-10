@@ -7,13 +7,12 @@
 # Another option is to set the value of DEV_USER_HOME_ACTIVE to 'true' which will use
 # $HOME/.local as the prefix for your development tools.
 
-export DEV_HOME="${DEV_HOME-/usr/local}"
+export DEV_HOME="${DEV_HOME:-/usr/local}"
 export DEV_USER_HOME="${DEV_USER_HOME:-${HOME}/.local}"
 export DEV_USER_HOME_ACTIVE="${DEV_USER_HOME_ACTIVE:-false}"
 
 fn.dev-prefix() {
   local prefix=''
-  local result=''
 
   if [[ "${DEV_USER_HOME_ACTIVE}" == 'true' ]]; then
     prefix="${DEV_USER_HOME}"
@@ -22,12 +21,18 @@ fn.dev-prefix() {
   fi
 
   # Resolve the directory path
-  echo $(realpath "${prefix}/${1}")
+  if (( ${+commands[realpath]} )); then
+    echo $(realpath "${prefix}/${1}")
+  else
+    # Workaround for macOS without gnu coreutils from homebrew
+    echo $(python "${ZDOTDIR}/utils/realpath.py" "${prefix}/${1}")
+  fi
 }
 
 # Initialize nodejs prefix path
 fn.init-node() {
   if (( ${+commands[node]} )); then
+    echo "node"
     alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(fn.dev-prefix)"
   fi
