@@ -24,7 +24,7 @@ fi
 
 # Helper functions for sourcing file
 fn.source() {
-  [[ -f "${1}" ]] && source "${1}" || echo "Cannot source: ${1}"
+  [[ -f "${1}" ]] && source "${1}"
 }
 
 _fn.import() {
@@ -92,6 +92,9 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 if $(fn.is-fun zplug); then
   # powerlevel10k!
   zplug 'romkatv/powerlevel10k', as:theme, depth:1
+
+  # To customize prompt, run `p10k configure` or edit ~/.config/dotfiles/.p10k.zsh.
+  fn.source "${ZDOTDIR}/.p10k.zsh"
 
   # oh-my-zsh plugins
   zplug 'plugins/sudo', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"(($+commands[sudo]))"
