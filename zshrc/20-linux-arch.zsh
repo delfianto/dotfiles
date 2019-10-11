@@ -81,6 +81,9 @@ pkg() {
   's' | 'sy' | 'sync' )
     yay -Syy
     ;;
+  'q' | 'qu' | 'quiet')
+    yay --editmenu --nocleanmenu --nodiffmenu --noeditmenu --noremovemake --save
+    ;;
   *)
     yay "${@:1}"
     ;;
