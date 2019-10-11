@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# read /etc/os-release and store parse it as key value pairs
+# read /etc/os-release and store the result as key value pairs
 # https://stackoverflow.com/questions/29030135/module-to-parse-a-simple-syntax-in-python
 
 with open("/etc/os-release") as f:
