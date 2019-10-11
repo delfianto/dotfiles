@@ -25,11 +25,11 @@ pkg() {
   fi
 
   case ${1} in
-  'make')
-    makepkg -sic
-    ;;
   'logs')
     cat /var/log/pacman.log
+    ;;
+  'build')
+    makepkg -sic
     ;;
   'check')
     yay "${@:2}"
@@ -56,7 +56,7 @@ pkg() {
     yay -Qdtq
     ;;
   'nodeps')
-    if [[ ! -z $(pkg orphans) ]]; then
+    if [[ ! -z $(pkg orphan) ]]; then
       tput setaf 1 #
       echo 'WARNING: Removing all unneeded dependencies...'
       tput sgr0
@@ -78,7 +78,7 @@ pkg() {
   'u' | 'up' | 'update')
     yay -Syu
     ;;
-  'd' | 'db' | 'database' )
+  's' | 'sy' | 'sync' )
     yay -Syy
     ;;
   *)
