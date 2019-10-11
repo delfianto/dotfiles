@@ -142,7 +142,7 @@ fn.ls-path() {
 }
 
 fn.pathmunge() {
-  if $(fn.is-dir "$1") && $(fn.is-readable "$1") && 
+  if $(fn.is-dir "$1") && $(fn.is-readable "$1") &&
       ! echo $PATH | grep -Eq "(^|:)$1($|:)"; then
     if [ "$2" = "after" ] ; then
       PATH=$PATH:$1
