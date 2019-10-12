@@ -75,10 +75,10 @@ pkg() {
   'r' | 'rm' | 'remove')
     yay -R "${@:2}"
     ;;
-  'u' | 'up' | 'update')
+  'u' | 'up' | 'upgrade')
     yay -Syu
     ;;
-  's' | 'sy' | 'sync' )
+  's' | 'sy' | 'update' )
     yay -Syy
     ;;
   'q' | 'qu' | 'quiet')
