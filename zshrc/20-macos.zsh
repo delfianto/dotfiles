@@ -93,7 +93,7 @@ pkg() {
   fi
 
   local cmd='brew'
-  case ${1} in
+  case "$1" in
     'info')
       "${cmd}" info "${@:2}"
       ;;

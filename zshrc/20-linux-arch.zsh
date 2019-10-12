@@ -24,7 +24,7 @@ pkg() {
     sudo pacman --noconfirm -S yay
   fi
 
-  case ${1} in
+  case "$1" in
   'logs')
     cat /var/log/pacman.log
     ;;
