@@ -87,24 +87,44 @@ fn.brew() {
 
 # Homebrew command wrapper
 pkg() {
-  typeset -A args
-  local brew='brew'
-
-  args[c]="${brew} cleanup"
-  args[i]="${brew} install"
-  args[f]="${brew} update"
-  args[o]="${brew} outdated"
-  args[u]="${brew} upgrade"
-  args[rm]="${brew} uninstall"
-  args[ls]="${brew} list"
-
-  local cmd="${args[$1]}"
-
-  if [[ -z "${1}" ]]; then
-    eval "${brew} $@"
-  else
-    eval "${cmd} ${@:2}"
+  if (( !${+commands[brew]} )); then
+    echo 'Homebrew is not installed.'
+    exit 1
   fi
+
+  local cmd='brew'
+  case ${1} in
+    'info')
+      "${cmd}" info "${@:2}"
+      ;;
+    'search')
+      "${cmd}" search "${@:2}"
+      ;;
+    'l' | 'ls' | 'list')
+      "${cmd}" list "${@:2}"
+      ;;
+    'i' | 'in' | 'install')
+      "${cmd}" install "${@:2}"
+      ;;
+    'r' | 'rm' | 'remove')
+      "${cmd}" uninstall "${@:2}"
+      ;;
+    'u' | 'up' | 'upgrade')
+      "${cmd}" upgrade "${@:2}"
+      ;;
+    's' | 'sy' | 'update')
+      "${cmd}" update
+      ;;
+    'c' | 'cfg' | 'config')
+      "${cmd}" config
+      ;;
+    'd' | 'doc' | 'doctor')
+      "${cmd}" doctor
+      ;;
+    *)
+      "${cmd}" "${@:1}"
+      ;;
+  esac
 }
 
 # Wrapper for homebrew service
