@@ -46,8 +46,7 @@ fn.brew-init() {
   fi
 
   # Ruby from homebrew
-  local ruby_bin="${prefix}/opt/ruby/bin"
-  [[ -r "${ruby_bin}" ]] && export PATH="${ruby_bin}:${PATH}"
+  fn.pathmunge "${prefix}/opt/ruby/bin"
 
   # Apache Tomcat from homebrew
   local catalina_home="${prefix}/opt/tomcat"

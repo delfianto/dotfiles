@@ -49,7 +49,11 @@ fn.init-ruby() {
 
     export GEM_HOME="$(fn.dev-prefix lib/${gem_path})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
-    export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_path}"
+    export GEM_PATH="${GEM_HOME}"
+
+    if $(fn.is-linux); then
+      export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_path}"
+    fi
 
     if [[ ! -d "${GEM_HOME}" ]]; then
       eval "mkdir -p ${GEM_HOME}/{specifications,bin}"
