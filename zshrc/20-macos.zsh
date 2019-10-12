@@ -31,8 +31,11 @@ fn.brew-init() {
   # Zplug for macOS
   fn.source "${prefix}/opt/zplug/init.zsh"
 
+  # ZSH completion from homebrew
+  fpath=(/usr/local/share/zsh-completions $fpath)
+
   if [[ "${HOMEBREW_GNU_UTILS}" == 'true' ]]; then
-    # gnu tools and manpage from homebrew
+    # GNU utilities and manpage from homebrew
     for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar gnu-indent gnu-which'); do
       local gnu_lib="${prefix}/opt/${gnu}/libexec"
 
