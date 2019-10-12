@@ -8,9 +8,10 @@ if ! (( ${+commands[brew]} )); then
 fi
 
 PACKAGES=(
-  zplug
+  # updates shell
   zsh
-  git
+  zplug
+  # gnu utilities
   grep
   gnu-sed
   gnu-tar
@@ -18,23 +19,31 @@ PACKAGES=(
   gnu-which
   coreutils
   findutils
-  autoconf
-  automake
-  libtool
+  # media apps
   ffmpeg
   imagemagick
+  # devtools
+  git
   diff-so-fancy
-  npm
-  yarn
+  autoconf
+  automake
+  libtool  
   pkg-config
   postgresql
   mariadb
   python
+  ruby
+  node
+  yarn
+  go
+  # other utils
+  gocryptfs
   tmux
   tree
+  wget
+  # text editors
   nano
   neovim
-  wget
 )
 
 echo 'Installing packages...'
