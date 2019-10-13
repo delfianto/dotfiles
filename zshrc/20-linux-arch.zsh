@@ -18,6 +18,20 @@ fn.source '/usr/share/zsh/scripts/zplug/init.zsh'
 # Import LS_Colors definition
 fn.source '/usr/share/LS_COLORS/dircolors.sh'
 
+# Wrapper for default system java, in case we need to bypass sdkman.
+jvm() {
+  local jvm_home=$(archlinux-java get)
+
+  if [[ -z "${jvm_home}" ]]; then
+    echo 'There is no defined Java VM environment on the system.'
+    echo 'Run [ archlinux-java set ] to configure your system JVM.'
+    exit 1
+  fi
+
+  GDK_SCALE=2 JAVA_HOME="/usr/lib/jvm/${jvm_home}"
+  "${JAVA_HOME}/bin/java" "${@:1}"
+}
+
 # Wrapper function for package manager
 pkg() {
   if (( !${+commands[yay]} )); then
