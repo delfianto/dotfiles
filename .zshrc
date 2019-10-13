@@ -104,10 +104,11 @@ if $(fn.is-fun zplug); then
   # zplug 'plugins/ssh-agent', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"[[ $OSTYPE != darwin* ]]"
 
   # Install plugins if there are plugins that have not been installed
-  if [[ "${ZPLUG_AUTO_PKG}" == 'true' ]] && ! zplug check --verbose; then
-    printf "Install? [y/N]: "
+  if [[ "${ZPLUG_AUTO_PKG}" == 'true' ]] && ! zplug check; then
+    zplug check --verbose
+    printf "\nInstall missing packages? [y/N]: "
     if read -q; then
-      echo
+      printf '\n'
       zplug install
     fi
   fi
@@ -127,6 +128,10 @@ fi
 # for fn in $(fn.list-fun | grep _fn); do
 #   unset -f "${fn}"
 # done
+
+if $(fn.is-macos); then
+  export PATH=$PATH:l
+fi
 
 # Stop zsh profiling (if enabled)
 if [[ "${ZSH_ZPROF}" == 'true' ]]; then
