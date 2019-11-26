@@ -73,12 +73,24 @@ class MyCLI < Thor
           raise Error, "ERROR: #{conf_key} is not a #{bin} directory" if
             !File.exist?("#{src_path}/gocryptfs.diriv")
 
-          opt = "-quiet "
-          opt += "-allow_other " if OS.mac?
-          opt += "-ko local"
-          opt += ",volname=#{vol_name}" if vol_name
-          opt += ",#{mod_opts}" if mod_opts
-          opt += " -o #{mnt_opts}" if mnt_opts
+          opt = '-debug -noexec '
+
+          if OS.mac?
+            opt += '-allow_other -ko local,noappledouble '
+          end
+
+          if vol_name
+            if opt.include? '-ko'
+              opt.strip!
+              opt += ','
+            else
+              opt += '-ko '
+            end
+
+            opt += "volname=#{vol_name}"
+          end
+          
+          opt += "-o #{mnt_opts}" if mnt_opts
       end
 
       # type the password using echo
@@ -86,6 +98,7 @@ class MyCLI < Thor
       cmd += "#{bin} #{opt} '#{src_path}' '#{mnt_path}'".strip
 
       system fuse_bin
+      puts cmd
       Process.detach(spawn(cmd))
     }
   end
