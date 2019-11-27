@@ -1,132 +1,168 @@
 #!/usr/bin/env ruby
 #
 # File cryptfs; ruby script for mounting encrypted volume
-# based on the config on '${HOME}/.config/cryptfs.conf'
+# based on the config on "${HOME}/.config/cryptfs.conf"
 # only supports encfs and gocryptfs for now.
 #
 # Sample config content:
 #
-# [global]
-# # pre-init reserved for macOS
-# fuse_bin = /Library/Filesystems/osxfuse.fs/Contents/Resources/load_osxfuse
-#
 # [entry_name]
-# app_type = 1 # '0' is encfs, '1' is gocryptfs
+# app_type = 1 # "0" is encfs, "1" is gocryptfs
 # src_path = encrypted_volume_path
 # mnt_path = volume_mount_path
 # vol_name = optional_volume_name
-# password = optional_volume_password
 #
-# If you have an entry named myvol then mount it with 'cryptfs mnt myvol'
+# If you have an entry named myvol then mount it with "cryptfs mnt myvol"
 
-require 'parseconfig'
-require 'pathname'
-require 'ptools'
-require 'thor'
-require 'os'
+require "parseconfig"
+require "pathname"
+require "ptools"
+require "thor"
+require "os"
 
-class MyCLI < Thor
+class CryptoFS
+  attr_reader :app_type, :dir_name, :mnt_name, :mod_opts, 
+              :mnt_opts, :src_path, :mnt_path, :osx_fuse,
+              :app_gcfs, :app_ecfs, :dbg_flag, :ext_pass
 
-  desc 'mount [CRYPT_DIR]', 'Mount an encrypted volume.'
-  def mount(conf_key, pass = nil)
-    key_file = ENV['LOCKER_SECRET_KEY'] || "#{Dir.home}/.config/cryptfs.conf"
-    raise Error, "Config file does not exist." if !File.exists?(key_file)
+  attr_writer :src_path, :mnt_path
 
-    reserved = 'global'
-    basename = Pathname.new(conf_key).absolute? ? (File.basename conf_key) : conf_key
-    raise Error, "ERROR: #{reserved} is a reserved config key." if basename == reserved
+  def initialize(config)
+    @osx_fuse = "/library/filesystems/osxfuse.fs/contents/resources/load_osxfuse"
+    @app_gcfs = "gocryptfs"
+    @app_ecfs = "encfs"
 
-    read_file(key_file) { |file, config|
-      fuse_bin = config[reserved]['fuse_bin']
+    @dbg_flag = config["dbg_flag"].to_s == "true" # flag for debug message
+    @ext_pass = config["ext_pass"].to_s == "true" # flag for native external pass app
 
-      conf_map = config[conf_key]
-      raise Error, "ERROR: invalid config key #{conf_key}." if !conf_map
+    @app_type = config["app_type"] # internal app type, 0 is encfs, 1 is gocryptfs
+    @dir_name = config["dir_name"] # source and mount name if using default path
+    @mnt_name = config["mnt_name"] # optional custom volume name
+    @mod_opts = config["mod_opts"] # fuse module options
+    @mnt_opts = config["mnt_opts"] # mount options
 
-      src_path = conf_map['src_path'].gsub('$HOME', Dir.home)
-      mnt_path = conf_map['mnt_path'].gsub('$HOME', Dir.home)
+    @src_path = config["src_path"]&.gsub("$HOME", Dir.home)
+    @mnt_path = config["mnt_path"]&.gsub("$HOME", Dir.home)
+  end
 
-      check_path src_path
-      check_path mnt_path
-      raise Error, "ERROR: #{mnt_path} is already mounted" if !Dir.empty?(mnt_path)
+  def mount
+    init_all_path
 
-      password = conf_map['password'] || pass
-      app_type = conf_map['app_type'] # internal app type, 0 is encfs, 1 is gocryptfs
-      vol_name = conf_map['vol_name'] # optional custom volume name
-      mod_opts = conf_map['mod_opts'] # fuse module options
-      mnt_opts = conf_map['mnt_opts'] # mount options
+    case self.app_type.to_i
+    when 0
+      cmd = build_ecfs_cmd
+    when 1
+      cmd = build_gcfs_cmd
+    else
+      raise Error, "ERROR: Unknown application id #{self.app_type}"
+    end
 
-      raise Error, "ERROR: cannot read volume password for #{conf_key}" if !password
-      raise Error, "ERROR: cannot read volume type config for #{conf_key}" if
-        !app_type || (app_type.to_i < 0 || app_type.to_i > 1)
+    if self.dbg_flag
+      puts "Object state: #{self.inspect}\n\n"
+      puts "Mount command: #{cmd}\n\n"
+    end
 
-      case app_type.to_i
-        when 0
-          bin = get_bin('encfs')
-          raise Error, "ERROR: #{conf_key} is not a #{bin} directory" if
-            !File.exist?("#{src_path}/.encfs6.xml")
-
-          opt = "-S"
-          opt += " -o #{mnt_opts}" if mnt_opts
-          opt += " volname=#{vol_name}" if vol_name
-        when 1
-          bin = get_bin('gocryptfs')
-          raise Error, "ERROR: #{conf_key} is not a #{bin} directory" if
-            !File.exist?("#{src_path}/gocryptfs.diriv")
-
-          opt = '-debug -noexec '
-
-          if OS.mac?
-            opt += '-allow_other -ko local,noappledouble '
-          end
-
-          if vol_name
-            if opt.include? '-ko'
-              opt.strip!
-              opt += ','
-            else
-              opt += '-ko '
-            end
-
-            opt += "volname=#{vol_name}"
-          end
-          
-          opt += "-o #{mnt_opts}" if mnt_opts
-      end
-
-      # type the password using echo
-      password ? cmd = "echo \'#{password}\' | " : cmd = ''
-      cmd += "#{bin} #{opt} '#{src_path}' '#{mnt_path}'".strip
-
-      system fuse_bin
-      puts cmd
-      Process.detach(spawn(cmd))
-    }
+    Process.detach(spawn(cmd))
   end
 
   private
-  def get_bin(name)
-    bin = File.which(name)
+
+  def init_all_path
+    if (!src_path || !mnt_path) && !dir_name
+      raise Error, "if src_path or mnt_path is not specified, dir_name must be defined."
+    end
+
+    if self.src_path
+      get_dir(self.src_path)
+    else
+      self.src_path = get_dir("#{Dir.home}/Google Drive/Applications/#{self.dir_name}")
+    end
+
+    if self.mnt_path
+      get_dir(self.mnt_path)
+    else
+      self.mnt_path = get_dir("#{Dir.home}/Applications/#{self.dir_name}")
+    end
+  end
+
+  def build_ecfs_cmd
+    cmd = get_bin(self.app_ecfs, "#{self.src_path}/.encfs6.xml")
+    cmd << "-S -o #{self.mnt_opts} " if self.mnt_opts
+    cmd << "volname=#{self.mnt_name}" if self.mnt_name
+    return cmd
+  end
+
+  def build_gcfs_cmd
+    cmd = get_bin(self.app_gcfs, "#{self.src_path}/gocryptfs.diriv")
+    cmd << (self.dbg_flag ? " -debug -noexec " : " -quiet -noexec ")
+    cmd << build_gcfs_extra_args(cmd)
+    cmd << "-o #{self.mnt_opts} " if self.mnt_opts
+    cmd << "\'#{self.src_path}\' \'#{self.mnt_path}\'"
+    return cmd
+  end
+
+  def build_gcfs_extra_args(cmd)
+    if OS.mac?
+      system self.osx_fuse
+      cmd << "-allow_other "
+      cmd << "-extpass \'#{macos_ext_pass(self.dir_name, self.app_gcfs)}\' " if self.ext_pass
+      cmd << "-ko local,noappledouble "
+    elsif OS.linux?
+      # compose linux specific args here
+      cmd << "-ko volname=#{self.mnt_name} " if self.mnt_name
+    else
+      raise Error, "ERROR: Unsupported operating system #{OS.host_os}."
+    end
+
+    return cmd
+  end
+
+  def macos_ext_pass(dir, app)
+    "security find-generic-password -a #{dir} -s #{app} -w"
+  end
+
+  def linux_ext_pass(dir, app)
+    "something-to-test-here"
+  end
+
+  def get_dir(path)
+    raise Error, "ERROR: Path #{path} is not an absolute path." if !Pathname.new(path).absolute?
+    raise Error, "ERROR: Path #{path} does not exist." if !File.exist?(path)
+    return path
+  end
+
+  def get_bin(app, crypt_file)
+    bin = File.which(app)
     raise Error, "Error: #{bin} is not installed or not available in PATH" if bin.nil?
+    raise Error, "ERROR: Directory is not a #{app} directory" if !File.exist?(crypt_file)    
     return bin
+  end
+end
+
+class MyCLI < Thor
+  desc "mount [CRYPT_DIR]", "Mount an encrypted volume."
+  def mount(conf_key, pass = nil)
+    key_file = ENV["LOCKER_SECRET_KEY"] || "#{Dir.home}/.config/cryptfs.conf"
+    raise Error, "Config file does not exist." if !File.exists?(key_file)
+
+    read_file(key_file) { |file, config|
+      conf_map = config[conf_key]
+      conf_map ? CryptoFS.new(conf_map).mount : 
+          (raise Error, "ERROR: invalid key #{conf_key}.")
+    }
   end
 
   private
   def read_file(file, &block)
     if !File.exist?(file)
-      File.new(file, 'w+').close
+      File.new(file, "w+").close
     end
 
     config = ParseConfig.new(file)
     block&.call(file, config)
   end
 
-  private
-  def check_path(path)
-    raise Error, "ERROR: Path #{path} is not an absolute path." if !Pathname.new(path).absolute?
-    raise Error, "ERROR: Path #{path} does not exist." if !File.exist?(path)
-  end
-
-  map 'mnt' => 'mount'
+  map "mnt" => "mount"
 end
 
 MyCLI.start(ARGV)
