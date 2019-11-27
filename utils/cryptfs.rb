@@ -69,20 +69,14 @@ class CryptoFS
 
   def init_all_path
     if (!src_path || !mnt_path) && !dir_name
-      raise Error, "if src_path or mnt_path is not specified, dir_name must be defined."
+      raise Error, "ERROR: If src_path or mnt_path is nil, dir_name must be defined."
     end
 
-    if self.src_path
-      get_dir(self.src_path)
-    else
-      self.src_path = get_dir("#{Dir.home}/Google Drive/Applications/#{self.dir_name}")
-    end
+    self.src_path = get_dir(self.src_path) || 
+        get_dir("#{Dir.home}/Google Drive/Applications/#{self.dir_name}")
 
-    if self.mnt_path
-      get_dir(self.mnt_path)
-    else
-      self.mnt_path = get_dir("#{Dir.home}/Applications/#{self.dir_name}")
-    end
+    self.mnt_path = get_dir(self.mnt_path) || 
+        get_dir("#{Dir.home}/Applications/#{self.dir_name}")
   end
 
   def build_ecfs_cmd
@@ -128,6 +122,7 @@ class CryptoFS
   end
 
   def get_dir(path)
+    return nil if !path
     raise Error, "ERROR: Path #{path} is not an absolute path." if !Pathname.new(path).absolute?
     raise Error, "ERROR: Path #{path} does not exist." if !File.exist?(path)
     return path
@@ -155,6 +150,7 @@ class MyCLI < Thor
   end
 
   private
+
   def read_file(file, &block)
     if !File.exist?(file)
       File.new(file, "w+").close
