@@ -104,7 +104,7 @@ class CryptoFS
       cmd << "-extpass \'#{macos_ext_pass(self.dir_name, self.app_gcfs)}\' " if self.ext_pass
       cmd << "-ko local,noappledouble "
     elsif OS.linux?
-      # compose linux specific args here, volname doesn't work on gocryptfs on macos
+      # compose linux specific args here, volname doesn't work on macos
       cmd << "-ko volname=#{self.mnt_name} " if self.mnt_name
     else
       raise Error, "ERROR: Unsupported operating system #{OS.host_os}."
