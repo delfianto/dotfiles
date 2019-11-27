@@ -95,20 +95,22 @@ class CryptoFS
   def build_gcfs_cmd
     cmd = get_bin(self.app_gcfs, "#{self.src_path}/gocryptfs.diriv")
     cmd << (self.dbg_flag ? " -debug -noexec " : " -quiet -noexec ")
-    cmd << build_gcfs_extra_args(cmd)
+    cmd << build_gcfs_extra_args
     cmd << "-o #{self.mnt_opts} " if self.mnt_opts
     cmd << "\'#{self.src_path}\' \'#{self.mnt_path}\'"
     return cmd
   end
 
-  def build_gcfs_extra_args(cmd)
+  def build_gcfs_extra_args
+    cmd = ""
+
     if OS.mac?
       system self.osx_fuse
       cmd << "-allow_other "
       cmd << "-extpass \'#{macos_ext_pass(self.dir_name, self.app_gcfs)}\' " if self.ext_pass
       cmd << "-ko local,noappledouble "
     elsif OS.linux?
-      # compose linux specific args here
+      # compose linux specific args here, volname doesn't work on gocryptfs on macos
       cmd << "-ko volname=#{self.mnt_name} " if self.mnt_name
     else
       raise Error, "ERROR: Unsupported operating system #{OS.host_os}."
