@@ -19,6 +19,7 @@ fn.clean-store() {
 
 fn.brew-init() {
   local prefix="${1:-/usr/local}"
+  export LC_ALL=en_US.UTF-8
   export HOMEBREW_PREFIX="${prefix}"
   export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-true}"
 
