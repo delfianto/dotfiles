@@ -33,7 +33,7 @@ fn.sudo() {
 
 fn.bench() {
   for i in $(seq 1 10); do
-    time $SHELL -i -c exit
+    time "${SHELL}" -i -c exit
   done
 }
 
@@ -143,11 +143,11 @@ fn.ls-path() {
 
 fn.pathmunge() {
   if $(fn.is-dir "$1") && $(fn.is-readable "$1") &&
-      ! echo $PATH | grep -Eq "(^|:)$1($|:)"; then
+      ! echo "${PATH}" | grep -Eq "(^|:)$1($|:)"; then
     if [ "$2" = "after" ] ; then
-      PATH=$PATH:$1
+      PATH="${PATH}:$1"
     else
-      PATH=$1:$PATH
+      PATH="$1:${PATH}"
     fi
   fi
 }

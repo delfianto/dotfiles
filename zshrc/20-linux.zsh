@@ -110,9 +110,7 @@ iommu() {
 }
 
 # Wrapper function for systemd related command.
-#
-# Why they have to make the command super long
-# and thus so goddamn tedious to type...
+# Why they have to make systemctl args so damn tedious to type...
 sux() {
   local cmd=''
   local usr='--user'
@@ -143,7 +141,6 @@ sux() {
     cmd="${fun} help"
     ;;
   esac
-
 
   if [[ "$1" == "${usr}" ]]; then
     cmd="${cmd} ${usr}"

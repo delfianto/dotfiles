@@ -44,7 +44,7 @@ fn.init-ruby() {
     # local full_ver="$(ruby -e 'print RUBY_VERSION')"
     # local ruby_ver="${full_ver%?}0"
 
-    # do this for now until we can speed up ruby version detection
+    # set a fix value until we can speed up ruby version detection
     local gem_path='ruby/gems/2.6.0'
 
     export GEM_HOME="$(fn.dev-prefix lib/${gem_path})"
