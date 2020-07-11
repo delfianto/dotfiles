@@ -37,7 +37,7 @@ fn.brew-init() {
 
   if [[ "${HOMEBREW_GNU_UTILS}" == 'true' ]]; then
     # GNU utilities and manpage from homebrew
-    for gnu in $(echo -e 'coreutils findutils gnu-sed gnu-tar gnu-indent gnu-which'); do
+    for gnu in $(echo -e 'coreutils findutils gnu-indent gnu-which gnu-sed gnu-tar'); do
       local gnu_lib="${prefix}/opt/${gnu}/libexec"
 
       if [[ -r "${gnu_lib}" ]]; then
@@ -64,7 +64,7 @@ fn.brew-init() {
 
 fn.brew-install() {
   if (( ${+commands[brew]} )); then
-    echo 'Homebrew is already installed.'
+    echo 'Homebrew is already installed.'2
     exit 1
   else
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
