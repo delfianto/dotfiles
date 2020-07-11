@@ -1,0 +1,2 @@
+#!/bin/sh
+OpenCorsairLink --device 0 --fan mode=3 --pump mode=4 --led mode=0,colors=FF0000

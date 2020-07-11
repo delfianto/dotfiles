@@ -1,6 +1,5 @@
 # ignored directories
-private
-private/
+private*
 zplug/
 
 # zsh dynamic files
@@ -9,4 +8,4 @@ zplug/
 .zsh_history
 
 # systemd target directory
-systemd/user/*.wants
+systemd/user/*.wants/

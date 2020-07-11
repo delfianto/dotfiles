@@ -54,6 +54,7 @@ zle_highlight=('paste:none')
 
 # On every prompt, set terminal title to "user@host: cwd".
 function set-term-title() { print -Pn '\e]0;%n@%m: %~\a' }
+autoload -U add-zsh-hook
 add-zsh-hook precmd set-term-title
 
 ZLE_RPROMPT_INDENT=0          # don't leave an empty space after right prompt
@@ -122,6 +123,8 @@ if $(fn.is-fun zplug); then
   if [[ "${ZPLUG_LOAD_FIX}" == 'true' ]]; then
     touch "$ZPLUG_LOADFILE"
   fi
+else
+  echo "ZPLUG is not installed yet" >&2
 fi
 
 # Cleanup any declared private functions (prefixed with _)

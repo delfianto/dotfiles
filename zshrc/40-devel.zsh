@@ -40,12 +40,8 @@ fn.init-node() {
 # Initialize ruby gem location
 fn.init-ruby() {
   if (( ${+commands[ruby]} )); then
-    # Replace minor rev with zero; this is super slow
-    # local full_ver="$(ruby -e 'print RUBY_VERSION')"
-    # local ruby_ver="${full_ver%?}0"
-
-    # do this for now until we can speed up ruby version detection
-    local gem_path='ruby/gems/2.6.0'
+    local full_ver="$(ruby -e 'puts RUBY_VERSION')"
+    local gem_path="ruby/gems/${full_ver%?}0" # transform 2.7.1 to 2.7.0
 
     export GEM_HOME="$(fn.dev-prefix lib/${gem_path})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
@@ -163,7 +159,7 @@ fn.init-sdkman() {
   *)
     if $(fn.is-readable "${init_script}"); then
       export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
-      export GRADLE_USER_HOME="${DEV_USER_HOME}/share/gradle"
+      export GRADLE_USER_HOME="${DEV_USER_HOME}/lib/gradle"
 
       mkdir -p "${SDKMAN_DIR}/ext"
       source "${init_script}"

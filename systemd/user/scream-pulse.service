@@ -1,0 +1,9 @@
+[Unit]
+Description=Scream Virtual Network Sound Card
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/scream -o pulse -v -i virbr0
+
+[Install]
+WantedBy=default.target
