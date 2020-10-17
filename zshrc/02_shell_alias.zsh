@@ -1,10 +1,10 @@
-# File 30-alias.zsh; common alias initialization
-#
-# Functions and aliases used by all operating systems
+# =====================================================
+# File 02_shell_alias.zsh; common alias initialization
+# =====================================================
 
 _ls_args='--color=auto --group-directories-first -hFX'
 
-if fn.is-linux; then
+if zsh::is_linux; then
   alias ls="ls ${_ls_args}"
   alias ll="ls ${_ls_args} -l"
   alias la="ls ${_ls_args} -a"
@@ -23,6 +23,11 @@ fi
 
 unset _ls_args
 
+# Alias for some zsh::function
+alias lspath='zsh::ls_path'
+alias lsenv='zsh::ls_env'
+alias lsfun='zsh::ls_fun'
+
 # Shell command alias
 alias c="clear && printf '\e[3J'"
 alias cls='c'
@@ -40,7 +45,7 @@ alias cp='cp -v'
 
 # Use safe-rm if present
 if (( $+commands[safe-rm] )); then
-  alias rf='safe-rm'
+  alias rm='safe-rm'
 fi
 
 # Colorize the grep command output;
@@ -55,17 +60,7 @@ alias sudo='sudo '
 # Reloads the current shell
 alias reload="exec ${SHELL} -l"
 
-# Aliases for parallel version of compression utility
-# Some of this apperently broke package manager in Manjaro
-#
-# (( $+commands[pbzip2] )) && alias bzip2='pbzip2'
-# (( $+commands[pigz] )) && alias gzip='pigz'
-# (( $+commands[pixz] )) && alias xz='pixz'
-
 # database command alias
 if (( $+commands[mysql] )); then
   alias sql="mysql -u root -p"
 fi
-
-# add .local/bin to PATH
-# export PATH="$(echo "${HOME}" | tr '[:upper:]' '[:lower:]')/.local/bin:${PATH}"

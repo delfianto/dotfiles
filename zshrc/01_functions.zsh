@@ -1,43 +1,20 @@
-# File 10-utils.zsh; common functions used by all shell script
-#
-# Most of the function I wrote will have 'fn.' prefix on them
-# (just my personal perference) to make them easier to identify.
-
-# Up, the Plugin
-# Author: Peter Hurford
-# https://github.com/peterhurford/up.zsh
-#
-# Go up X directories (default 1)
-up() {
-  if [[ "$#" -ne 1 ]]; then
-    cd ..
-  elif ! [[ "$1" =~ '^[0_9]+$' ]]; then
-    echo "Error: up should be called with the number of directories to go up. The default is 1."
-  else
-    local d=""
-    limit="$1"
-    for ((i=1 ; i <= limit ; i++))
-      do
-        d="${d}/.."
-      done
-    d=$(echo "${d}" | sed 's/^\///')
-    cd "${d}"
-  fi
-}
+# ===============================================
+# File 01_functions.zsh; common helper functions
+# ===============================================
 
 # Enable call of an existing function using sudo
 # https://unix.stackexchange.com/questions/317687/command-not-found-when-sudoing-function-from-zshrc
-fn.sudo() {
+zsh::sudo() {
   sudo zsh -c "$functions[$1]" "$@"
 }
 
-fn.bench() {
+zsh::bench() {
   for i in $(seq 1 10); do
     time "${SHELL}" -i -c exit
   done
 }
 
-fn.emoji() {
+zsh::emoji() {
   if [[ "$?" == 0 ]]; then
     echo '🍄'
   else
@@ -45,7 +22,7 @@ fn.emoji() {
   fi
 }
 
-fn.ls-type() {
+zsh::get_ls() {
   if $(ls --color -d "${HOME}" >/dev/null 2>&1); then
     echo 'gnu'
   elif $(ls -G -d "${HOME}" >/dev/null 2>&1); then
@@ -55,7 +32,7 @@ fn.ls-type() {
   fi
 }
 
-fn.os-name() {
+zsh::get_os() {
   case "${OSTYPE}" in
     bsd*)
       echo 'bsd'
@@ -75,57 +52,58 @@ fn.os-name() {
   esac
 }
 
-fn.os-like() {
-  [[ $(fn.os-name) != 'linux' ]] && echo $(fn.os-name) ||
+zsh::get_os_like() {
+  [[ $(zsh::get_os) != 'linux' ]] && echo $(zsh::get_os) ||
   echo $(grep 'ID_LIKE=*' /etc/os-release | cut -f2- -d=)
 }
 
 # This thing is damn slow to run multiple time, better put it here
-export OS_NAME="$(fn.os-name)"
-export OS_LIKE="$(fn.os-like)"
+# TODO: USE EVAL CACHE for OS and LS_TYPE
+export OS_NAME="$(zsh::get_os)"
+export OS_LIKE="$(zsh::get_os_like)"
 
-fn.is-macos() {
+zsh::is_macos() {
   [[ "${OS_NAME}" == 'macos' ]]
 }
 
-fn.is-linux() {
+zsh::is_linux() {
   [[ "${OS_NAME}" == 'linux' ]]
 }
 
-fn.is-fun() {
+zsh::is_fun() {
   typeset -f "$1" > /dev/null
   return "$?"
 }
 
-fn.is-set() {
+zsh::is_set() {
   [[ -v "$1" ]]
 }
 
-fn.is-dir() {
+zsh::is_dir() {
   [[ -d "$1" ]]
 }
 
-fn.is-file() {
+zsh::is_file() {
   [[ -f "$1" ]]
 }
 
-fn.is-readable() {
+zsh::is_readable() {
   [[ -r "$1" ]]
 }
 
-fn.is-writeable() {
+zsh::is_writeable() {
   [[ -w "$1" ]]
 }
 
-fn.is-not-empty() {
+zsh::not_empty() {
   [[ -f "$1" && -s "$1" ]]
 }
 
-fn.ls-fun() {
+zsh::ls_fun() {
   print -l ${(ok)functions}
 }
 
-fn.ls-env() {
+zsh::ls_env() {
   if [[ -z "$1" ]]; then
     printenv | sort
   else
@@ -133,7 +111,7 @@ fn.ls-env() {
   fi
 }
 
-fn.ls-path() {
+zsh::ls_path() {
   local paths=(${(@s/:/)PATH})
 
   for entry in ${paths}; do
@@ -141,8 +119,8 @@ fn.ls-path() {
   done
 }
 
-fn.pathmunge() {
-  if $(fn.is-dir "$1") && $(fn.is-readable "$1") &&
+zsh::path_munge() {
+  if $(zsh::is_dir "$1") && $(zsh::is_readable "$1") &&
       ! echo "${PATH}" | grep -Eq "(^|:)$1($|:)"; then
     if [ "$2" = "after" ] ; then
       PATH="${PATH}:$1"

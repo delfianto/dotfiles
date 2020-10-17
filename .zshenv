@@ -1,10 +1,6 @@
 # File .zshenv; zsh environment config
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
-# changes the type of path from array-special to array-unique-special
-# prevents duplicate entry in PATH variable
-typeset -aU path
-
 export ZSH_TRACE="${ZSH_TRACE:-false}"
 export ZSH_ZPROF="${ZSH_ZPROF:-false}"
 
@@ -17,7 +13,7 @@ export ZPLUG_LOAD_FIX="${ZPLUG_LOAD_FIX:-true}"
 
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
-export HISTIGNORE="&:history*:rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
+export HISTIGNORE="&:history*:[sudo ]rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
 export HISTFILE="${ZDOTDIR}/.zsh_history"
 export HISTSIZE=1000
 export SAVEHIST=1000

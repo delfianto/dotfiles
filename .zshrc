@@ -2,46 +2,10 @@
 #
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshrc
 
-# Start zsh tracing (if enabled)
-if [[ "${ZSH_TRACE}" == 'true' ]]; then
-  zmodload zsh/datetime
-  setopt PROMPT_SUBST
-  PS4='+$EPOCHREALTIME %N:%i> '
-
-  logfile=$(mktemp zsh_profile.XXXXXXXX)
-  echo "Logging to $logfile"
-  exec 3>&2 2>$logfile
-
-  setopt XTRACE
-fi
-
-# Start zsh profiling (if enabled)
-if [[ "${ZSH_ZPROF}" == 'true' ]]; then
-  zmodload zsh/zprof
-fi
-
-[[ "${TERM}" == xterm* ]] || : ${PURE_POWER_MODE:=portable}
-
-# Helper functions for sourcing file
-fn.source() {
-  [[ -f "${1}" ]] && source "${1}"
-}
-
-_fn.import() {
-  cd "${ZDOTDIR}/zshrc"
-
-  # Exclude distro specific script, will be sourced inside 20-linux.zsh
-  for file in $(find . -type f ! -name '20-linux-*.zsh' | sort); do
-    source "${file}"
-  done; cd
-}
+# [[ "${TERM}" == xterm* ]] || : ${PURE_POWER_MODE:=portable}
 
 # Set path as array-unique-special (no duplicates)
 typeset -aU path
-
-# Load os specific file and other zsh scripts
-# Order of imports will be sequential according to prefix number
-_fn.import
 
 # Initialize zsh auto complete
 autoload -Uz compinit; compinit
@@ -89,60 +53,22 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # (i.e. capital letters match only capital letters.)
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-# Zplug plugin initialization
-if $(fn.is-fun zplug); then
-  # powerlevel10k!
-  zplug 'romkatv/powerlevel10k', as:theme, depth:1
+# Helper functions for sourcing file
+zsh::source() {
+  [[ -f "${1}" ]] && source "${1}"
+}
 
-  # To customize prompt, run `p10k configure` or edit ~/.config/dotfiles/.p10k.zsh.
-  fn.source "${ZDOTDIR}/.p10k.zsh"
-
-  # oh-my-zsh plugins
-  zplug 'plugins/sudo', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"(($+commands[sudo]))"
-  zplug 'plugins/systemd', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"(($+commands[systemctl]))"
-
-  # Seems broken on Manjaro Linux KDE, will spawn tons of ssh-add process until ulimit is reached
-  # zplug 'plugins/ssh-agent', from:'oh-my-zsh', ignore:'oh-my-zsh.sh', if:"[[ $OSTYPE != darwin* ]]"
-
-  # Install plugins if there are plugins that have not been installed
-  if [[ "${ZPLUG_AUTO_PKG}" == 'true' ]] && ! zplug check; then
-    zplug check --verbose
-    printf "\nInstall missing packages? [y/N]: "
-    if read -q; then
-      printf '\n'
-      zplug install
-    fi
-  fi
-
-  # Then, source plugins and add commands to $PATH
-  zplug load
-
-  # Workaround for issue https://github.com/zplug/zplug/issues/427 which sometimes still happen
-  # because zplug cannot find the loadfile, causing __zplug::log::write::info consuming up to
-  # 70% of the shell initialization time.
-  if [[ "${ZPLUG_LOAD_FIX}" == 'true' ]]; then
-    touch "$ZPLUG_LOADFILE"
-  fi
-else
-  echo "ZPLUG is not installed yet" >&2
-fi
+zsh::source_rc() {
+  zsh::source "${ZDOTDIR}/zshrc/${1}.zsh"
+}
 
 # Cleanup any declared private functions (prefixed with _)
 # for fn in $(fn.list-fun | grep _fn); do
 #   unset -f "${fn}"
 # done
 
-if $(fn.is-macos); then
-  export PATH=$PATH:l
-fi
+# if $(fn.is-macos); then
+#   export PATH=$PATH:l
+# fi
 
-# Stop zsh profiling (if enabled)
-if [[ "${ZSH_ZPROF}" == 'true' ]]; then
-  zprof
-fi
-
-# Stop zsh tracing (if enabled)
-if [[ "${ZSH_TRACE}" == 'true' ]]; then
-  unsetopt XTRACE
-  exec 2>&3 3>&-
-fi
+zsh::source_rc _shell_init

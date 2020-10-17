@@ -1,11 +1,16 @@
-# File 20-linux-arch.zsh; Arch family specific zsh setup
+# =======================================================
+# File 03_linux_arch.zsh; Arch family specific zsh setup
 #
 # Actually written on Manjaro, but this file should be
-# compatible with any Arch-based distro out there
+# compatible with any Arch-based distro
+# =======================================================
+
+if [[ "${OS_LIKE}" != 'arch' ]]; then
+  return 1
+fi
 
 # Set makepkg environment variables
-export PKGEXT='.pkg.tar.xz'
-export COMPRESSXZ=(xz -T 0 -c -z -)
+export PKGEXT='.pkg.tar.zst'
 export MAKEFLAGS='-j20'
 
 # Set compiler flags
@@ -13,10 +18,10 @@ export CFLAGS='-march=native -O2 -pipe -fstack-protector-strong -fno-plt'
 export CXXFLAGS="${CFLAGS}"
 
 # Initialize zplug
-fn.source '/usr/share/zsh/scripts/zplug/init.zsh'
+zsh::source '/usr/share/zsh/scripts/zplug/init.zsh'
 
 # Import LS_Colors definition
-fn.source '/usr/share/LS_COLORS/dircolors.sh'
+zsh::source '/usr/share/LS_COLORS/dircolors.sh'
 
 # Wrapper for default system java, in case we need to bypass sdkman.
 jvm() {
@@ -71,7 +76,7 @@ pkg() {
     ;;
   'nodeps')
     if [[ ! -z $(pkg orphan) ]]; then
-      tput setaf 1 #
+      tput setaf 1
       echo 'WARNING: Removing all unneeded dependencies...'
       tput sgr0
 

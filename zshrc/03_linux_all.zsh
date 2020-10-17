@@ -1,21 +1,20 @@
-# File 20-linux.zsh; Linux specific zsh setup
+# ==================================================================
+# File 03_linux_all.zsh; Linux specific zsh setup
 #
 # This file should be applicable to most of Linux distribution, any
 # other distro specific script should be placed in (os-family).zsh
+# ==================================================================
 
 if [[ "${OS_NAME}" != 'linux' ]]; then
   return 1
-else
-  fn.source "20-${OS_NAME}-${OS_LIKE}.zsh"
 fi
+
+# Source distro specific stuff
+zsh::source_rc "03_${OS_NAME}_${OS_LIKE}"
 
 # Set git credentials helper
 export SSH_ASKPASS="$(which ksshaskpass)"
 export GIT_ASKPASS="${SSH_ASKPASS}"
-
-# Hardware acceleration on Firefox
-export MOZ_ACCELERATED=1
-export MOZ_WEBRENDER=1
 
 # CPU clock and system monitoring
 alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'
@@ -64,7 +63,7 @@ gcc-flags() {
 # Very useful when running pci passthrough using vfio
 iommu() {
   case "${1}" in
-  's' | 'dev')
+  'p' | 'pci')
     sudo lspci -vv -s "${2}"
     ;;
   'g' | 'group')
@@ -103,52 +102,8 @@ iommu() {
     done
     ;;
   *)
-    # todo: put some help text here
-    echo 'Fus Ro Dah!'
+    # TODO: Put some help text here
+    echo 'Klaatu Barada Nikto'
     ;;
   esac
 }
-
-# Wrapper function for systemd related command.
-# Why they have to make systemctl args so damn tedious to type...
-sux() {
-  local cmd=''
-  local usr='--user'
-  local fun=$funcstack[1]
-
-  if [[ "$1" == "${usr}" ]]; then
-    local arg="$2"
-  else
-    local arg="$1"
-  fi
-
-  case "${arg}" in
-  'ls' | 'list')
-    cmd='systemctl list-units --type service'
-    [[ ! -z "$2" ]] && cmd="${cmd} --all"
-    ;;
-  'start' | 'stop' | 'restart' | 'status' | 'enable' | 'disable')
-    [ ! -z "$2" ] && cmd="systemctl ${@:2}"
-    ;;
-  'log')
-    [[ ! -z "$2" ]] && cmd="journalctl -u ${@:2}"
-    ;;
-  'help')
-    echo "Usage: ${fun} [list] [unit-state]"
-    echo "Usage: ${fun} [log|start|stop|restart] [unit-name]"
-    ;;
-  *)
-    cmd="${fun} help"
-    ;;
-  esac
-
-  if [[ "$1" == "${usr}" ]]; then
-    cmd="${cmd} ${usr}"
-  fi
-
-  [[ ! -z "${cmd}" ]] && eval "${cmd}"
-}
-
-# Alias for systemd wrapper
-alias scu='sux --user'
-alias scx='fn.sudo sux'

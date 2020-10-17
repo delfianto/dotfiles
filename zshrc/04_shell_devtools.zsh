@@ -1,4 +1,5 @@
-# File 40-devel.zsh; initialize path and environment variable for development tools
+# ===========================================================================================
+# File 04_shell_devtools.zsh; initialize path and environment variable for development tools
 #
 # Linux users might want to check the permission of their '/usr/local' path and chown
 # it as needed, or if you're not so confident in doing this then set the DEV_HOME
@@ -6,6 +7,7 @@
 #
 # Another option is to set the value of DEV_USER_HOME_ACTIVE to 'true' which will use
 # $HOME/.local as the prefix for your development tools.
+# ===========================================================================================
 
 export DEV_HOME="${DEV_HOME:-/usr/local}"
 export DEV_USER_HOME="${DEV_USER_HOME:-${HOME}/.local}"

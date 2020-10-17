@@ -1,23 +1,12 @@
-# File 20-macos.zsh; macOS specific zsh setup
-#
-# Setup homebrew and environment variables specific to macOS
+# ================================================
+# File 03_macos_all.zsh; macOS specific zsh setup
+# ================================================
 
 if [[ "${OS_NAME}" != 'macos' ]]; then
   return 1
 fi
 
-# Add spacer to dock
-fn.dock-spacer() {
-  defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
-  killall Dock
-}
-
-# Remove all .DS_Store from current directory
-fn.clean-store() {
-  find . -name ".DS_Store" -delete
-}
-
-fn.brew-init() {
+zsh::macos::brew_init() {
   local prefix="${1:-/usr/local}"
   export LC_ALL=en_US.UTF-8
   export HOMEBREW_PREFIX="${prefix}"
@@ -25,12 +14,12 @@ fn.brew-init() {
 
   if (( ! $+commands[brew] )); then
     echo "WARNING: Homebrew is not installed"
-    echo "WARNING: Run 'fn.brew install' first"
+    echo "WARNING: Run 'brew_env install' first"
     return 1
   fi
 
   # Zplug for macOS
-  fn.source "${prefix}/opt/zplug/init.zsh"
+  zsh::source "${prefix}/opt/zplug/init.zsh"
 
   # ZSH completion from homebrew
   fpath=(/usr/local/share/zsh-completions $fpath)
@@ -47,10 +36,10 @@ fn.brew-init() {
   fi
 
   # Ruby from homebrew
-  fn.pathmunge "${prefix}/opt/ruby/bin"
+  zsh::path_munge "${prefix}/opt/ruby/bin"
 
   # Python from homebrew
-  fn.pathmunge "${prefix}/opt/python/libexec/bin"
+  zsh::path_munge "${prefix}/opt/python/libexec/bin"
 
   # Apache Tomcat from homebrew
   local catalina_home="${prefix}/opt/tomcat"
@@ -62,16 +51,16 @@ fn.brew-init() {
   export HOMEBREW_CASK_OPTS='--appdir=/Applications'
 }
 
-fn.brew-install() {
+zsh::macos::brew_setup() {
   if (( ${+commands[brew]} )); then
-    echo 'Homebrew is already installed.'2
+    echo 'Homebrew is already installed.'
     exit 1
   else
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   fi
 }
 
-fn.brew-uninstall() {
+zsh::macos::brew_purge() {
   if (( ${+commands[brew]} )); then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
   else
@@ -80,15 +69,14 @@ fn.brew-uninstall() {
   fi
 }
 
-fn.brew() {
+brew_env() {
   typeset -A args
-  args[init]="fn.brew-init"
-  args[install]="fn.brew-install"
-  args[uninstall]="fn.brew-uninstall"
+  args[init]="zsh::macos::brew_init"
+  args[install]="zsh::macos::brew_setup"
+  args[uninstall]="zsh::macos::brew_purge"
   eval "${args[$1]}"
 }
 
-# Homebrew command wrapper
 pkg() {
   if (( !${+commands[brew]} )); then
     echo 'Homebrew is not installed.'
@@ -96,6 +84,7 @@ pkg() {
   fi
 
   local cmd='brew'
+
   case "$1" in
     'info')
       "${cmd}" info "${@:2}"
@@ -149,4 +138,15 @@ svc() {
   esac
 }
 
-fn.brew init
+# Add spacer to dock
+dock_spacer() {
+  defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'
+  killall Dock
+}
+
+# # Remove all .DS_Store from current directory
+# fn.clean-store() {
+#   find . -name ".DS_Store" -delete
+# }
+
+zsh::macos::brew_env init
