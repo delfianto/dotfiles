@@ -30,10 +30,13 @@ zsh::macos::brew_init() {
       local gnu_lib="${prefix}/opt/${gnu}/libexec"
 
       if [[ -r "${gnu_lib}" ]]; then
-        fn.pathmunge "${gnu_lib}/gnubin"
+        zsh::path_munge "${gnu_lib}/gnubin"
       fi
     done
   fi
+
+  # Homebrew local/sbin
+  zsh::path_munge "${prefix}/sbin"
 
   # Ruby from homebrew
   zsh::path_munge "${prefix}/opt/ruby/bin"
@@ -69,11 +72,11 @@ zsh::macos::brew_purge() {
   fi
 }
 
-brew_env() {
+zsh::macos::brew_env() {
   typeset -A args
-  args[init]="zsh::macos::brew_init"
-  args[install]="zsh::macos::brew_setup"
-  args[uninstall]="zsh::macos::brew_purge"
+  args[start]="zsh::macos::brew_init"
+  args[setup]="zsh::macos::brew_setup"
+  args[purge]="zsh::macos::brew_purge"
   eval "${args[$1]}"
 }
 
@@ -144,9 +147,4 @@ dock_spacer() {
   killall Dock
 }
 
-# # Remove all .DS_Store from current directory
-# fn.clean-store() {
-#   find . -name ".DS_Store" -delete
-# }
-
-zsh::macos::brew_env init
+zsh::macos::brew_env start
