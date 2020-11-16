@@ -13,7 +13,7 @@ export DEV_HOME="${DEV_HOME:-/usr/local}"
 export DEV_USER_HOME="${DEV_USER_HOME:-${HOME}/.local}"
 export DEV_USER_HOME_ACTIVE="${DEV_USER_HOME_ACTIVE:-false}"
 
-fn.dev-prefix() {
+zsh::devtools:prefix() {
   local prefix=''
 
   if [[ "${DEV_USER_HOME_ACTIVE}" == 'true' ]]; then
@@ -32,24 +32,24 @@ fn.dev-prefix() {
 }
 
 # Initialize nodejs prefix path
-fn.init-node() {
+zsh::devtools:node() {
   if (( ${+commands[node]} )); then
     alias nls='npm ls --depth=0'
-    export NPM_CONFIG_PREFIX="$(fn.dev-prefix)"
+    export NPM_CONFIG_PREFIX="$(zsh::devtools:prefix)"
   fi
 }
 
 # Initialize ruby gem location
-fn.init-ruby() {
+zsh::devtools:ruby() {
   if (( ${+commands[ruby]} )); then
     local full_ver="$(ruby -e 'puts RUBY_VERSION')"
     local gem_path="ruby/gems/${full_ver%?}0" # transform 2.7.1 to 2.7.0
 
-    export GEM_HOME="$(fn.dev-prefix lib/${gem_path})"
+    export GEM_HOME="$(zsh::devtools:prefix lib/${gem_path})"
     export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
     export GEM_PATH="${GEM_HOME}"
 
-    if $(fn.is-linux); then
+    if $(zsh::is_linux); then
       export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_path}"
     fi
 
@@ -57,16 +57,16 @@ fn.init-ruby() {
       eval "mkdir -p ${GEM_HOME}/{specifications,bin}"
     fi
 
-    fn.pathmunge "${GEM_HOME}/bin"
+    zsh::path_munge "${GEM_HOME}/bin"
   fi
 }
 
 # Initialize perl lib directory
-fn.init-perl() {
+zsh::devtools:perl() {
   if (( ${+commands[perl]} )); then
-    local base="$(fn.dev-prefix lib/perl5)"
+    local base="$(zsh::devtools:prefix lib/perl5)"
 
-    if $(fn.is-readable "${base}"); then
+    if $(zsh::is_readable "${base}"); then
       export PATH="${base}/bin${PATH:+:${PATH}}"
       export PERL5LIB="${base}${PERL5LIB:+:${PERL5LIB}}"
       export PERL_LOCAL_LIB_ROOT="${base}${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"
@@ -77,7 +77,7 @@ fn.init-perl() {
 }
 
 # Initialize python env and aliases
-fn.init-python() {
+zsh::devtools:python() {
   if (( ${+commands[python]} )); then
     alias py='python'
     alias pyinst='pip install'
@@ -86,7 +86,7 @@ fn.init-python() {
     alias pyhttp='python -m http.server' # starts a python lightweight http server
     alias pyjson='python -m json.tool'   # pipe to this alias to format json with python
 
-    export PYTHONUSERBASE="$(fn.dev-prefix)"
+    export PYTHONUSERBASE="$(zsh::devtools:prefix)"
 
     jsoncat() {
       if $(fn.is-not-empty "${1}"); then
@@ -104,10 +104,10 @@ fn.init-python() {
 }
 
 # Initialize google cloud sdk toolkit
-fn.init-gcloud() {
-  export GCLOUD_SDK_DIR="$(fn.dev-prefix lib/google-cloud-sdk)"
+zsh::devtools:gcp() {
+  export GCLOUD_SDK_DIR="$(zsh::devtools:prefix lib/google-cloud-sdk)"
 
-  if $(fn.is-readable "${GCLOUD_SDK_DIR}"); then
+  if $(zsh::is_readable "${GCLOUD_SDK_DIR}"); then
     local shell=$(basename "${SHELL}")
     source "${GCLOUD_SDK_DIR}/path.${shell}.inc"
     source "${GCLOUD_SDK_DIR}/completion.${shell}.inc"
@@ -120,7 +120,7 @@ fn.init-gcloud() {
 
 # Wrapper function for google cloud components
 if (( ${+commands[gcloud]} )); then
-  gcm() {
+  gcp() {
     typeset -A args
 
     args[i]='install'
@@ -150,8 +150,8 @@ if (( ${+commands[gcloud]} )); then
 fi
 
 # Initialize sdk manager
-fn.init-sdkman() {
-  export SDKMAN_DIR="$(fn.dev-prefix lib/sdkman)"
+zsh::devtools:jvm() {
+  export SDKMAN_DIR="$(zsh::devtools:prefix sdk)"
   local init_script="${SDKMAN_DIR}/bin/sdkman-init.sh"
 
   case "${1}" in
@@ -159,7 +159,7 @@ fn.init-sdkman() {
     curl -s "https://get.sdkman.io" | zsh
     ;;
   *)
-    if $(fn.is-readable "${init_script}"); then
+    if $(zsh::is_readable "${init_script}"); then
       export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
       export GRADLE_USER_HOME="${DEV_USER_HOME}/lib/gradle"
 
@@ -171,17 +171,17 @@ fn.init-sdkman() {
 }
 
 # Initialize all devtools
-fn.init-dev() {
-  fn.init-ruby
-  fn.init-node
-  fn.init-perl
-  fn.init-python
-  fn.init-gcloud
-  fn.init-sdkman
+zsh::devtools:init() {
+  zsh::devtools:ruby
+  zsh::devtools:node
+  zsh::devtools:perl
+  zsh::devtools:python
+  zsh::devtools:gcp
+  zsh::devtools:jvm
 }
 
 # Init everything
-fn.init-dev
+zsh::devtools:init
 
 # Add .local/bin to PATH
-fn.pathmunge "${DEV_USER_HOME}/bin"
+# zsh::path_munge "${DEV_USER_HOME}/bin"

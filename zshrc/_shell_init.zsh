@@ -27,6 +27,7 @@ zsh::source_rc 01_functions
 zsh::source_rc 02_shell_alias
 zsh::source_rc 03_linux_all
 zsh::source_rc 03_macos_all
+zsh::source_rc 04_devtools
 zsh::source_rc 05_plugins
 
 # add .local/bin to PATH
