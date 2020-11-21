@@ -19,6 +19,7 @@ export GIT_ASKPASS="${SSH_ASKPASS}"
 # CPU clock and system monitoring
 alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'
 alias hwmon='watch -n1 sensors'
+alias dmesg='sudo dmesg -H'
 
 # Device info alias
 alias usbdev='lsusb -tv'
