@@ -122,6 +122,28 @@ pkg() {
   esac
 }
 
+# Wrapper for hostname
+host() {
+  case "$1" in
+  'set')
+    if [[ ! -z "$2" ]]; then
+      sudo scutil --set LocalHostName "$2"
+      sudo scutil --set HostName "$2"
+      dscacheutil -flushcache
+    else
+      echo 'Specify a new hostname to be set'
+    fi
+    ;;
+  'help')
+    echo "Usage: ${FUNCNAME[0]} [ set | help ]"
+    echo "Running without any argument will invoke /bin/hostname"
+    ;;
+  *)
+    /bin/hostname "${@:1}"
+    ;;
+  esac
+}
+
 # Wrapper for homebrew service
 svc() {
   case "$1" in
@@ -132,8 +154,8 @@ svc() {
     brew services "$1"
     ;;
   'help')
-    echo "Usage: ${FUNCNAME[0]} [list | run | start | stop | restart | cleanup] [...]"
-    echo "Running without any param will list all available services"
+    echo "Usage: ${FUNCNAME[0]} [ list | run | start | stop | restart | cleanup ] [...]"
+    echo "Running without any argument will list all available services"
     ;;
   *)
     "${FUNCNAME[0]}" 'ls'
