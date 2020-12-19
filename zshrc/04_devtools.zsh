@@ -61,21 +61,6 @@ zsh::devtools:ruby() {
   fi
 }
 
-# Initialize perl lib directory
-zsh::devtools:perl() {
-  if (( ${+commands[perl]} )); then
-    local base="$(zsh::devtools:prefix lib/perl5)"
-
-    if $(zsh::is_readable "${base}"); then
-      export PATH="${base}/bin${PATH:+:${PATH}}"
-      export PERL5LIB="${base}${PERL5LIB:+:${PERL5LIB}}"
-      export PERL_LOCAL_LIB_ROOT="${base}${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"
-      export PERL_MB_OPT="--install_base \"${base}\""
-      export PERL_MM_OPT="INSTALL_BASE=${base}"
-    fi
-  fi
-}
-
 # Initialize python env and aliases
 zsh::devtools:python() {
   if (( ${+commands[python]} )); then
@@ -174,7 +159,6 @@ zsh::devtools:jvm() {
 zsh::devtools:init() {
   zsh::devtools:ruby
   zsh::devtools:node
-  zsh::devtools:perl
   zsh::devtools:python
   zsh::devtools:gcp
   zsh::devtools:jvm
