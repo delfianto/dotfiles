@@ -48,7 +48,7 @@ pkg() {
     cat /var/log/pacman.log
     ;;
   'build')
-    makepkg -sic
+    makepkg -sc
     ;;
   'check')
     yay "${@:2}"

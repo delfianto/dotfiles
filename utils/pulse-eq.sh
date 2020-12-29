@@ -1,0 +1,26 @@
+#!/bin/zsh
+# Switch equalizer preset for pulse effects
+
+if [[ -z "${1}" ]]; then
+  echo "Usage: ${0} [ device_name ]"
+  exit 1
+fi
+
+conf="${ZDOTDIR}/private/pulse-eq.conf"
+
+if [[ -f "${conf}" ]]; then
+  source "${conf}"
+else
+  echo "Could not source ${conf}"
+  exit 2
+fi
+
+preset="${device_map[$1]}"
+
+if [[ -z "${preset}" ]]; then
+  echo "Cannot find preset for device name '${1}'"
+  exit 3
+fi
+
+pulseeffects --load-preset "${preset}"
+gsettings set com.github.wwmm.pulseeffects last-used-output-preset "${preset}"
