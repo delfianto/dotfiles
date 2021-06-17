@@ -29,10 +29,9 @@ alias lsenv='zsh::ls_env'
 alias lsfun='zsh::ls_fun'
 
 # Shell command alias
-alias c="clear && printf '\e[3J'"
-alias cls='c'
+alias cls="clear && printf '\e[3J'"
 alias which='command -v'
-alias zshdir="cd ${ZDOTDIR}"
+alias shdir="cd ${ZDOTDIR}"
 
 # Disk usage in human readable format
 alias du='du -h'
@@ -60,7 +59,5 @@ alias sudo='sudo '
 # Reloads the current shell
 alias reload="exec ${SHELL} -l"
 
-# database command alias
-if (( $+commands[mysql] )); then
-  alias sql="mysql -u root -p"
-fi
+# Docker pretty ps
+alias dps='docker-pretty-ps'
