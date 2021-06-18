@@ -24,7 +24,7 @@ fi
 unset _ls_args
 
 # Replace 'cat' with 'bat'
-if (( ${+command[bat]} )); then
+if (( ${+commands[bat]} )); then
   alias cat='bat'
 fi
 
