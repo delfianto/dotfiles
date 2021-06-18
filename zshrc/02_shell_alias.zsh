@@ -23,6 +23,11 @@ fi
 
 unset _ls_args
 
+# Replace 'cat' with 'bat'
+if (( ${+command[bat]} )); then
+  alias cat='bat'
+fi
+
 # Alias for some zsh::function
 alias lspath='zsh::ls_path'
 alias lsenv='zsh::ls_env'
@@ -49,9 +54,9 @@ fi
 
 # Colorize the grep command output;
 # Good for your eyes when reading long log files
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
+alias grep='grep -i --color=auto'
+alias egrep='egrep -i --color=auto'
+alias fgrep='fgrep -i --color=auto'
 
 # Allow aliases to be sudo’ed
 alias sudo='sudo '
