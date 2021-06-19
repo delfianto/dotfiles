@@ -13,6 +13,36 @@ export DEV_HOME="${DEV_HOME:-/usr/local}"
 export DEV_USER_HOME="${DEV_USER_HOME:-${HOME}/.local}"
 export DEV_USER_HOME_ACTIVE="${DEV_USER_HOME_ACTIVE:-false}"
 
+# Shorten docker management command
+if (( ${+commands[docker]} )); then
+  # Docker pretty ps
+  alias dps='docker-pretty-ps'
+
+  docker() {
+    typeset -A args
+
+    args[com]='compose'
+    args[pps]='pretty'
+    args[img]='image'
+    args[net]='network'
+    args[ver]='version'
+    args[vol]='volume'
+
+    local arg="${args[$1]}"
+    local cmd='/usr/bin/docker'
+
+    if [[ -z "${arg}" ]]; then
+      eval "${cmd} ${@}"
+    elif [[ "${arg}" == 'compose' ]]; then
+      eval "docker-compose ${@:2}"
+    elif [[ "${arg}" == 'pretty' ]]; then
+      eval "docker-pretty-ps ${@:2}"
+    else
+      eval "${cmd} ${arg} ${@:2}"  
+    fi
+  }
+fi
+
 zsh::devtools:prefix() {
   local prefix=''
 

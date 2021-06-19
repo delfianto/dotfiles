@@ -63,6 +63,3 @@ alias sudo='sudo '
 
 # Reloads the current shell
 alias reload="exec ${SHELL} -l"
-
-# Docker pretty ps
-alias dps='docker-pretty-ps'
