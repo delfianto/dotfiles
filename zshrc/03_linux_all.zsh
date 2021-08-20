@@ -19,7 +19,9 @@ export GIT_ASKPASS="${SSH_ASKPASS}"
 # CPU clock and system monitoring
 alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'
 alias hwmon='watch -n1 sensors'
+alias hdmon='sudo hdsentinel'
 alias dmesg='sudo dmesg -H'
+alias lqctl='sudo liquidctl'
 
 # Device info alias
 alias usbdev='lsusb -tv'
@@ -106,5 +108,19 @@ iommu() {
     # TODO: Put some help text here
     echo 'Klaatu Barada Nikto'
     ;;
+  esac
+}
+
+fb() {
+  exec='filebot'
+
+  case "${1}" in
+    'tvdb' | 'tmdb')
+      cmd=(${exec} -script "fn:artwork.${1}" "${@:2}")
+      "${cmd[@]}"
+      ;;
+    *)
+      ${exec} "${@:1}"
+      ;;
   esac
 }
