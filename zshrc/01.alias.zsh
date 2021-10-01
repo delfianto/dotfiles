@@ -1,27 +1,6 @@
 # =====================================================
-# File 02_shell_alias.zsh; common alias initialization
+# File 01_alias.zsh; common shell alias initialization
 # =====================================================
-
-_ls_args='--color=auto --group-directories-first -hFX'
-
-if zsh::is_linux; then
-  alias ls="ls ${_ls_args}"
-  alias ll="ls ${_ls_args} -l"
-  alias la="ls ${_ls_args} -a"
-else
-  if (( ${+commands[gls]} )); then
-    # macOS with gnu coreutils from homebrew
-    alias ls="gls ${_ls_args}"
-    alias ll="gls ${_ls_args} -l"
-    alias la="gls ${_ls_args} -a"
-  else
-    # other Unix, most probably BSD or Solaris
-    alias ll="ls -l"
-    alias la="ls -a"
-  fi
-fi
-
-unset _ls_args
 
 # Replace 'cat' with 'bat'
 if (( ${+commands[bat]} )); then

@@ -1,6 +1,6 @@
 # ignored directories
 private*
-zplug/
+.zinit/
 .zsh_sessions/
 
 # zsh dynamic files

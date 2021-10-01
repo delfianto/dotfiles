@@ -1,0 +1,5 @@
+for arg in "${@}";
+do
+  local file="${ZDOTDIR}/zshrc/${arg}.zsh"
+  [[ -r ${file} ]] && source ${file}
+done
