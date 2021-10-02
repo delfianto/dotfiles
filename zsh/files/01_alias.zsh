@@ -7,11 +7,6 @@ if (( ${+commands[bat]} )); then
   alias cat='bat'
 fi
 
-# Alias for some zsh::function
-alias lspath='zsh::ls_path'
-alias lsenv='zsh::ls_env'
-alias lsfun='zsh::ls_fun'
-
 # Shell command alias
 alias cls="clear && printf '\e[3J'"
 alias which='command -v'

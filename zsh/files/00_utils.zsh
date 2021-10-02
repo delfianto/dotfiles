@@ -26,7 +26,7 @@ ex() {
 }
 
 exit_code() {
-  if [[ $? -eq 0 ]]; then
+  if [[ "$?" -eq 0 ]]; then
     echo '🍄'
   else
     echo '💀'
@@ -53,8 +53,8 @@ jvm() {
 }
 
 is_func() {
-  typeset -f $1 > /dev/null
-  return $?
+  typeset -f "$1" > /dev/null
+  return "$?"
 }
 
 ls_func() {
@@ -75,11 +75,11 @@ ls_vars() {
 
 path_munge() {
   if [[ -d "$1" ]] && [[ -r "$1" ]] && 
-      ! echo $PATH | grep -Eq "(^|:)$1($|:)"; then
+      ! echo "${PATH}" | grep -Eq "(^|:)$1($|:)"; then
     if [[ "$2" = 'after' ]]; then
-      PATH="$PATH:$1"
+      PATH="${PATH}:$1"
     else
-      PATH="$1:$PATH"
+      PATH="$1:${PATH}"
     fi
   fi
 }

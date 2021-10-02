@@ -16,7 +16,7 @@ zinit ice depth"1" # git clone depth
 zinit light romkatv/powerlevel10k
 
 # Set function path
-fpath=( "${ZDOTDIR}/zfunc" "${fpath[@]}" )
+fpath=( "${ZDOTDIR}/func" "${fpath[@]}" )
 
 # Set path as array-unique-special (no duplicates)
 typeset -aU path
@@ -80,10 +80,10 @@ zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
-HISTFILE=~/.zhistory
-HISTSIZE=1000
-SAVEHIST=500
-WORDCHARS=${WORDCHARS//\/[&.;]}                                 # Don't consider certain characters part of the word
+HISTFILE='~/.zhistory'
+HISTSIZE='1000'
+SAVEHIST='500'
+WORDCHARS="${WORDCHARS//\/[&.;]}"                               # Don't consider certain characters part of the word
 
 ## Keybindings section
 bindkey -e
@@ -122,7 +122,7 @@ zsh-in \
   /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # Load the rest of zshrc files
-zsh-rc 00_utils 01_alias 02_linux 03_macos 04_devel
+zsh-rc 00_utils 01_alias "02_$(sys os-name)" 03_devel
 
 # To customize prompt, run `p10k configure` or edit ~/.config/dotfiles/.p10k.zsh.
-zsh-in ${ZDOTDIR}/.p10k.zsh
+zsh-in "${ZDOTDIR}/.p10k.zsh"

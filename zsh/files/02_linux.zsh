@@ -2,8 +2,10 @@
 # File 01_linux.zsh; linux specific alias and environment variables
 # ==================================================================
 
-# Bail out if not running on Linux
-[[ $(sys is-linux) == 0 ]] && return 1
+# Bail out if not sourced from linux
+if [[ $(sys is-linux) != 'true' ]]; then
+  return 1
+fi
 
 # ls enhancement
 alias ls="ls ${LS_ARGS}"
@@ -146,7 +148,7 @@ pkg() {
       yay -Sy "${@:2}"
       ;;
     'r' | 'rm' | 'remove')
-      yay -R "${@:2}"
+      yay -R ${@:2}
       ;;
     'u' | 'up' | 'upgrade')
       yay -Syu
@@ -158,11 +160,11 @@ pkg() {
       yay --editmenu --nocleanmenu --nodiffmenu --noeditmenu --noremovemake --save
       ;;
     *)
-      yay "${@:1}"
+      yay ${@:1}
       ;;
   esac
 }
 
 svc() {
-  systemctl "${@:1}"
+  systemctl ${@:1}
 }

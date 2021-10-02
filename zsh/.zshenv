@@ -2,14 +2,14 @@
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
 # Set zsh dotfile location
-export ZDOTDIR="${ZDOTDIR:-"${HOME}/.config/dotfiles"}"
+export ZDOTDIR="${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}"
 
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
 export HISTIGNORE="&:history*:[sudo ]rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
 export HISTFILE="${ZDOTDIR}/.zsh_history"
-export HISTSIZE=1000
-export SAVEHIST=1000
+export HISTSIZE='1000'
+export SAVEHIST='1000'
 
 export EDITOR='/usr/bin/nano'
 export VISUAL='/usr/bin/code'

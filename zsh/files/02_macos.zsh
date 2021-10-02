@@ -2,8 +2,10 @@
 # File 03_macos.zsh; macos specific alias and environment variables
 # ==================================================================
 
-# Bail out if not running on macOS
-[[ $(sys is-macos) == 0 ]] && return 1
+# Bail out if not sourced from macos
+if [[ $(sys is-macos) != 'true' ]]; then
+  return 1
+fi
 
 # Initialize homebrew stuff
 if (( $+commands[brew] )); then

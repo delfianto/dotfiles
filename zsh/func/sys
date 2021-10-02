@@ -38,11 +38,11 @@ os_like() {
 }
 
 is_linux() {
-  [[ $(os_name) == 'linux' ]]
+  [[ $(os_name) == 'linux' ]] && echo 'true' || echo 'false'
 }
 
 is_macos() {
-  [[ $(os_name) == 'macos' ]]
+  [[ $(os_name) == 'macos' ]] && echo 'true' || echo 'false'
 }
 
 help() {
