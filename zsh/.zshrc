@@ -1,22 +1,35 @@
+# =======================================
 # File .zshrc; zsh initialization script
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.config/dotfiles/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
-# # Initialize zinit
-(( ${+commands[brew]} )) && source $(brew --prefix)/opt/zinit/zinit.zsh   # macOS
-[[ -f /usr/share/zinit/zinit.zsh ]] && source /usr/share/zinit/zinit.zsh  # Linux
-
-# Load powerlevel10k theme
-zinit ice depth"1" # git clone depth
-zinit light romkatv/powerlevel10k
+# =======================================
 
 # Set function path
-fpath=( "${ZDOTDIR}/func" "${fpath[@]}" )
+fpath=( "${ZDOTDIR}/fpath" "${fpath[@]}" )
+
+# Initialize custom functions
+autoload -Uz func sys zsh-in zsh-rc
+
+# Set the OS name and family
+export OS_NAME=$(sys os-name)
+export OS_LIKE=$(sys os-like)
+
+# Initialize zinit
+(( ${+commands[brew]} )) && zsh-in $(brew --prefix)/opt/zinit/zinit.zsh   # macOS
+[[ "${OS_NAME}" == 'linux' ]] && zsh-in /usr/share/zinit/zinit.zsh        # Linux
+
+# Load zinit plugins on success initialization
+if [[ $(func zinit) == 'true' ]]; then
+  # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.config/dotfiles/.zshrc.
+  # Initialization code that may require console input (password prompts, [y/n]
+  # confirmations, etc.) must go above this block; everything else may go below.
+  zsh-in "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+
+  # Load powerlevel10k theme
+  zinit ice depth"1" # git clone depth
+  zinit light romkatv/powerlevel10k
+
+  # To customize prompt, run `p10k configure` or edit ~/.config/dotfiles/.p10k.zsh.
+  zsh-in "${ZDOTDIR}/.p10k.zsh"
+fi
 
 # Set path as array-unique-special (no duplicates)
 typeset -aU path
@@ -25,9 +38,6 @@ typeset -aU path
 autoload -Uz colors compinit regexp-replace zcalc
 compinit -d
 colors
-
-# Initialize zsh custom functions
-autoload -Uz ex jvm pkg svc sys iommu zsh-in zsh-rc
 
 # On every prompt, set terminal title to "user@host: cwd".
 function set-term-title() { print -Pn '\e]0;%n@%m: %~\a' }
@@ -123,6 +133,3 @@ zsh-in \
 
 # Load the rest of zshrc files
 zsh-rc 00_utils 01_alias "02_$(sys os-name)" 03_devel
-
-# To customize prompt, run `p10k configure` or edit ~/.config/dotfiles/.p10k.zsh.
-zsh-in "${ZDOTDIR}/.p10k.zsh"

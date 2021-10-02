@@ -14,67 +14,73 @@ export DEV_USER_HOME="${DEV_USER_HOME:-${HOME}/.local}"
 export DEV_USER_HOME_ACTIVE="${DEV_USER_HOME_ACTIVE:-false}"
 
 # Docker command wrapper
-if (( ${+commands[docker]} )); then
+docker() {
+  if (( ! ${+commands[docker]} )); then
+    echo 'Docker is not installed'
+    return 1
+  fi
+
   # Docker pretty ps
   alias dps='docker-pretty-ps'
 
-  docker() {
-    typeset -A args
+  typeset -A args
 
-    args[com]='compose'
-    args[pps]='pretty'
-    args[img]='image'
-    args[net]='network'
-    args[ver]='version'
-    args[vol]='volume'
+  args[com]='compose'
+  args[pps]='pretty'
+  args[img]='image'
+  args[net]='network'
+  args[ver]='version'
+  args[vol]='volume'
 
-    local arg="${args[$1]}"
-    local cmd='/usr/bin/docker'
+  local arg="${args[$1]}"
+  local cmd='/usr/bin/docker'
 
-    if [[ -z "${arg}" ]]; then
-      "${cmd} ${@}"
-    elif [[ "${arg}" == 'compose' ]]; then
-      "docker-compose ${@:2}"
-    elif [[ "${arg}" == 'pretty' ]]; then
-      "docker-pretty-ps ${@:2}"
-    else
-      "${cmd} ${arg} ${@:2}"  
-    fi
-  }
-fi
+  if [[ -z "${arg}" ]]; then
+    "${cmd}" "${@}"
+  elif [[ "${arg}" == 'compose' ]]; then
+    docker-compose "${@:2}"
+  elif [[ "${arg}" == 'pretty' ]]; then
+    docker-pretty-ps
+  else
+    "${cmd}" "${arg}" "${@:2}"
+  fi
+}
 
-# Google cloud components wrapper
-if (( ${+commands[gcloud]} )); then
-  gcp() {
-    typeset -A args
+# Google cloud command wrapper
+gcp() {
+  if (( ! ${+commands[gcloud]} )); then
+    echo 'Cloud Command Line Tools is not installed'
+    return 1
+  fi
 
-    args[i]='install'
-    args[u]='update'
-    args[ls]='list'
-    args[rm]='remove'
-    args[rs]='restore'
-    args[re]='reinstall'
-    args[repo]='repositories'
-    args[help]='--help'
+  typeset -A args
 
-    # Iterate key-val for debugging
-    #
-    # for key val in ${(kv)args}; do
-    #   echo "$key -> $val"
-    # done
+  args[i]='install'
+  args[up]='update'
+  args[ls]='list'
+  args[rm]='remove'
+  args[rs]='restore'
+  args[re]='reinstall'
+  args[repo]='repositories'
+  args[help]='--help'
 
-    local arg="${args[$1]}"
-    local cmd='gcloud components'
+  # Iterate key-val for debugging
+  #
+  # for key val in ${(kv)args}; do
+  #   echo "$key -> $val"
+  # done
 
-    if [[ -z "${arg}" ]]; then
-      eval "${cmd} ${@}"
-    else
-      eval "${cmd} ${arg} ${@:2}"
-    fi
-  }
-fi
+  local arg="${args[$1]}"
+  local cmd='gcloud components'
 
-devtools_prefix() {
+  if [[ -z "${arg}" ]]; then
+    "${cmd}" "${@}"
+  else
+    "${cmd}" "${arg}" "${@:2}"
+  fi
+}
+
+get_prefix() {
   local prefix=''
 
   if [[ "${DEV_USER_HOME_ACTIVE}" == 'true' ]]; then
@@ -87,14 +93,18 @@ devtools_prefix() {
   if (( ${+commands[realpath]} )); then
     echo $(realpath -m "${prefix}/${1}")
   else
-    # Workaround for macOS without gnu coreutils from homebrew
-    echo $(python "${ZDOTDIR}/utils/realpath.py" "${prefix}/${1}")
+    # Workaround for macOS without gnu coreutils
+    echo $("${ZDOTDIR}/utils/realpath.py" "${prefix}/${1}")
   fi
 }
 
 # Initialize google cloud sdk toolkit
-devtools_gcp() {
-  export GCLOUD_SDK_DIR="$(devtools_prefix lib/google-cloud-sdk)"
+init_gcloud() {
+  if (( ! ${+commands[gcloud]} )); then
+    return 1
+  fi
+
+  export GCLOUD_SDK_DIR="$(get_prefix lib/google-cloud-sdk)"
 
   if [[ -r "${GCLOUD_SDK_DIR}" ]]; then
     local shell=$(basename "${SHELL}")
@@ -107,77 +117,36 @@ devtools_gcp() {
   fi
 }
 
-# Initialize sdk manager
-devtools_jvm() {
-  export SDKMAN_DIR="$(devtools_prefix sdk)"
-  local init_script="${SDKMAN_DIR}/bin/sdkman-init.sh"
-
-  case "${1}" in
-  'install')
-    curl -s "https://get.sdkman.io" | zsh
-    ;;
-  *)
-    if [[ -r "${init_script}" ]]; then
-      export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
-      export GRADLE_USER_HOME="${DEV_USER_HOME}/lib/gradle"
-
-      mkdir -p "${SDKMAN_DIR}/ext"
-      source "${init_script}"
-    fi
-    ;;
-  esac
-}
-
 # Initialize nodejs prefix path
-devtools_node() {
+init_nodejs() {
   if (( ${+commands[node]} )); then
     alias nls='npm ls --depth=0'
-    export NPM_CONFIG_PREFIX="$(devtools_prefix)"
-  fi
-}
-
-# Initialize ruby gem location
-devtools_ruby() {
-  if (( ${+commands[ruby]} )); then
-    local full_ver="$(ruby -e 'puts RUBY_VERSION')"
-    local gem_path="ruby/gems/${full_ver%?}0" # transform 2.7.1 to 2.7.0
-
-    export GEM_HOME="$(devtools_prefix lib/${gem_path})"
-    export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
-    export GEM_PATH="${GEM_HOME}"
-
-    if $(sys is-linux); then
-      export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_path}"
-    fi
-
-    if [[ ! -d "${GEM_HOME}" ]]; then
-      eval "mkdir -p ${GEM_HOME}/{specifications,bin}"
-    fi
-
-    path_munge "${GEM_HOME}/bin"
+    export NPM_CONFIG_PREFIX="$(get_prefix)"
   fi
 }
 
 # Initialize python env and aliases
-devtools_python() {
-  if (( ${+commands[python]} )); then
-    alias py='python'
-    alias pyinst='pip install'
-    alias pyupgd='pip install --upgrade'
-    alias pytool='pip install --upgrade pip inittools wheel'
-    alias pyhttp='python -m http.server' # starts a python lightweight http server
-    alias pyjson='python -m json.tool'   # pipe to this alias to format json with python
-
-    export PYTHONUSERBASE="$(devtools_prefix)"
-
-    jsoncat() {
-      if [[ -s "$1" ]]; then
-        cat "$1" | pyjson
-      else
-        echo 'File is empty.'
-      fi
-    }
+init_python() {
+  if (( ! ${+commands[python]} )); then
+    return 1
   fi
+
+  alias py='python'
+  alias pyinst='pip install'
+  alias pyupgd='pip install --upgrade'
+  alias pytool='pip install --upgrade pip inittools wheel'
+  alias pyhttp='python -m http.server' # starts a python lightweight http server
+  alias pyjson='python -m json.tool'   # pipe to this alias to format json with python
+
+  export PYTHONUSERBASE="$(get_prefix)"
+
+  jsoncat() {
+    if [[ -s "$1" ]]; then
+      cat "$1" | pyjson
+    else
+      echo 'File is empty.'
+    fi
+  }  
 
   # Used by chromium build script
   if (( ${+commands[python2]} )); then
@@ -185,17 +154,64 @@ devtools_python() {
   fi
 }
 
-# Initialize all devtools
-devtools_init() {
-  devtools_gcp
-  devtools_jvm
-  devtools_node
-  devtools_ruby
-  devtools_python
+# Initialize ruby gem location
+init_ruby() {
+  if (( ! ${+commands[ruby]} )); then
+    return 1
+  fi
+
+  local full_ver="$(ruby -e 'puts RUBY_VERSION')"
+  local gem_path="ruby/gems/${full_ver%?}0" # transform 2.7.1 to 2.7.0
+
+  export GEM_HOME="$(get_prefix lib/${gem_path})"
+  export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
+  export GEM_PATH="${GEM_HOME}"
+
+  if [[ "${OS_NAME}" == 'linux' ]]; then
+    export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_path}"
+  fi
+
+  if [[ ! -d "${GEM_HOME}" ]]; then
+    eval "mkdir -p ${GEM_HOME}/{specifications,bin}"
+  fi
+
+  path_munge "${GEM_HOME}/bin"
+}
+
+# Initialize sdk manager
+init_sdkman() {
+  export SDKMAN_DIR="$(get_prefix sdk)"
+  local sdkman_init="${SDKMAN_DIR}/bin/sdkman-init.sh"
+
+  if [[ -r "${sdkman_init}" ]]; then
+    export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
+    export GRADLE_USER_HOME="${DEV_USER_HOME}/lib/gradle"
+
+    mkdir -p "${SDKMAN_DIR}/ext"
+    source "${sdkman_init}"
+  else
+    unset SDKMAN_DIR
+  fi
 }
 
 # Init everything
-devtools_init
+init_gcloud
+unfunction init_gcloud
+
+init_nodejs
+unfunction init_nodejs
+
+init_python
+unfunction init_python
+
+init_ruby
+unfunction init_ruby
+
+init_sdkman
+unfunction init_sdkman
+
+# Final Cleanup
+unfunction get_prefix
 
 # Add .local/bin to PATH
 path_munge "${DEV_USER_HOME}/bin"

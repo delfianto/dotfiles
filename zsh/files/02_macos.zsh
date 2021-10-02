@@ -3,27 +3,29 @@
 # ==================================================================
 
 # Bail out if not sourced from macos
-if [[ $(sys is-macos) != 'true' ]]; then
+if [[ "${OS_NAME}" != 'macos' ]]; then
   return 1
 fi
 
 # Initialize homebrew stuff
-if (( $+commands[brew] )); then
-  export LC_ALL=en_US.UTF-8
-  export HOMEBREW_PREFIX=${HOMEBREW_PREFIX:-/usr/local}
-  export HOMEBREW_GNU_UTILS=${HOMEBREW_GNU_UTILS:-true}
+if (( ${+commands[brew]} )); then
+  export LC_ALL='en_US.UTF-8'
+  export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/usr/local}"
+  export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-true}"
 
   # ZSH completion
-  fpath=(/usr/local/share/zsh-completions $fpath)
+  fpath=('/usr/local/share/zsh-completions' "${fpath[@]}" )
 
   if [[ "${HOMEBREW_GNU_UTILS}" == 'true' ]]; then
     # GNU utilities and manpage
     for gnu in $(echo -e 'coreutils findutils gnu-indent gnu-which gnu-sed gnu-tar'); do
-      local gnu_lib="${prefix}/opt/${gnu}/libexec"
+      gnu_lib="${HOMEBREW_PREFIX}/opt/${gnu}/libexec"
 
       if [[ -r "${gnu_lib}" ]]; then
-        zsh::path_munge "${gnu_lib}/gnubin"
+        path_munge "${gnu_lib}/gnubin"
       fi
+
+      unset gnu_lib
     done
   fi
 

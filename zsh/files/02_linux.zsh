@@ -3,7 +3,7 @@
 # ==================================================================
 
 # Bail out if not sourced from linux
-if [[ $(sys is-linux) != 'true' ]]; then
+if [[ "${OS_NAME}" != 'linux' ]]; then
   return 1
 fi
 

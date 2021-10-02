@@ -56,7 +56,7 @@ help() {
 }
 
 local arg="${1/-/_}"
-local fun=(cflags ls_type os_name os_like is_linux is_macos)
+local fun=(cflags ls_type os_name os_like is_linux is_macos is_func)
 
 # Check whether value exists in fun array before executing, prevent any random argument from being executed
 # https://unix.stackexchange.com/questions/411304/how-do-i-check-whether-a-zsh-array-contains-a-given-value

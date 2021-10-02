@@ -52,20 +52,11 @@ jvm() {
   fi 
 }
 
-is_func() {
-  typeset -f "$1" > /dev/null
-  return "$?"
-}
-
-ls_func() {
-  print -l ${(ok)functions}
-}
-
-ls_path() {
+lspath() {
   echo 'path'
 }
 
-ls_vars() {
+lsvar() {
   if [[ -z "$1" ]]; then
     printenv | sort
   else
