@@ -122,7 +122,7 @@ zsh-in \
   /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # Load the rest of zshrc files
-zsh-rc 00.utils 01.alias 02.linux 03.macos
+zsh-rc 00_utils 01_alias 02_linux 03_macos 04_devel
 
 # To customize prompt, run `p10k configure` or edit ~/.config/dotfiles/.p10k.zsh.
 zsh-in ${ZDOTDIR}/.p10k.zsh

@@ -76,7 +76,7 @@ ls_vars() {
 path_munge() {
   if [[ -d "$1" ]] && [[ -r "$1" ]] && 
       ! echo $PATH | grep -Eq "(^|:)$1($|:)"; then
-    if [ $2 = 'after' ] ; then
+    if [[ "$2" = 'after' ]]; then
       PATH="$PATH:$1"
     else
       PATH="$1:$PATH"
