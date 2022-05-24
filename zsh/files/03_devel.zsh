@@ -127,16 +127,16 @@ init_nodejs() {
 
 # Initialize python env and aliases
 init_python() {
-  if (( ! ${+commands[python]} )); then
+  if (( ! ${+commands[python3]} )); then
     return 1
   fi
 
-  alias py='python'
-  alias pyinst='pip install'
-  alias pyupgd='pip install --upgrade'
-  alias pytool='pip install --upgrade pip inittools wheel'
-  alias pyhttp='python -m http.server' # starts a python lightweight http server
-  alias pyjson='python -m json.tool'   # pipe to this alias to format json with python
+  alias py='python3'
+  alias pyinst='pip3 install'
+  alias pyupgd='pip3 install --upgrade'
+  alias pytool='pip3 install --upgrade pip inittools wheel'
+  alias pyhttp='python3 -m http.server' # starts a python lightweight http server
+  alias pyjson='python3 -m json.tool'   # pipe to this alias to format json with python
 
   export PYTHONUSERBASE="$(get_prefix)"
 
@@ -146,12 +146,7 @@ init_python() {
     else
       echo 'File is empty.'
     fi
-  }  
-
-  # Used by chromium build script
-  if (( ${+commands[python2]} )); then
-    export PNACLPYTHON="$(command -v python2)"
-  fi
+  }
 }
 
 # Initialize ruby gem location
@@ -172,7 +167,7 @@ init_ruby() {
   fi
 
   if [[ ! -d "${GEM_HOME}" ]]; then
-    eval "mkdir -p ${GEM_HOME}/{specifications,bin}"
+    eval "mkdir -p ${GEM_HOME}/{specifications,bin}" &> /dev/null
   fi
 
   path_munge "${GEM_HOME}/bin"
@@ -187,7 +182,7 @@ init_sdkman() {
     export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
     export GRADLE_USER_HOME="${DEV_USER_HOME}/lib/gradle"
 
-    mkdir -p "${SDKMAN_DIR}/ext"
+    eval "mkdir -p ${SDKMAN_DIR}/ext" &> /dev/null
     source "${sdkman_init}"
   else
     unset SDKMAN_DIR
