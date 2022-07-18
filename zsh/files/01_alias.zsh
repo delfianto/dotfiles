@@ -37,3 +37,7 @@ alias sudo='sudo '
 
 # Reloads the current shell
 alias reload="exec ${SHELL} -l"
+
+# Update all docker image
+alias docker-image="docker images | grep -v repo | sed 's/ \+/:/g' | cut -d: -f1,2"
+alias docker-pull='docker-image | xargs -L1 docker pull'

@@ -240,3 +240,6 @@
   rebase = false
 [credential "https://github.com"]
   helper = !/usr/bin/gh auth git-credential
+[user]
+	name = Dwi Elfianto
+	email = dwi.elfianto@gmail.com
