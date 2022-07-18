@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # python alternative for realpath in gnu coreutils
 import os
 import sys
