@@ -49,7 +49,7 @@ jvm() {
     "${JAVA_HOME}/bin/java" "${@:1}"
   else
     java "${@:1}"
-  fi 
+  fi
 }
 
 lspath() {
@@ -65,7 +65,7 @@ lsvar() {
 }
 
 path_munge() {
-  if [[ -d "$1" ]] && [[ -r "$1" ]] && 
+  if [[ -d "$1" ]] && [[ -r "$1" ]] &&
       ! echo "${PATH}" | grep -Eq "(^|:)$1($|:)"; then
     if [[ "$2" = 'after' ]]; then
       PATH="${PATH}:$1"
