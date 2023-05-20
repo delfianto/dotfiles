@@ -1,2 +1,2 @@
-# dotfiles
-My personal dotfile config and some scripts I wrote to setup my development environment
+# ZSH Dotfiles
+Customized ZSH shell script and dotfiles for Linux and macOS development box
