@@ -1,23 +1,31 @@
 [include]
   path = ~/.config/dotfiles/private/gitconfig
+
 [core]
   autocrlf = input
+
 [diff]
   tool = meld
+
 [merge]
   tool = meld
+
 [difftool]
   prompt = false
+
 [core]
   pager = diff-so-fancy | less -RFXMx4
   untrackedCache = true
+
 [color]
   ui = true
+
 [color "diff-highlight"]
   oldNormal = red bold
   oldHighlight = red bold 52
   newNormal = green bold
   newHighlight = green bold 22
+
 [color "diff"]
   meta = yellow
   frag = magenta bold
@@ -25,9 +33,11 @@
   old = red bold
   new = green bold
   whitespace = red reverse
+
 [submodule]
   recurse = true
   fetchJobs = 0
+
 ##########################################
 # a nice sets of git aliases, taken from
 # https://gist.github.com/pksunkara/988716
@@ -231,15 +241,15 @@
   human = name-rev --name-only --refs=refs/heads/*
   #############
   hist = "log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short"
+
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
+
 [pull]
   rebase = false
+
 [credential "https://github.com"]
   helper = !/usr/bin/gh auth git-credential
-[user]
-	name = Dwi Elfianto
-	email = dwi.elfianto@gmail.com
