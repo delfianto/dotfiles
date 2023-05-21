@@ -53,7 +53,10 @@ jvm() {
 }
 
 lspath() {
-  echo 'path'
+  local parts=(${(s/:/)PATH})
+  for i in ${parts}; do
+    echo ${i}
+  done
 }
 
 lsvar() {
