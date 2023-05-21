@@ -11,7 +11,7 @@
 
 export DEV_HOME="${DEV_HOME:-/usr/local}"
 
-if (( !${+commands[realpath]} )); then
+if (( ! ${+commands[realpath]} )); then
   echo 'Warning: Realpath command does not exist in $PATH'
   echo 'Warning: DevTools initialization skipped'
   return 1
@@ -79,7 +79,6 @@ gcp() {
   args[help]='--help'
 
   # Iterate key-val for debugging
-  #
   # for key val in ${(kv)args}; do
   #   echo "$key -> $val"
   # done
