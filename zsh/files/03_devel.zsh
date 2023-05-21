@@ -170,7 +170,7 @@ init_ruby() {
 
 # Initialize sdk manager
 init_sdkman() {
-  export SDKMAN_DIR="$(get_prefix sdk)"
+  export SDKMAN_DIR="$(get_prefix sdkman)"
   local sdkman_init="${SDKMAN_DIR}/bin/sdkman-init.sh"
 
   if [[ -r "${sdkman_init}" ]]; then
