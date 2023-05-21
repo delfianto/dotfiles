@@ -203,5 +203,6 @@ unfunction init_sdkman
 # Final Cleanup
 unfunction get_prefix
 
-# Add .local/bin to PATH
+# Ensure ~/.local/bin and $DEV_HOME/bin is added to PATH
+path_munge "${HOME}/.local/bin"
 path_munge "${DEV_USER_HOME}/bin"
