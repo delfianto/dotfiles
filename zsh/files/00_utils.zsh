@@ -77,3 +77,9 @@ path_munge() {
     fi
   fi
 }
+
+dot_update() {
+  cd "${ZDOTDIR}"
+  git pull
+  cd -
+}
