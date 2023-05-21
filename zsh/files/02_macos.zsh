@@ -59,7 +59,6 @@ else
 fi
 
 beer() {
-  local cmd='curl -fsSL'
   local src='https://raw.githubusercontent.com/Homebrew/install/HEAD'
   
   case "${1}" in
@@ -69,10 +68,10 @@ beer() {
         return 1
       fi
 
-      /bin/bash -c "$(${cmd} ${src}/install.sh)"
+      /bin/bash -c "$(curl -fsSL ${src}/install.sh)"
       ;;
     'purge')
-      /bin/bash -c "$(${cmd} ${src}/uninstall.sh)"
+      /bin/bash -c "$(curl -fsSL ${src}/uninstall.sh)"
       ;;
     *)
       echo "Usage: ${0} [ setup | purge ]"
