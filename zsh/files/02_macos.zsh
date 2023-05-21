@@ -73,6 +73,10 @@ beer() {
     'purge')
       /bin/bash -c "$(curl -fsSL ${src}/uninstall.sh)"
       ;;
+    'chown')
+      # https://stackoverflow.com/questions/16432071/how-to-fix-homebrew-permissions/46844441#46844441
+      sudo chown -Rv $(whoami) $(brew --prefix)/*
+      ;;
     *)
       echo "Usage: ${0} [ setup | purge ]"
       ;;
