@@ -77,6 +77,7 @@ beer() {
     *)
       echo "Usage: ${0} [ setup | purge ]"
       ;;
+  esac
 }
 
 dock_spacer() {
