@@ -58,22 +58,25 @@ else
   alias la="ls -a"
 fi
 
-brew_setup() {
-  if (( ${+commands[brew]} )); then
-    echo 'Homebrew is already installed.'
-    return 1
-  else
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  fi
-}
+beer() {
+  local cmd='curl -fsSL'
+  local src='https://raw.githubusercontent.com/Homebrew/install/HEAD'
+  
+  case "${1}" in
+    'setup')
+      if (( ${+commands[brew]} )); then
+        echo 'Homebrew is already installed'
+        return 1
+      fi
 
-brew_purge() {
-  if (( ${+commands[brew]} )); then
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
-  else
-    echo 'Homebrew is not installed.'
-    return 1
-  fi
+      /bin/bash -c "$(${cmd} ${src}/install.sh)"
+      ;;
+    'purge')
+      /bin/bash -c "$(${cmd} ${src}/uninstall.sh)"
+      ;;
+    *)
+      echo "Usage: ${0} [ setup | purge ]"
+      ;;
 }
 
 dock_spacer() {
