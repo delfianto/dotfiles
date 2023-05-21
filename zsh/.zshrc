@@ -12,9 +12,16 @@ autoload -Uz func sys zsh-in zsh-rc
 export OS_NAME=$(sys os-name)
 export OS_LIKE=$(sys os-like)
 
-# Initialize zinit
-(( ${+commands[brew]} )) && zsh-in $(brew --prefix)/opt/zinit/zinit.zsh   # macOS
-[[ "${OS_NAME}" == 'linux' ]] && zsh-in /usr/share/zinit/zinit.zsh        # Linux
+# zinit on macOS
+if (( ${+commands[brew]} )); then
+  export HOMEBREW_PREFIX=$(brew --prefix)
+
+  zsh-in "${HOMEBREW_PREFIX}/opt/zinit/zinit.zsh"
+  fpath=( "${HOMEBREW_PREFIX}/share/zsh-completions" "${fpath[@]}" )
+fi
+
+# zinit on Linux
+[[ "${OS_NAME}" == 'linux' ]] && zsh-in /usr/share/zinit/zinit.zsh
 
 # Load zinit plugins on success initialization
 if [[ $(func zinit) == 'true' ]]; then
