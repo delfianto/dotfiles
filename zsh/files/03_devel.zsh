@@ -5,13 +5,27 @@
 # it as needed, or if you're not so confident in doing this then set the DEV_HOME
 # to set the directory where you would like to store your devtools (libs, sdks, etc).
 #
-# Another option is to set the value of DEV_USER_HOME_ACTIVE to 'true' which will use
-# $HOME/.local as the prefix for your development tools.
+# Another good option is to set DEV_HOME to $HOME/.local as the current user
+# is guaranteed to have read/write access to this directory.
 # ===========================================================================================
 
 export DEV_HOME="${DEV_HOME:-/usr/local}"
-export DEV_USER_HOME="${DEV_USER_HOME:-${HOME}/.local}"
-export DEV_USER_HOME_ACTIVE="${DEV_USER_HOME_ACTIVE:-false}"
+
+if (( !${+commands[realpath]} )); then
+  echo 'Warning: Realpath command does not exist in $PATH'
+  echo 'Warning: DevTools initialization skipped'
+  return 1
+fi
+
+get_prefix() {
+  local prefix=$(realpath -q "${DEV_HOME}/${1}")
+
+  if [[ -z "${prefix}" ]]; then
+    echo "${DEV_HOME}/${1}"
+  else
+    echo "${prefix}"
+  fi
+}
 
 # Docker command wrapper
 docker() {
@@ -77,24 +91,6 @@ gcp() {
     "${cmd}" "${@}"
   else
     "${cmd}" "${arg}" "${@:2}"
-  fi
-}
-
-get_prefix() {
-  local prefix=''
-
-  if [[ "${DEV_USER_HOME_ACTIVE}" == 'true' ]]; then
-    prefix="${DEV_USER_HOME}"
-  else
-    prefix="${DEV_HOME}"
-  fi
-
-  # Resolve the directory path
-  if (( ${+commands[realpath]} )); then
-    echo $(realpath -m "${prefix}/${1}")
-  else
-    # Workaround for macOS without gnu coreutils
-    echo $("${ZDOTDIR}/utils/realpath.py" "${prefix}/${1}")
   fi
 }
 
