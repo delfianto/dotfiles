@@ -182,19 +182,6 @@ init_sdkman() {
   fi
 }
 
-# Init everything
-init_gcloud
-unfunction init_gcloud
-
-init_nodejs
-unfunction init_nodejs
-
-init_python
-unfunction init_python
-
-init_ruby
-unfunction init_ruby
-
 init_sdkman
 unfunction init_sdkman
 
