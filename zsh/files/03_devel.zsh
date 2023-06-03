@@ -175,9 +175,7 @@ init_sdkman() {
 
   if [[ -r "${sdkman_init}" ]]; then
     export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
-    export GRADLE_USER_HOME="${DEV_USER_HOME}/lib/gradle"
-
-    eval "mkdir -p ${SDKMAN_DIR}/ext" &> /dev/null
+    export GRADLE_USER_HOME="${HOME}/.gradle"
     source "${sdkman_init}"
   else
     unset SDKMAN_DIR
@@ -205,4 +203,3 @@ unfunction get_prefix
 
 # Ensure ~/.local/bin and $DEV_HOME/bin is added to PATH
 path_munge "${HOME}/.local/bin"
-path_munge "${DEV_USER_HOME}/bin"
