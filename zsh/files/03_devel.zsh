@@ -177,7 +177,7 @@ init_sdkman() {
     export GROOVY_TURN_OFF_JAVA_WARNINGS='true'
     export GRADLE_USER_HOME="${HOME}/.gradle"
 
-    eval "mkdir -p ${SDKMAN_DIR}/{ext}" &> /dev/null
+    eval "mkdir -p ${SDKMAN_DIR}/ext" &> /dev/null
     source "${sdkman_init}"
   else
     unset SDKMAN_DIR
