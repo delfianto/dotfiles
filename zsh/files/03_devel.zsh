@@ -27,8 +27,8 @@ get_prefix() {
   fi
 }
 
+dkr() {
 # Docker command wrapper
-docker() {
   if (( ! ${+commands[docker]} )); then
     echo 'Docker is not installed'
     return 1
