@@ -138,7 +138,7 @@ if [[ -n ${ZSH_DEBUG_INIT} ]]; then
 
   # Calculate elapsed time
   local elapsed_seconds=$(echo "$end_time - $start_time" | bc)
-  elapsed_milliseconds=$(printf "%.3f" "$(echo "$elapsed_seconds * 1000" | bc)")
+  local elapsed_milliseconds=$(printf "%.3f" "$(echo "$elapsed_seconds * 1000" | bc)")
 
   # Print elapsed time
   echo "Shell initialization took $elapsed_milliseconds milliseconds."
