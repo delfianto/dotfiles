@@ -1,8 +1,4 @@
-# =======================================
 # File .zshrc; zsh initialization script
-# =======================================
-
-ZSH_DEBUG_INIT=${ZSH_DEBUG_INIT:-1}
 
 if [[ -n ${ZSH_DEBUG_INIT} ]]; then
   # Start timing
@@ -25,10 +21,6 @@ if [[ -n ${os} ]]; then
 fi
 
 unset -f autoload_init
-
-# Set the OS name and family
-# export OS_NAME=$(env_check os_name)
-# export OS_LIKE=$(env_check os_like)
 
 # Set path as array-unique-special (no duplicates)
 typeset -aU path
