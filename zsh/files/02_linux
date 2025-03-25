@@ -3,11 +3,6 @@
 # File 01_linux; linux specific alias and environment variables
 # =============================================================
 
-# Bail out if not sourced from linux
-if [[ "${OS_NAME}" != 'linux' ]]; then
-  return 1
-fi
-
 # CPU clock and system monitoring
 alias amd-epp-switch='sudo /usr/local/sbin/amd-epp-switch'
 alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'

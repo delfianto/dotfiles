@@ -3,11 +3,6 @@
 # File 03_macos; macos specific alias and environment variables
 # =============================================================
 
-# Bail out if not sourced from macos
-if [[ "${OS_NAME}" != 'macos' ]]; then
-  return 1
-fi
-
 # Initialize homebrew stuff
 if [[ ! -z "${HOMEBREW_PREFIX}" ]]; then
   export LC_ALL='en_US.UTF-8'
