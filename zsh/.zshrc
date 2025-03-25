@@ -6,11 +6,11 @@ if [[ -n ${ZSH_DEBUG_INIT} ]]; then
 fi
 
 autoload_init() {
-    fpath=($@ $fpath)
-    for file in $^@/[^_]*(ND.:t); do
-      [[ -n ${ZSH_DEBUG_INIT} ]] && echo "Autoloaded: ${file}"
-      autoload -Uz ${file}
-    done
+  fpath=($@ $fpath)
+  for file in $^@/[^_]*(ND.:t); do
+    [[ -n ${ZSH_DEBUG_INIT} ]] && echo "Autoloaded: ${file}"
+    autoload -Uz ${file}
+  done
 }
 
 autoload_init ${ZDOTDIR}/autoload/common
