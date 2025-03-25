@@ -13,22 +13,32 @@ alias ll="ls ${LS_ARGS} -l"
 alias la="ls ${LS_ARGS} -a"
 
 # CPU clock and system monitoring
+alias amd-epp-switch='sudo /usr/local/sbin/amd-epp-switch'
 alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'
-alias hwmon='watch -n1 sensors'
 alias hdmon='sudo hdsentinel'
-alias dmesg='sudo dmesg -H'
-alias lqctl='sudo liquidctl'
+alias hwmon='watch -n1 sensors'
 
 # Device info alias
 alias usbdev='lsusb -tv'
 alias pcidev='lspci -tv'
 alias pcinfo='lspci -nnv'
 
-# Get parameters of a kernel module
-alias svm='systool -vm'
+# Process management
+alias kill='sudo kill'
+alias nice='sudo nice'
+alias pkill='sudo pkill'
+alias renice='sudo renice'
 
-# Wrapper for running virtmanager cli
-alias vsh='sudo virsh'
+# System management
+alias dmesg='sudo dmesg -H'
+alias halt='sudo halt'
+alias journalctl='sudo journalctl'
+alias pacman='sudo pacman'
+alias poweroff='sudo poweroff'
+alias reboot='sudo reboot'
+alias svm='systool -vm'
+alias systemctl='sudo systemctl'
+alias virsh='sudo virsh'
 
 # Set git credentials helper
 export SSH_ASKPASS="$(which ksshaskpass)"
@@ -163,8 +173,4 @@ pkg() {
       yay ${@:1}
       ;;
   esac
-}
-
-svc() {
-  systemctl ${@:1}
 }

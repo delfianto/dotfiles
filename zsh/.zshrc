@@ -12,32 +12,6 @@ autoload -Uz func sys zsh-in zsh-rc
 export OS_NAME=$(sys os-name)
 export OS_LIKE=$(sys os-like)
 
-# zinit on macOS
-if (( ${+commands[brew]} )); then
-  export HOMEBREW_PREFIX=$(brew --prefix)
-
-  zsh-in "${HOMEBREW_PREFIX}/opt/zinit/zinit.zsh"
-  fpath=( "${HOMEBREW_PREFIX}/share/zsh-completions" "${fpath[@]}" )
-fi
-
-# zinit on Linux
-[[ "${OS_NAME}" == 'linux' ]] && zsh-in /usr/share/zinit/zinit.zsh
-
-# Load zinit plugins on success initialization
-if [[ $(func zinit) == 'true' ]]; then
-  # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.config/dotfiles/.zshrc.
-  # Initialization code that may require console input (password prompts, [y/n]
-  # confirmations, etc.) must go above this block; everything else may go below.
-  zsh-in "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-
-  # Load powerlevel10k theme
-  zinit ice depth"1" # git clone depth
-  zinit light romkatv/powerlevel10k
-
-  # To customize prompt, run `p10k configure` or edit ~/.config/dotfiles/.p10k.zsh.
-  zsh-in "${ZDOTDIR}/.p10k.zsh"
-fi
-
 # Set path as array-unique-special (no duplicates)
 typeset -aU path
 
@@ -140,3 +114,6 @@ zsh-in \
 
 # Load the rest of zshrc files
 zsh-rc 00_utils 01_alias "02_$(sys os-name)" 03_devel
+
+# Load starship
+eval "$(starship init zsh)"
