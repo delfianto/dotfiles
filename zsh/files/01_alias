@@ -3,20 +3,46 @@
 # File 01_alias; common shell alias initialization
 # ================================================
 
-# Replace 'cat' with 'bat'
-if (( ${+commands[bat]} )); then
+# Command replacements
+if check_command bat; then
   alias cat='bat'
+fi
+
+if check_command duf; then
+  alias df='duf'
+else
+  alias df='df -h'
+fi
+
+if check_command gdu; then
+  alias du='gdu'
+else
+  alias du='du -h'
+  alias ds='du -hs'
+fi
+
+if check_command eza; then
+  alias ls="eza ${LS_ARGS}"
+  alias ll="eza ${LS_ARGS} -l"
+  alias la="eza ${LS_ARGS} -a"
+  alias lla="eza ${LS_ARGS} -al"
+else
+  alias ls="ls ${LS_ARGS}"
+  alias ll="ls ${LS_ARGS} -l"
+  alias la="ls ${LS_ARGS} -a"
+  alias lla="ls ${LS_ARGS} -al"
+fi
+
+if check_command docker; then
+  alias docker-images="docker images | grep -v repo | sed 's/ \+/:/g' | cut -d: -f1,2"
+  alias docker-update="docker images | xargs -L1 docker pull"
+  alias docker-prune="docker system prune -a -f"
 fi
 
 # Shell command alias
 alias cls="clear && printf '\e[3J'"
 alias which='command -v'
 alias shdir="cd ${ZDOTDIR}"
-
-# Disk usage in human readable format
-alias du='du -h'
-alias ds='du -s'
-alias df='df -h'
 
 # Make some of the file manipulation programs verbose
 alias mv='mv -v'
@@ -33,7 +59,3 @@ alias sudo='sudo '
 
 # Reloads the current shell
 alias reload="exec ${SHELL} -l"
-
-# Update all docker image
-alias docker-images="docker images | grep -v repo | sed 's/ \+/:/g' | cut -d: -f1,2"
-alias docker-update="docker images | xargs -L1 docker pull"

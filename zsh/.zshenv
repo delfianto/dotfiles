@@ -37,4 +37,4 @@ if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env ${commands}[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
-export LS_ARGS='--color=auto --group-directories-first --time-style=long-iso -hFX'
+export LS_ARGS='--color=auto --group-directories-first --time-style=long-iso -hF'

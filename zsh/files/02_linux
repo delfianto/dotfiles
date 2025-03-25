@@ -8,11 +8,6 @@ if [[ "${OS_NAME}" != 'linux' ]]; then
   return 1
 fi
 
-# ls enhancement
-alias ls="ls ${LS_ARGS}"
-alias ll="ls ${LS_ARGS} -l"
-alias la="ls ${LS_ARGS} -a"
-
 # CPU clock and system monitoring
 alias amd-epp-switch='sudo /usr/local/sbin/amd-epp-switch'
 alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'
@@ -52,6 +47,3 @@ export MAKEFLAGS='-j20'
 # Set compiler flags
 export CFLAGS='-march=native -O2 -pipe -fstack-protector-strong -fno-plt'
 export CXXFLAGS="${CFLAGS}"
-
-# Import LS_COLORS definition
-zsh-in /usr/share/LS_COLORS/dircolors.sh

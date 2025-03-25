@@ -132,7 +132,10 @@ zsh_import \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # Load the rest of zshrc files
-# zsh-rc 01_alias "02_$(sys os-name)" 03_devel
+zsh_import \
+  ${ZDOTDIR}/files \
+  01_alias \
+  02_$(os_name)
 
 # Load starship
 eval "$(starship init zsh)"
