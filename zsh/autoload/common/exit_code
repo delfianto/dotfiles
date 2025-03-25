@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+if [[ "$?" -eq 0 ]]; then
+  echo '🍄'
+else
+  echo '💀'
+fi

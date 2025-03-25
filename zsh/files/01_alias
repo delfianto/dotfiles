@@ -1,6 +1,7 @@
-# =====================================================
-# File 01_alias.zsh; common shell alias initialization
-# =====================================================
+#!/bin/zsh
+# ================================================
+# File 01_alias; common shell alias initialization
+# ================================================
 
 # Replace 'cat' with 'bat'
 if (( ${+commands[bat]} )); then
@@ -21,11 +22,6 @@ alias df='df -h'
 alias mv='mv -v'
 alias cp='cp -v'
 
-# Use safe-rm if present
-if (( $+commands[safe-rm] )); then
-  alias rm='safe-rm'
-fi
-
 # Colorize the grep command output;
 # Good for your eyes when reading long log files
 alias grep='grep -i --color=auto'
@@ -39,5 +35,5 @@ alias sudo='sudo '
 alias reload="exec ${SHELL} -l"
 
 # Update all docker image
-alias docker-image="docker images | grep -v repo | sed 's/ \+/:/g' | cut -d: -f1,2"
-alias docker-pull='docker-image | xargs -L1 docker pull'
+alias docker-images="docker images | grep -v repo | sed 's/ \+/:/g' | cut -d: -f1,2"
+alias docker-update="docker images | xargs -L1 docker pull"

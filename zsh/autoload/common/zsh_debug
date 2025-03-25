@@ -1,0 +1,2 @@
+#!/bin/zsh
+[[ -n ${ZSH_DEBUG_INIT} ]] && return 0 || return 1

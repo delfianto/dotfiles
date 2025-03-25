@@ -1,0 +1,32 @@
+#!/bin/zsh
+
+local code=$(cat <<'EOF'
+import json
+
+with open("/etc/os-release") as f:
+  d = {}
+  for line in f:
+      k, v = line.rstrip().split("=")
+      if v.startswith('"'):
+          v = v[1:-1]
+      d[k] = v
+print(json.dumps(d))
+EOF
+)
+
+local os_release_json=$(python3 -c "$code")
+
+if [[ $? -ne 0 ]]; then
+  echo "Failed to get os-release"
+  return 1
+fi
+
+local os_release_data=$(echo "$os_release_json" | jq -r '.')
+
+if [[ $? -ne 0 ]]; then
+    echo "jq is not installed, install it to parse the json output"
+    echo "$os_release_json"
+    return 1
+fi
+
+echo "$os_release_data"

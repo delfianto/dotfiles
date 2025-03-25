@@ -1,0 +1,2 @@
+#!/bin/zsh
+gcc -c -Q -march=native --help=target

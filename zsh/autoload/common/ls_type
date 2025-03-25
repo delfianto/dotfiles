@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+if $(ls --color -d "${HOME}" >/dev/null 2>&1); then
+  echo 'gnu'
+elif $(ls -G -d "${HOME}" >/dev/null 2>&1); then
+  echo 'bsd'
+else
+  echo 'solaris'
+fi

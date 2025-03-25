@@ -1,4 +1,0 @@
-for arg in "${@}";
-do
-  [[ -r ${arg} ]] && source ${arg}
-done

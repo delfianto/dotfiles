@@ -1,0 +1,57 @@
+#!/bin/zsh
+# =============================================================
+# File 01_linux; linux specific alias and environment variables
+# =============================================================
+
+# Bail out if not sourced from linux
+if [[ "${OS_NAME}" != 'linux' ]]; then
+  return 1
+fi
+
+# ls enhancement
+alias ls="ls ${LS_ARGS}"
+alias ll="ls ${LS_ARGS} -l"
+alias la="ls ${LS_ARGS} -a"
+
+# CPU clock and system monitoring
+alias amd-epp-switch='sudo /usr/local/sbin/amd-epp-switch'
+alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'
+alias hdmon='sudo hdsentinel'
+alias hwmon='watch -n1 sensors'
+
+# Device info alias
+alias usbdev='lsusb -tv'
+alias pcidev='lspci -tv'
+alias pcinfo='lspci -nnv'
+
+# Process management
+alias kill='sudo kill'
+alias nice='sudo nice'
+alias pkill='sudo pkill'
+alias renice='sudo renice'
+
+# System management
+alias dmesg='sudo dmesg -H'
+alias halt='sudo halt'
+alias journalctl='sudo journalctl'
+alias pacman='sudo pacman'
+alias poweroff='sudo poweroff'
+alias reboot='sudo reboot'
+alias svm='systool -vm'
+alias systemctl='sudo systemctl'
+alias virsh='sudo virsh'
+
+# Set git credentials helper
+export SSH_ASKPASS="$(which ksshaskpass)"
+export GIT_ASKPASS="${SSH_ASKPASS}"
+
+# Set makepkg environment variables
+export PKGEXT='.pkg.tar.zst'
+export MAKEFLAGS='-j20'
+
+# Set compiler flags
+export CFLAGS='-march=native -O2 -pipe -fstack-protector-strong -fno-plt'
+export CXXFLAGS="${CFLAGS}"
+
+# Import LS_COLORS definition
+zsh-in /usr/share/LS_COLORS/dircolors.sh

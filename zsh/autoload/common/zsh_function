@@ -1,10 +1,12 @@
+#!/bin/zsh
+
 case "$1" in
   '-l' | 'list')
     print -l ${(ok)functions}
     ;;
   '-c' | 'check')
     typeset -f "$2" > /dev/null
-    [[ "$?" -eq 0 ]] && echo 'true' || echo 'false'  
+    [[ "$?" -eq 0 ]] && echo 'true' || echo 'false'
     ;;
   '-h' | 'help')
     echo "Usage: $0 [OPTIONS]"
@@ -15,6 +17,6 @@ case "$1" in
     echo '  -h | help   show help message'
     ;;
   *)
-    func -c "$1"
+    zsh_function help
     ;;
 esac

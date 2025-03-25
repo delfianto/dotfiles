@@ -2,15 +2,33 @@
 # File .zshrc; zsh initialization script
 # =======================================
 
-# Set function path
-fpath=( "${ZDOTDIR}/fpath" "${fpath[@]}" )
+ZSH_DEBUG_INIT=${ZSH_DEBUG_INIT:-1}
 
-# Initialize custom functions
-autoload -Uz func sys zsh-in zsh-rc
+if [[ -n ${ZSH_DEBUG_INIT} ]]; then
+  # Start timing
+  local start_time=$(date +%s.%N)
+fi
+
+autoload_init() {
+    fpath=($@ $fpath)
+    for file in $^@/[^_]*(ND.:t); do
+      [[ -n ${ZSH_DEBUG_INIT} ]] && echo "Autoloaded: ${file}"
+      autoload -Uz ${file}
+    done
+}
+
+autoload_init ${ZDOTDIR}/autoload/common
+
+os=$(os_name 2>/dev/null)
+if [[ -n ${os} ]]; then
+  autoload_init ${ZDOTDIR}/autoload/$(os_name)
+fi
+
+unset -f autoload_init
 
 # Set the OS name and family
-export OS_NAME=$(sys os-name)
-export OS_LIKE=$(sys os-like)
+# export OS_NAME=$(env_check os_name)
+# export OS_LIKE=$(env_check os_like)
 
 # Set path as array-unique-special (no duplicates)
 typeset -aU path
@@ -108,12 +126,25 @@ bindkey '^H' backward-kill-word                                 # delete previou
 bindkey '^[[Z' undo                                             # Shift+tab undo last action
 
 ## Plugins section: Enable fish style features
-zsh-in \
-  /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
-  /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+zsh_import \
+  /usr/share/zsh/plugins \
+  zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+  zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # Load the rest of zshrc files
-zsh-rc 00_utils 01_alias "02_$(sys os-name)" 03_devel
+# zsh-rc 01_alias "02_$(sys os-name)" 03_devel
 
 # Load starship
 eval "$(starship init zsh)"
+
+if [[ -n ${ZSH_DEBUG_INIT} ]]; then
+  # End timing
+  local end_time=$(date +%s.%N)
+
+  # Calculate elapsed time
+  local elapsed_seconds=$(echo "$end_time - $start_time" | bc)
+  elapsed_milliseconds=$(printf "%.3f" "$(echo "$elapsed_seconds * 1000" | bc)")
+
+  # Print elapsed time
+  echo "Shell initialization took $elapsed_milliseconds milliseconds."
+fi
