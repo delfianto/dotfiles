@@ -14,6 +14,7 @@ autoload_init() {
 }
 
 autoload_init ${ZDOTDIR}/autoload/common
+autoload_init ${ZDOTDIR}/autoload/devtools
 
 os=$(os_name 2>/dev/null)
 if [[ -n ${os} ]]; then
