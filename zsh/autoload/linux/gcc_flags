@@ -1,2 +1,5 @@
 #!/bin/zsh
-gcc -c -Q -march=native --help=target
+
+gcc_flags() {
+  gcc -c -Q -march=native --help=target
+}

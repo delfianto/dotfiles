@@ -1,2 +1,5 @@
 #!/bin/zsh
-[[ $(os_name) == 'linux' ]] && echo 'true' || echo 'false'
+
+is_linux() {
+  [[ $(os_name) == 'linux' ]]
+}

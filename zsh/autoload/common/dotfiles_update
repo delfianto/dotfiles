@@ -1,5 +1,7 @@
 #!/bin/zsh
 
-cd "${ZDOTDIR}"
-git pull
-cd -
+dotfiles_update() {
+  cd "${ZDOTDIR}"
+  git pull
+  cd -
+}

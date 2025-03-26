@@ -1,6 +1,8 @@
 #!/bin/zsh
 
-local parts=(${(s/:/)PATH})
+print_path() {
+  local parts=(${(s/:/)PATH})
   for i in ${parts}; do
-  echo ${i}
-done
+    echo "❯ ${i}"
+  done
+}

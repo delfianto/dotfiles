@@ -1,10 +1,9 @@
 #!/bin/zsh
 
-check_command() {
+check_command_quiet() {
   local cmd="${1}"
 
   if (( ! ${+commands[$cmd]} )); then
-    echo "${cmd} is not installed."
     return 1
   fi
 

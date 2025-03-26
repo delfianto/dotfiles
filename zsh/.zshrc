@@ -1,5 +1,6 @@
 # File .zshrc; zsh initialization script
 
+export ZSH_DEBUG_INIT=1
 if [[ -n ${ZSH_DEBUG_INIT} ]]; then
   # Start timing
   local start_time=$(date +%s.%N)

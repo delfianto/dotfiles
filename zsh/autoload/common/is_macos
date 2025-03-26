@@ -1,2 +1,5 @@
 #!/bin/zsh
-[[ $(os_name) == 'macos' ]] && echo 'true' || echo 'false'
+
+is_macos() {
+  [[ $(os_name) == 'macos' ]]
+}

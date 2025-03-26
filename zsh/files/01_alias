@@ -4,24 +4,24 @@
 # ================================================
 
 # Command replacements
-if check_command bat; then
+if check_command_quiet bat; then
   alias cat='bat'
 fi
 
-if check_command duf; then
+if check_command_quiet duf; then
   alias df='duf'
 else
   alias df='df -h'
 fi
 
-if check_command gdu; then
+if check_command_quiet gdu; then
   alias du='gdu'
 else
   alias du='du -h'
   alias ds='du -hs'
 fi
 
-if check_command eza; then
+if check_command_quiet eza; then
   alias ls="eza ${LS_ARGS}"
   alias ll="eza ${LS_ARGS} -l"
   alias la="eza ${LS_ARGS} -a"
@@ -33,7 +33,7 @@ else
   alias lla="ls ${LS_ARGS} -al"
 fi
 
-if check_command docker; then
+if check_command_quiet docker; then
   alias docker-images="docker images | grep -v repo | sed 's/ \+/:/g' | cut -d: -f1,2"
   alias docker-update="docker images | xargs -L1 docker pull"
   alias docker-prune="docker system prune -a -f"
