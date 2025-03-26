@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+gcc_flags() {
+  if check_command gcc; then
+    gcc -c -Q -march=native --help=target
+  fi
+}
