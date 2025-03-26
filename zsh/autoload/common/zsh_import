@@ -12,9 +12,9 @@ zsh_import() {
       file="${base_dir}/${arg}"
     fi
 
-    [[ -n ${ZSH_DEBUG_INIT} ]] && echo "Attempting to load ${file}..."
+    (( "${ZSH_DEBUG_INIT}" )) && echo "Attempting to load ${file}..."
     if [[ -f "${file}" ]]; then
-      [[ -n ${ZSH_DEBUG_INIT} ]] && echo "Loading ${file}"
+      (( "${ZSH_DEBUG_INIT}" )) && echo "Loading ${file}"
       source "${file}"
     fi
   done

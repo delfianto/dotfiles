@@ -3,6 +3,11 @@
 check_command() {
   local cmd="${1}"
 
+  if [[ -z "${cmd}" ]]; then
+    echo "No command provided."
+    return 1
+  fi
+
   if (( ! ${+commands[$cmd]} )); then
     echo "${cmd} is not installed."
     return 1

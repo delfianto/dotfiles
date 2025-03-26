@@ -1,5 +1,0 @@
-#!/bin/zsh
-
-zsh_debug() {
-  [[ -n ${ZSH_DEBUG_INIT} ]]
-}

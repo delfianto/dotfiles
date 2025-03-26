@@ -2,7 +2,7 @@
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
 # Set zsh dotfile location
-export ZDOTDIR="${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}"
+export ZDOTDIR=${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}
 
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
@@ -37,4 +37,5 @@ if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env ${commands}[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
-export LS_ARGS='--color=auto --group-directories-first --time-style=long-iso -hF'
+export LS_ARGS=${LS_ARGS:-'--color=auto --group-directories-first --time-style=long-iso -hF'}
+export ZSH_DEBUG_INIT=${ZSH_DEBUG_INIT:-0}

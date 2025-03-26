@@ -4,20 +4,23 @@
 # =============================================================
 
 # Initialize homebrew stuff
-if [[ ! -z "${HOMEBREW_PREFIX}" ]]; then
-  export LC_ALL='en_US.UTF-8'
-  export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-true}"
+export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-'/opt/homebrew'}"
 
-  if [[ "${HOMEBREW_GNU_UTILS}" == 'true' ]]; then
+if [[ -d "${HOMEBREW_PREFIX}" ]] && [[ -r "${HOMEBREW_PREFIX}" ]]; then
+  export LC_ALL='en_US.UTF-8'
+  export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-1}"
+
+  if (( "${HOMEBREW_GNU_UTILS}" )); then
     # GNU utilities and manpage
-    for gnu in $(echo -e 'coreutils findutils gnu-indent gnu-which gnu-sed gnu-tar'); do
-      gnu_lib="${HOMEBREW_PREFIX}/opt/${gnu}/libexec"
+    local -a gnu_pkgs
+    gnu_pkgs=(coreutils findutils gnu-indent gnu-which gnu-sed gnu-tar)
+
+    for gnu in "${gnu_pkgs[@]}"; do
+      local gnu_lib="${HOMEBREW_PREFIX}/opt/${gnu}/libexec"
 
       if [[ -r "${gnu_lib}" ]]; then
         path_munge "${gnu_lib}/gnubin"
       fi
-
-      unset gnu_lib
     done
   fi
 
@@ -31,13 +34,12 @@ if [[ ! -z "${HOMEBREW_PREFIX}" ]]; then
   path_munge "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
 
   # Cask options
-  zsh-in "${ZDOTDIR}/private/homebrew.zsh"
+  zsh_import "${ZDOTDIR}/private/homebrew.zsh"
   export HOMEBREW_CASK_OPTS='--appdir=/Applications'
 fi
 
 # ls enhancement
-if (( ${+commands[gls]} )); then
-  # if gnu coreutils is installed
+if has_command gls; then
   alias ls="gls ${LS_ARGS}"
   alias ll="gls ${LS_ARGS} -l"
   alias la="gls ${LS_ARGS} -a"

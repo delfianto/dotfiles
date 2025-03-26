@@ -1,7 +1,6 @@
 # File .zshrc; zsh initialization script
 
-export ZSH_DEBUG_INIT=1
-if [[ -n ${ZSH_DEBUG_INIT} ]]; then
+if (( "${ZSH_DEBUG_INIT}" )); then
   # Start timing
   local start_time=$(date +%s.%N)
 fi
@@ -9,7 +8,7 @@ fi
 autoload_init() {
   fpath=($@ $fpath)
   for file in $^@/[^_]*(ND.:t); do
-    [[ -n ${ZSH_DEBUG_INIT} ]] && echo "Autoloaded: ${file}"
+    (( "${ZSH_DEBUG_INIT}" )) && echo "Autoloaded: ${file}"
     autoload -Uz ${file}
   done
 }
@@ -133,7 +132,7 @@ zsh_import \
 # Load starship
 eval "$(starship init zsh)"
 
-if [[ -n ${ZSH_DEBUG_INIT} ]]; then
+if (( "${ZSH_DEBUG_INIT}" )); then
   # End timing
   local end_time=$(date +%s.%N)
 
