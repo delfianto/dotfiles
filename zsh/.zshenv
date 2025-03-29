@@ -37,5 +37,5 @@ if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env ${commands}[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
-export LS_ARGS=${LS_ARGS:-'--color=auto --group-directories-first --time-style=long-iso -hF'}
+export LS_ARGS=${LS_ARGS:-'--color=auto --group-directories-first --time-style=long-iso -h'}
 export ZSH_DEBUG_INIT=${ZSH_DEBUG_INIT:-0}

@@ -131,7 +131,9 @@ zsh_import \
   02_$(os_name)
 
 # Load starship
-eval "$(starship init zsh)"
+if has_command starship; then
+  eval "$(starship init zsh)"
+fi
 
 if (( "${ZSH_DEBUG_INIT}" )); then
   # End timing
