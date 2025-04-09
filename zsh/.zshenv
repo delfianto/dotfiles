@@ -3,6 +3,7 @@
 
 # --- Set zsh dotfile location ---
 export ZDOTDIR=${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}
+export HISTFILE="${ZDOTDIR}/.zsh_history"
 
 # --- Don't keep duplicates and ignore specific sets of command from history ---
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history

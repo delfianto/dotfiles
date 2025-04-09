@@ -1,7 +1,7 @@
 #!/bin/zsh
 # File 01_alias; common shell alias initialization
 
-# Create kebab-case aliases for cmd:snake_case functions
+# --- Create kebab-case aliases for cmd:snake_case functions ---
 # Iterate over all defined functions (keys of the 'functions' special associative array)
 local func_name kebab_name
 for func_name in ${(k)functions}; do
@@ -22,7 +22,7 @@ done
 
 unset func_name kebab_name
 
-# Command replacements
+# --- Command replacements ---
 if fun:has_command bat; then
   alias cat='bat'
 fi
@@ -58,23 +58,23 @@ if fun:has_command docker; then
   alias docker-prune="docker system prune -a -f"
 fi
 
-# Shell command alias
+# --- Shell command alias ---
 alias cls="clear && printf '\e[3J'"
 alias which='command -v'
 alias shdir="cd ${ZDOTDIR}"
 
-# Make some of the file manipulation programs verbose
+# --- Make some of the file manipulation programs verbose ---
 alias mv='mv -v'
 alias cp='cp -v'
 
-# Colorize the grep command output;
+# --- Colorize the grep command output ---
 # Good for your eyes when reading long log files
 alias grep='grep -i --color=auto'
 alias egrep='egrep -i --color=auto'
 alias fgrep='fgrep -i --color=auto'
 
-# Allow aliases to be sudo’ed
+# --- Allow aliases to be sudo’ed ---
 alias sudo='sudo '
 
-# Reloads the current shell
+# --- Reloads the current shell ---
 alias reload="exec ${SHELL} -l"

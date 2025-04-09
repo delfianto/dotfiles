@@ -1,9 +1,7 @@
 #!/bin/zsh
-# =============================================================
 # File 03_macos; macos specific alias and environment variables
-# =============================================================
 
-# Initialize homebrew stuff
+# --- Initialize homebrew stuff ---
 export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-'/opt/homebrew'}"
 
 if [[ -d "${HOMEBREW_PREFIX}" ]] && [[ -r "${HOMEBREW_PREFIX}" ]]; then
@@ -38,7 +36,7 @@ if [[ -d "${HOMEBREW_PREFIX}" ]] && [[ -r "${HOMEBREW_PREFIX}" ]]; then
   export HOMEBREW_CASK_OPTS='--appdir=/Applications'
 fi
 
-# ls enhancement
+# --- ls enhancement ---
 if fun:has_command gls; then
   alias ls="gls ${LS_ARGS}"
   alias ll="gls ${LS_ARGS} -l"
