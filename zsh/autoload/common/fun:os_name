@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-os_name() {
+fun:os_name() {
   case "${OSTYPE}" in
     bsd*)
       echo 'bsd'

@@ -6,21 +6,27 @@ if (( "${ZSH_DEBUG_INIT}" )); then
 fi
 
 autoload_init() {
-  fpath=($@ $fpath)
-  for file in $^@/[^_]*(ND.:t); do
-    (( "${ZSH_DEBUG_INIT}" )) && echo "Autoloaded: ${file}"
-    autoload -Uz ${file}
+  for dir in "$@"; do
+    if [[ -d "${dir}" ]]; then
+      fpath=("${dir}" $fpath)
+      for file in "${dir}"/[^_]*(.N:t); do
+        (( ZSH_DEBUG_INIT )) && echo "Autoloaded: ${file}"
+        autoload -Uz "${file}"
+      done
+    else
+      (( ZSH_DEBUG_INIT )) && echo "Skipped (not a directory): ${dir}"
+    fi
   done
 }
 
-autoload_init ${ZDOTDIR}/autoload/common
-autoload_init ${ZDOTDIR}/autoload/devtools
+# Load shared functions
+autoload_init \
+  "${ZDOTDIR}/autoload/common" \
+  "${ZDOTDIR}/autoload/devtools"
 
-os=$(os_name 2>/dev/null)
-if [[ -n ${os} ]]; then
-  autoload_init ${ZDOTDIR}/autoload/$(os_name)
-fi
-
+# Load OS-specific functions
+local os_name=$(fun:os_name)
+autoload_init "${ZDOTDIR}/autoload/${os_name}"
 unset -f autoload_init
 
 # Set path as array-unique-special (no duplicates)
@@ -119,19 +125,21 @@ bindkey '^H' backward-kill-word                                 # delete previou
 bindkey '^[[Z' undo                                             # Shift+tab undo last action
 
 ## Plugins section: Enable fish style features
-zsh_import \
+fun:zsh_import \
   /usr/share/zsh/plugins \
   zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # Load the rest of zshrc files
-zsh_import \
-  ${ZDOTDIR}/files \
-  01_alias \
-  02_$(os_name)
+fun:zsh_import \
+  "${ZDOTDIR}/files" \
+  "01_alias" \
+  "02_${os_name}"
+
+unset os_name
 
 # Load starship
-if has_command starship; then
+if fun:has_command starship; then
   eval "$(starship init zsh)"
 fi
 

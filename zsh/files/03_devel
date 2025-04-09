@@ -9,7 +9,7 @@
 # Another good option is to set DEV_HOME to $HOME/.local as the current user
 # is guaranteed to have read/write access to this directory.
 # ===========================================================================================
-
+# Deprecated, need a better approach for initializing development tools
 export DEV_HOME="${DEV_HOME:-/usr/local}"
 
 if (( ! ${+commands[realpath]} )); then

@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-svc() {
+cmd:svc() {
   if ! check_command brew; then
     return 1
   fi

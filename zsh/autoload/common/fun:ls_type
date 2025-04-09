@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-ls_type() {
+fun:ls_type() {
   if $(ls --color -d "${HOME}" >/dev/null 2>&1); then
     echo 'gnu'
   elif $(ls -G -d "${HOME}" >/dev/null 2>&1); then

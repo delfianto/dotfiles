@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-zsh_function() {
+cmd:zsh_function() {
   case "${1}" in
     '-l' | 'list')
       print -l ${(ok)functions}

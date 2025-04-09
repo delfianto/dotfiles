@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-os_release_json() {
+cmd:os_release_json() {
   local code=$(cat <<'EOF'
 import json
 

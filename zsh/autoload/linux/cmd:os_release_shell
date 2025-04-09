@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-os_release_shell() {
+cmd:os_release_shell() {
   typeset -A os_info
 
   while IFS='=' read -r key value; do

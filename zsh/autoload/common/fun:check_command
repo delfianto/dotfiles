@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-check_command() {
+fun:check_command() {
   local cmd="${1}"
 
   if [[ -z "${cmd}" ]]; then

@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-dotfiles_update() {
+cmd:dotfiles_update() {
   cd "${ZDOTDIR}"
   git fetch origin
   git reset --hard origin/master

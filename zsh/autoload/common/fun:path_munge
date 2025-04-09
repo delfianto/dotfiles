@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-path_munge() {
+fun:path_munge() {
   if [[ -d "$1" ]] && [[ -r "$1" ]] &&
     ! echo "${PATH}" | grep -Eq "(^|:)$1($|:)"; then
     if [[ "$2" = 'after' ]]; then

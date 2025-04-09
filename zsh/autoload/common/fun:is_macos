@@ -1,5 +1,5 @@
 #!/bin/zsh
 
-is_macos() {
+fun:is_macos() {
   [[ $(os_name) == 'macos' ]]
 }

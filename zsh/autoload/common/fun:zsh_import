@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-zsh_import() {
+fun:zsh_import() {
   local base_dir="${1}" # Base directory, can be "" for current dir, or "$ZDOTDIR/files"
   shift               # Remove the first argument from the positional parameters
 

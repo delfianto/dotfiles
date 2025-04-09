@@ -1,5 +1,5 @@
 #!/bin/zsh
 
-is_linux() {
+fun:is_linux() {
   [[ $(os_name) == 'linux' ]]
 }

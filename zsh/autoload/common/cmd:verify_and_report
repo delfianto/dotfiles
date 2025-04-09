@@ -1,0 +1,125 @@
+#!/bin/zsh
+
+# Usage: verify_archive <archive_file_path>
+# Returns:
+#   0: Archive is OK
+#   1: File not found or invalid argument
+#   2: Command not found
+#   3: Archive is corrupted
+#   4: Format is unsupported
+#   5: Unknown error
+cmd:verify_and_report() {
+  # --- Argument Check, File Check, Extension Extraction ---
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: verify_archive <archive_file_path>" >&2
+    return 1
+  fi
+
+  local archive_file="${1}"
+  if [[ ! -f "${archive_file}" ]]; then
+    echo "Error: File '${archive_file}' does not exist." >&2
+    return 1
+  fi
+
+  local file_extension="${archive_file##*.}"
+  local lower_ext="${file_extension:l}"
+  local upper_ext="${file_extension:u}"
+
+  # --- Determine verification command to run ---
+  local exit_code=0
+  local status_message=""
+
+  # Use the .ext as default tool name, overriden on special case
+  local tool_name="${lower_ext}"
+  local tool_args=""
+  local verification_command=""
+
+  case "${lower_ext}" in
+    'zip')
+      tool_args="-T"
+      ;;
+    'tar')
+      tool_args="-tf"
+      ;;
+    'rar')
+      if (( ! ${+commands[rar]} )); then
+        # Alternative verification command for RAR files
+        tool_name="unrar"
+      fi
+
+      tool_args="t"
+      ;;
+    '7z')
+      if (( ! ${+commands[7z]} )); then
+        # Alternative verification command for 7z files
+        tool_name="7za"
+      fi
+
+      tool_args="t"
+      ;;
+    'gz' | 'tgz')
+      tool_name="gzip"
+      tool_args="-t"
+      ;;
+    'bz2' | 'tbz' | 'tbz2')
+      tool_name="bzip2"
+      tool_args="-t"
+      ;;
+    'xz' | 'txz')
+      tool_name="xz"
+      tool_args="-t"
+      ;;
+    *)
+      exit_code=4
+      status_message="UNSUPPORTED_FORMAT"
+      ;;
+  esac
+
+  # --- Check for verification command ---
+  if ! command -v "${tool_name}" 2>&1 >/dev/null; then
+    exit_code=2
+    status_message="COMMAND_NOT_FOUND"
+  else
+    verification_command=("${tool_name}" "${tool_args}" "${archive_file}")
+  fi
+
+  # --- Execute command if determined and not already failed ---
+  if [[ -z "$status_message" && ${#verification_command[@]} -gt 0 ]]; then
+    # Execute the command stored in the array, redirecting output
+    if "${verification_command[@]}" > /dev/null 2>&1; then
+      status_message="OK"
+    else
+      exit_code=3
+      status_message="CORRUPTED"
+    fi
+  elif [[ -z "$status_message" && ${#verification_command[@]} -eq 0 ]]; then
+    # Should only happen if a case is missed or logic error
+    exit_code=3
+    status_message="INTERNAL_ERROR"
+  fi
+
+  # --- Print the verification status ---
+  case "${status_message}" in
+    'OK')
+      echo "${upper_ext}: '${archive_file}' - OK"
+      ;;
+    'CORRUPTED')
+      echo "${upper_ext}: '${archive_file}' - CORRUPTED" >&2
+      ;;
+    'UNSUPPORTED_FORMAT')
+      echo "Unsupported archive format: '${file_extension}' for file '${archive_file}'" >&2
+      ;;
+    'COMMAND_NOT_FOUND')
+      local install_hint=""
+      [[ "$tool_name" == "rar" ]] && install_hint=" Please install it to verify RAR archives."
+      [[ "$tool_name" == "7z" ]] && install_hint=" Please install p7zip package to verify 7z archives."
+      echo "Error: '${tool_name}' command not found. ${install_hint}" >&2
+      ;;
+    *) # Includes INTERNAL_ERROR or any unexpected status
+      echo "Error: Could not determine status for '${archive_file}' (${status_message:-unknown})." >&2
+      exit_code=5
+      ;;
+  esac
+
+  return "${exit_code}"
+}

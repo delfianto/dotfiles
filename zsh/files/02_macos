@@ -25,21 +25,21 @@ if [[ -d "${HOMEBREW_PREFIX}" ]] && [[ -r "${HOMEBREW_PREFIX}" ]]; then
   fi
 
   # Homebrew local/sbin
-  path_munge "${HOMEBREW_PREFIX}/sbin"
+  fun:path_munge "${HOMEBREW_PREFIX}/sbin"
 
   # Ruby
-  path_munge "${HOMEBREW_PREFIX}/opt/ruby/bin"
+  fun:path_munge "${HOMEBREW_PREFIX}/opt/ruby/bin"
 
   # Python
-  path_munge "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+  fun:path_munge "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
 
   # Cask options
-  zsh_import "${ZDOTDIR}/private/homebrew.zsh"
+  fun:zsh_import "${ZDOTDIR}/private/homebrew.zsh"
   export HOMEBREW_CASK_OPTS='--appdir=/Applications'
 fi
 
 # ls enhancement
-if has_command gls; then
+if fun:has_command gls; then
   alias ls="gls ${LS_ARGS}"
   alias ll="gls ${LS_ARGS} -l"
   alias la="gls ${LS_ARGS} -a"

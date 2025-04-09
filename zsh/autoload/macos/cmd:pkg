@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-pkg() {
+cmd:pkg() {
   if ! check_command brew; then
     return 1
   fi

@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-jstatd() {
+cmd:jstatd() {
   local exec='jstatd'
   local host="${host:-localhost}"
   local port="${port:-9090}"
