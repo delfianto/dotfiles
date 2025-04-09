@@ -7,7 +7,6 @@ local func_name kebab_name
 for func_name in ${(k)functions}; do
   # Check if the function name contains an underscore (likely snake_case)
   if [[ "${func_name}" == cmd:* ]]; then
-    echo "${func_name}"
     # Convert cmd:snake_case to kebab-case using parameter expansion
     kebab_name="${func_name//_/-}" && kebab_name="${kebab_name#cmd:}"
 
