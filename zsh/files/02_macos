@@ -17,7 +17,7 @@ if [[ -d "${HOMEBREW_PREFIX}" ]] && [[ -r "${HOMEBREW_PREFIX}" ]]; then
       local gnu_lib="${HOMEBREW_PREFIX}/opt/${gnu}/libexec"
 
       if [[ -r "${gnu_lib}" ]]; then
-        path_munge "${gnu_lib}/gnubin"
+        fun:path_munge "${gnu_lib}/gnubin"
       fi
     done
   fi
