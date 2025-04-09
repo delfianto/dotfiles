@@ -1,10 +1,10 @@
 # File .zshenv; zsh environment config
 # Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
-# Set zsh dotfile location
+# --- Set zsh dotfile location ---
 export ZDOTDIR=${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}
 
-# Don't keep duplicates and ignore specific sets of command from history
+# --- Don't keep duplicates and ignore specific sets of command from history ---
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
 export HISTIGNORE="&:history*:[sudo ]rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
 export HISTFILE="${ZDOTDIR}/.zsh_history"
@@ -15,6 +15,7 @@ export EDITOR='/usr/bin/nano'
 export VISUAL='/usr/bin/code'
 export PAGER='less'
 
+# --- Configure terminal pager ---
 # This affects every invocation of `less`.
 #   -i   case-insensitive search unless search string contains uppercase letters
 #   -R   color
@@ -24,7 +25,7 @@ export PAGER='less'
 #   -x4  tabs are 4 instead of 8
 export LESS='-iRFXMx4'
 
-# Color man pages
+# --- Set man pages colors ---
 export LESS_TERMCAP_mb=$'\E[01;32m'
 export LESS_TERMCAP_md=$'\E[01;32m'
 export LESS_TERMCAP_me=$'\E[0m'

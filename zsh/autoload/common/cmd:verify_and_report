@@ -1,4 +1,5 @@
 #!/bin/zsh
+# File: cmd:verify_and_report; function for verifying archive file integrity
 
 # Usage: verify_archive <archive_file_path>
 # Returns:
@@ -8,8 +9,9 @@
 #   3: Archive is corrupted
 #   4: Format is unsupported
 #   5: Unknown error
+
 cmd:verify_and_report() {
-  # --- Argument Check, File Check, Extension Extraction ---
+  # --- Argument check, file check, extract file extension ---
   if [[ $# -ne 1 ]]; then
     echo "Usage: verify_archive <archive_file_path>" >&2
     return 1
@@ -26,12 +28,11 @@ cmd:verify_and_report() {
   local upper_ext="${file_extension:u}"
 
   # --- Determine verification command to run ---
-  local exit_code=0
-  local status_message=""
-
-  # Use the .ext as default tool name, overriden on special case
   local tool_name="${lower_ext}"
   local tool_args=""
+
+  local exit_code=0
+  local status_message=""
   local verification_command=""
 
   case "${lower_ext}" in

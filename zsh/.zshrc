@@ -5,6 +5,7 @@ if (( "${ZSH_DEBUG_INIT}" )); then
   local start_time=$(date +%s.%N)
 fi
 
+# --- Initialize autoloaded functions ---
 autoload_init() {
   for dir in "$@"; do
     if [[ -d "${dir}" ]]; then
@@ -19,12 +20,12 @@ autoload_init() {
   done
 }
 
-# Load shared functions
+# Shared functions
 autoload_init \
   "${ZDOTDIR}/autoload/common" \
   "${ZDOTDIR}/autoload/devtools"
 
-# Load OS-specific functions
+# OS-specific functions
 local os_name=$(fun:os_name)
 autoload_init "${ZDOTDIR}/autoload/${os_name}"
 unset -f autoload_init
@@ -37,12 +38,12 @@ autoload -Uz colors compinit regexp-replace zcalc
 compinit -d
 colors
 
-# On every prompt, set terminal title to "user@host: cwd".
+# --- On every prompt, set terminal title to "user@host: cwd" ---
 function set-term-title() { print -Pn '\e]0;%n@%m: %~\a' }
 autoload -U add-zsh-hook
 add-zsh-hook precmd set-term-title
 
-# Disable highlighting of text pasted into the command line.
+# --- Disable highlighting of text pasted into the command line ---
 zle_highlight=('paste:none')
 
 ZLE_RPROMPT_INDENT=0          # don't leave an empty space after right prompt
@@ -77,13 +78,13 @@ setopt RCEXPANDPARAM          # array expension with parameters
 setopt SHARE_HISTORY          # write and import history on every command
 setopt EXTENDED_HISTORY       # write timestamps to history
 
-# The following lines were added by compinstall
+# --- The following lines were added by compinstall ---
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'       # Case insensitive tab completion
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"         # Colored completion (different colors for dirs/files/etc)
 zstyle ':completion:*' rehash true                              # automatically find new executables in path
 
-# Speed up completions
+# --- Speed up completions ---
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
@@ -93,7 +94,7 @@ HISTSIZE='1000'
 SAVEHIST='500'
 WORDCHARS="${WORDCHARS//\/[&.;]}"                               # Don't consider certain characters part of the word
 
-## Keybindings section
+# --- Keybindings ---
 bindkey -e
 bindkey '^[[7~' beginning-of-line                               # Home key
 bindkey '^[[H' beginning-of-line                                # Home key
@@ -124,13 +125,13 @@ bindkey '^[[1;5C' forward-word                                  #
 bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
 bindkey '^[[Z' undo                                             # Shift+tab undo last action
 
-## Plugins section: Enable fish style features
+# --- Plugins sections: Enable fish style features ---
 fun:zsh_import \
   /usr/share/zsh/plugins \
   zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
-# Load the rest of zshrc files
+# --- Load the rest of zshrc files ---
 fun:zsh_import \
   "${ZDOTDIR}/files" \
   "01_alias" \
@@ -138,7 +139,7 @@ fun:zsh_import \
 
 unset os_name
 
-# Load starship
+# --- Load starship ---
 if fun:has_command starship; then
   eval "$(starship init zsh)"
 fi
