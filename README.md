@@ -28,7 +28,8 @@ ln -sf ~/.config/dotfiles/zsh/.zshenv ~/.zshenv
 
 ## Note on Autoloaded Functions
 Functions with name `fun:` and `cmd:` are autoloaded and can be used anywhere in the shell.
-They are sourced from the `zsh/autoload` directory.
+The `zsh/autoload` directory is defined as ZSH `fpath` and initialized by the `${ZDOTDIR}/.zshrc` file.
 
-Functions with name `fun:` are intended to be used as common function helpers when writing scripts or functions.
-Functions with name `cmd:` are intended to be executed as commands, they are automatically aliased to `kebab-cased` name for ease of access. For example, `cmd:print_path` will be aliased to `print-path`.
+### Naming Coventions
+- `fun:` intended to be used as common helpers when writing scripts or functions.
+- `cmd:` intended to be executed as commands, they are automatically aliased to `kebab-cased` name for ease of access. For example, `cmd:print_path` will be aliased to `print-path`.
