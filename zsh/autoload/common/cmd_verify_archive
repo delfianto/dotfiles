@@ -29,9 +29,8 @@ cmd_verify_archive() {
   # --- Run verification ---
   if [[ "$num_threads" -gt 1 ]]; then
     stdout "Verifying archives in parallel using ${num_threads} threads..."
-    # Using GNU Parallel directly is often preferred
-    SHELL=$(which zsh) parallel --jobs "${num_threads}" cmd_verify_and_report ::: "$@"
-    # Or using env_parallel if preferred (less common now)
+    # TODO: fix execution using GNU parallal
+    # SHELL=$(which zsh) parallel --jobs "${num_threads}" cmd_verify_and_report ::: "$@"
     # env_parallel --jobs "${num_threads}" --env verify_and_report verify_and_report ::: "$@"
   else
     stdout "Verifying archives sequentially..."
