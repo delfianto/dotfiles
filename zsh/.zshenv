@@ -1,20 +1,20 @@
 # File .zshenv; zsh environment config
-# Based on https://github.com/romkatv/dotfiles-public/blob/master/.zshenv
 
 # --- Set zsh dotfile location ---
 export ZDOTDIR=${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}
 
 # --- Don't keep duplicates and ignore specific sets of command from history ---
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
+export WORDCHARS="${WORDCHARS//\/[&.;]}" # Don't consider certain characters part of the word
 export HISTIGNORE="&:history*:[sudo ]rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
-export HISTFILE="${ZDOTDIR}/.zsh_history"
-export HISTTIMEFORMAT="%d/%m/%Y %H:%M] "
-export HISTSIZE='1000'
-export SAVEHIST='1000'
+export HISTFILE="$HISTFILE:-${ZDOTDIR}/.zsh_history"
+export HISTTIMEFORMAT="[%d/%m/%Y %H:%M] "
+export HISTSIZE="5000"
+export SAVEHIST="5000"
 
-export EDITOR='/usr/bin/nano'
-export VISUAL='/usr/bin/code'
-export PAGER='less'
+export EDITOR="/usr/bin/nano"
+export VISUAL="/usr/bin/code"
+export PAGER="less"
 
 # --- Configure terminal pager ---
 # This affects every invocation of `less`.
@@ -24,7 +24,7 @@ export PAGER='less'
 #   -X   keep content on screen after exit
 #   -M   show more info at the bottom prompt line
 #   -x4  tabs are 4 instead of 8
-export LESS='-iRFXMx4'
+export LESS="-iRFXMx4"
 
 # --- Set man pages colors ---
 export LESS_TERMCAP_mb=$'\E[01;32m'
@@ -39,5 +39,5 @@ if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env ${commands}[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
-export LS_ARGS=${LS_ARGS:-'--color=auto --group-directories-first --time-style=long-iso -h'}
-export ZSH_DEBUG_INIT=${ZSH_DEBUG_INIT:-0}
+export LS_ARGS="${LS_ARGS:---color=auto --group-directories-first --time-style=long-iso -h}"
+export ZSH_DEBUG_INIT="${ZSH_DEBUG_INIT:-0}"

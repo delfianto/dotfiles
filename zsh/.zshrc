@@ -62,6 +62,7 @@ setopt CORRECT                # auto correct mistakes
 setopt EXTENDED_GLOB          # (#qx) glob qualifier and more
 setopt GLOB_DOTS              # glob matches files starting with dot; `*` becomes `*(D)`
 setopt HIST_EXPIRE_DUPS_FIRST # if history needs to be trimmed, evict dups first
+setopt HIST_FCNTL_LOCK        # lock history file using the system’s fcntl call
 setopt HIST_IGNORE_ALL_DUPS   # don't add dups to history
 setopt HIST_IGNORE_SPACE      # don't add commands starting with space to history
 setopt HIST_REDUCE_BLANKS     # remove junk whitespace from commands before adding to history
@@ -92,11 +93,6 @@ zstyle ':completion:*' rehash true                              # automatically 
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
-
-HISTFILE='~/.zhistory'
-HISTSIZE='1000'
-SAVEHIST='500'
-WORDCHARS="${WORDCHARS//\/[&.;]}"                               # Don't consider certain characters part of the word
 
 # --- Keybindings ---
 bindkey -e
