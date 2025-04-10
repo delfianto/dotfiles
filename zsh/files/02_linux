@@ -11,7 +11,7 @@ alias pcidev="lspci -tv"
 alias pcinfo="lspci -nnv"
 
 # --- System management ---
-alias dmesg="dmesg -H"
+alias dmesg="sudo dmesg -H"
 alias pacman="sudo pacman"
 
 # --- Set git credentials helper ---
