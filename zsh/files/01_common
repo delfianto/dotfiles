@@ -54,12 +54,6 @@ else
   alias lla="ls ${LS_ARGS} -al"
 fi
 
-if fn_check_command -q docker; then
-  alias docker-images="docker images | grep -v repo | sed 's/ \+/:/g' | cut -d: -f1,2"
-  alias docker-update="docker images | xargs -L1 docker pull"
-  alias docker-prune="docker system prune -a -f"
-fi
-
 # --- Rest of command alias ---
 alias cls="clear && printf '\e[3J'"
 alias cp='cp -v'
