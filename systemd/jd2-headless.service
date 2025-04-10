@@ -1,0 +1,14 @@
+[Unit]
+Description=JDownloader Headless
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=%h/.app/jd2/
+ExecStart=/usr/bin/java -Djava.awt.headless=true -jar %h/.app/jd2/JDownloader.jar
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,10 +1,12 @@
 [Unit]
 Description=SSH key agent
+Requires=run-user-%U.mount
+After=run-user-%U.mount
 
 [Service]
 Type=simple
 Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
-ExecStart=/usr/bin/ssh-agent -D -a $SSH_AUTH_SOCK
+ExecStart=/usr/bin/ssh-agent -D -a %t/ssh-agent.socket
 
 [Install]
 WantedBy=default.target
