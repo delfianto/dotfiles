@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 
 function cmd_amd_epp {
   local epp_value=""
@@ -13,14 +13,14 @@ function cmd_amd_epp {
 
   if [[ $# -eq 0 ]]; then
       # No arguments provided, default to info
-      cmd:amd_epp --info
+      ${funcstack[1]} --info
       return $?
   fi
 
   case "${1}" in
     '-h' | '--help')
       stdout ""
-      stdout "cmd:amd_epp, amd-epp: simple script to manage AMD energy performance preference settings"
+      stdout "cmd_amd_epp, amd-epp: simple script to manage AMD energy performance preference settings"
       stdout "Running with no argument given will default to show EPP state (--info)"
       stdout ""
       stdout "Usage: amd-epp [argument]"
@@ -31,6 +31,9 @@ function cmd_amd_epp {
       stdout "  -p1, --bal-performance  set epp to balance_performance"
       stdout "  -p2, --bal-powersave    set epp to balance_power"
       stdout "  -p3, --max-powersave    set epp to power"
+      stdout ""
+      stdout "If you want to switch EPP profile without password, add the following line to sudoers (sudo visudo)"
+      stdout "<your_username> ALL=(root) NOPASSWD: /usr/bin/tee /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference"
       ;;
     '-i' | '--info')
       for filepath in "${epp_paths[@]}"; do
