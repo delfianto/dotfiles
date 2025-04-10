@@ -12,9 +12,9 @@ export HISTTIMEFORMAT="%F %T "
 export HISTSIZE="5000"
 export SAVEHIST="5000"
 
-export EDITOR="/usr/bin/nano"
-export VISUAL="/usr/bin/code"
-export PAGER="less"
+export EDITOR="${EDITOR:-/usr/bin/nano}"
+export VISUAL="${VISUAL:-/usr/bin/zeditor}"
+export PAGER="${PAGER:-/usr/bin/less}"
 
 # --- Configure terminal pager ---
 # This affects every invocation of `less`.
