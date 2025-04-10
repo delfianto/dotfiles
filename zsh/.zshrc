@@ -2,7 +2,7 @@
 
 if (( "${ZSH_DEBUG_INIT}" )); then
   # Start timing
-  local start_time=$(date +%s.%N)
+  START_TIME=$(date +%s.%N)
 fi
 
 # --- Initialize autoloaded functions ---
@@ -48,12 +48,7 @@ add-zsh-hook precmd set-term-title
 # --- Disable highlighting of text pasted into the command line ---
 zle_highlight=('paste:none')
 
-ZLE_RPROMPT_INDENT=0          # don't leave an empty space after right prompt
-READNULLCMD="${PAGER}"        # use the default pager instead of `more`
-WORDCHARS=''                  # only alphanums make up words in word-based zle widgets
-ZLE_REMOVE_SUFFIX_CHARS=''    # don't eat space when typing '|' after a tab completion
-
-## Options section
+# --- ZSH options ---
 setopt ALWAYS_TO_END          # full completions move cursor to the end
 setopt APPEND_HISTORY         # immediately append history instead of overwriting
 setopt AUTO_CD                # `dirname` is equivalent to `cd dirname`
@@ -147,12 +142,13 @@ fi
 
 if (( "${ZSH_DEBUG_INIT}" )); then
   # End timing
-  local end_time=$(date +%s.%N)
+  END_TIME=$(date +%s.%N)
 
   # Calculate elapsed time
-  local elapsed_seconds=$(stdout "$end_time - $start_time" | bc)
-  local elapsed_milliseconds=$(printf "%.3f" "$(echo "$elapsed_seconds * 1000" | bc)")
+  ELAPSED_SECONDS=$(stdout "${END_TIME} - ${START_TIME}" | bc)
+  ELAPSED_MILLISECONDS=$(printf "%.3f" "$(echo "${ELAPSED_SECONDS} * 1000" | bc)")
 
   # Print elapsed time
-  stdout "Shell initialization took $elapsed_milliseconds milliseconds."
+  stdout "Shell initialization took ${ELAPSED_MILLISECONDS} milliseconds."
+  unset START_TIME END_TIME ELAPSED_SECONDS ELAPSED_MILLISECONDS
 fi

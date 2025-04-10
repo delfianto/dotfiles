@@ -5,12 +5,16 @@ export ZDOTDIR=${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}
 
 # --- Don't keep duplicates and ignore specific sets of command from history ---
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
-export WORDCHARS="${WORDCHARS//\/[&.;]}" # Don't consider certain characters part of the word
 export HISTIGNORE="&:history*:[sudo ]rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
 export HISTFILE="${HISTFILE:-${ZDOTDIR}/.zsh_history}"
 export HISTTIMEFORMAT="%F %T "
 export HISTSIZE="5000"
 export SAVEHIST="5000"
+
+export ZLE_RPROMPT_INDENT=0               # don't leave an empty space after right prompt
+export ZLE_REMOVE_SUFFIX_CHARS=''         # don't eat space when typing '|' after a tab completion
+export READNULLCMD="${PAGER}"             # use the default pager instead of `more`
+export WORDCHARS="${WORDCHARS//\/[&.;]}"  # don't consider certain characters part of the word
 
 export EDITOR="${EDITOR:-/usr/bin/nano}"
 export VISUAL="${VISUAL:-/usr/bin/zeditor}"
