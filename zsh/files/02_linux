@@ -2,7 +2,7 @@
 # File 01_linux; linux specific alias and environment variables
 
 # --- CPU clock and system monitoring ---
-alias amd-epp-switch='sudo /usr/local/sbin/amd-epp-switch'
+# alias amd-epp-switch='sudo /usr/local/sbin/amd-epp-switch'
 alias cpufreq='watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""'
 alias hdmon='sudo hdsentinel'
 alias hwmon='watch -n1 sensors'

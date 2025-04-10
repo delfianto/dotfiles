@@ -1,9 +1,0 @@
-#!/bin/zsh
-
-fun:exit_code() {
-  if (( $? == 0 )); then
-    echo '🍄'
-  else
-    echo '💀'
-  fi
-}

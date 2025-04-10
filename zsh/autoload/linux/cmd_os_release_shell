@@ -1,0 +1,25 @@
+#!/bin/zsh
+
+cmd_os_release_shell() {
+  typeset -A os_info
+
+  while IFS='=' read -r key value; do
+    # Remove quotes if present
+    value="${value//\"/""}"
+    os_info[$key]=$value
+  done </etc/os-release
+
+  # Access the values
+  stdout "NAME: ${os_info[NAME]}"
+  stdout "PRETTY_NAME: ${os_info[PRETTY_NAME]}"
+  stdout "ID: ${os_info[ID]}"
+  stdout "ID_LIKE: ${os_info[ID_LIKE]}"
+  stdout "BUILD_ID: ${os_info[BUILD_ID]}"
+  stdout "ANSI_COLOR: ${os_info[ANSI_COLOR]}"
+  stdout "HOME_URL: ${os_info[HOME_URL]}"
+  stdout "DOCUMENTATION_URL: ${os_info[DOCUMENTATION_URL]}"
+  stdout "SUPPORT_URL: ${os_info[SUPPORT_URL]}"
+  stdout "BUG_REPORT_URL: ${os_info[BUG_REPORT_URL]}"
+  stdout "PRIVACY_POLICY_URL: ${os_info[PRIVACY_POLICY_URL]}"
+  stdout "LOGO: ${os_info[LOGO]}"
+}

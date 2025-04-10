@@ -1,11 +1,11 @@
 #!/bin/zsh
 
-fun:ls_type() {
+fn_ls_type() {
   if $(ls --color -d "${HOME}" >/dev/null 2>&1); then
-    echo 'gnu'
+    stdout "gnu"
   elif $(ls -G -d "${HOME}" >/dev/null 2>&1); then
-    echo 'bsd'
+    stdout "bsd"
   else
-    echo 'solaris'
+    stdout "solaris"
   fi
 }

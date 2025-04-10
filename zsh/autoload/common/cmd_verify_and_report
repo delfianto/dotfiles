@@ -10,16 +10,16 @@
 #   4: Format is unsupported
 #   5: Unknown error
 
-cmd:verify_and_report() {
+cmd_verify_and_report() {
   # --- Argument check, file check, extract file extension ---
   if [[ $# -ne 1 ]]; then
-    echo "Usage: verify_archive <archive_file_path>" >&2
+    stderr "Usage: verify_archive <archive_file_path>"
     return 1
   fi
 
   local archive_file="${1}"
   if [[ ! -f "${archive_file}" ]]; then
-    echo "Error: File '${archive_file}' does not exist." >&2
+    stderr "Error: File '${archive_file}' does not exist."
     return 1
   fi
 
@@ -102,22 +102,22 @@ cmd:verify_and_report() {
   # --- Print the verification status ---
   case "${status_message}" in
     'OK')
-      echo "${upper_ext}: '${archive_file}' - OK"
+      stdout "${upper_ext}: '${archive_file}' - OK"
       ;;
     'CORRUPTED')
-      echo "${upper_ext}: '${archive_file}' - CORRUPTED" >&2
+      stderr "${upper_ext}: '${archive_file}' - CORRUPTED"
       ;;
     'UNSUPPORTED_FORMAT')
-      echo "Unsupported archive format: '${file_extension}' for file '${archive_file}'" >&2
+      stderr "Unsupported archive format: '${file_extension}' for file '${archive_file}'"
       ;;
     'COMMAND_NOT_FOUND')
       local install_hint=""
       [[ "$tool_name" == "rar" ]] && install_hint=" Please install it to verify RAR archives."
       [[ "$tool_name" == "7z" ]] && install_hint=" Please install p7zip package to verify 7z archives."
-      echo "Error: '${tool_name}' command not found. ${install_hint}" >&2
+      stderr "Error: '${tool_name}' command not found. ${install_hint}"
       ;;
     *) # Includes INTERNAL_ERROR or any unexpected status
-      echo "Error: Could not determine status for '${archive_file}' (${status_message:-unknown})." >&2
+      stderr "Error: Could not determine status for '${archive_file}' (${status_message:-unknown})."
       exit_code=5
       ;;
   esac

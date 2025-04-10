@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-cmd:beer() {
+cmd_beer() {
   local src='https://raw.githubusercontent.com/Homebrew/install/HEAD'
 
   case "${1}" in

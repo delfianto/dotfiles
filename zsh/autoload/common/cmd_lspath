@@ -1,8 +1,8 @@
 #!/bin/zsh
 
-cmd:print_path() {
+cmd_lspath() {
   local parts=(${(s/:/)PATH})
   for i in ${parts}; do
-    echo "❯ ${i}"
+    stdout "❯ ${i}"
   done
 }

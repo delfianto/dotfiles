@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-cmd:verify_archive() {
+cmd_verify_archive() {
   local num_threads=1
 
   # --- Parse command-line options ---
@@ -11,7 +11,7 @@ cmd:verify_archive() {
           num_threads="${2}"
           shift 2
         else
-          echo "Error: Option '${1}' requires a positive integer argument for the number of threads." >&2
+          stderr "Error: Option '${1}' requires a positive integer argument for the number of threads."
           return 1
         fi
         ;;
@@ -22,21 +22,21 @@ cmd:verify_archive() {
   done
 
   if [[ $# -eq 0 ]]; then
-    echo "Usage: ${0##*/} [-p|--parallel <num_threads>] <filename1> [filename2 ...]" >&2
+    stderr "Usage: ${0##*/} [-p|--parallel <num_threads>] <filename1> [filename2 ...]"
     return 1
   fi
 
   # --- Run verification ---
   if [[ "$num_threads" -gt 1 ]]; then
-    echo "Verifying archives in parallel using ${num_threads} threads..."
+    stdout "Verifying archives in parallel using ${num_threads} threads..."
     # Using GNU Parallel directly is often preferred
-    SHELL=$(which zsh) parallel --jobs "${num_threads}" verify_and_report ::: "$@"
+    SHELL=$(which zsh) parallel --jobs "${num_threads}" cmd_verify_and_report ::: "$@"
     # Or using env_parallel if preferred (less common now)
     # env_parallel --jobs "${num_threads}" --env verify_and_report verify_and_report ::: "$@"
   else
-    echo "Verifying archives sequentially..."
+    stdout "Verifying archives sequentially..."
     for archive_file in "$@"; do
-      verify_and_report "${archive_file}"
+      cmd_verify_and_report "${archive_file}"
     done
   fi
 }

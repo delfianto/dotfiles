@@ -1,5 +1,0 @@
-#!/bin/zsh
-
-fun:has_command() {
-  [[ -n "$1" ]] && (( ${+commands[$1]} ))
-}

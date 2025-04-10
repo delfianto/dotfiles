@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-cmd:os_release_json() {
+cmd_os_release_json() {
   local code=$(cat <<'EOF'
 import json
 
@@ -18,17 +18,17 @@ EOF
   local os_release_json=$(python3 -c "$code")
 
   if [[ $? -ne 0 ]]; then
-    echo "Failed to get os-release"
+    stderr "Failed to get os-release"
     return 1
   fi
 
-  local os_release_data=$(echo "$os_release_json" | jq -r '.')
+  local os_release_data=$(stdout "$os_release_json" | jq -r '.')
 
   if [[ $? -ne 0 ]]; then
-      echo "jq is not installed, install it to parse the json output"
-      echo "$os_release_json"
+      stderr "jq is not installed, install it to parse the json output"
+      stderr "$os_release_json"
       return 1
   fi
 
-  echo "$os_release_data"
+  stdout "$os_release_data"
 }

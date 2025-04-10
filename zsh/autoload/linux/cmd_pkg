@@ -1,7 +1,7 @@
 #!/bin/zsh
 
-cmd:pkg() {
-  if ! fun:check_command yay; then
+cmd_pkg() {
+  if ! fn_check_command yay; then
     return 1
   fi
 
@@ -39,12 +39,12 @@ cmd:pkg() {
     'nodeps')
       if [[ ! -z $(pkg orphan) ]]; then
         tput setaf 1
-        echo 'WARNING: Removing all unneeded dependencies...'
+        stdout "WARNING: Removing all unneeded dependencies..."
         tput sgr0
 
         yay -Yc
       else
-        echo 'No unneeded dependencies in the system.'
+        stdout "No unneeded dependencies in the system."
       fi
       ;;
     'l' | 'ls' | 'list')

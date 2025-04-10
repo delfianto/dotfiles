@@ -1,0 +1,6 @@
+#!/bin/zsh
+
+# Function to safely print arguments literally (wraps print -r --)
+stderr() {
+  print -u2 -- "$@"
+}

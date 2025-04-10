@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+cmd_lsenv() {
+  return 1
+}

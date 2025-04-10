@@ -1,5 +1,5 @@
 # File .zshrc; zsh initialization script
-
+ZSH_DEBUG_INIT=1
 if (( "${ZSH_DEBUG_INIT}" )); then
   # Start timing
   local start_time=$(date +%s.%N)
@@ -8,26 +8,28 @@ fi
 # --- Initialize autoloaded functions ---
 autoload_init() {
   for dir in "$@"; do
-    if [[ -d "${dir}" ]]; then
-      fpath=("${dir}" $fpath)
-      for file in "${dir}"/[^_]*(.N:t); do
-        (( ZSH_DEBUG_INIT )) && echo "Autoloaded: ${file}"
+    local autoload_dir="${ZDOTDIR}/autoload/${dir}"
+
+    if [[ -d "${autoload_dir}" ]]; then
+      fpath=("${autoload_dir}" $fpath)
+      for file in "${autoload_dir}"/[^_]*(.N:t); do
+        (( ZSH_DEBUG_INIT )) && print -r -- "Autoloaded: ${file}"
         autoload -Uz "${file}"
       done
     else
-      (( ZSH_DEBUG_INIT )) && echo "Skipped (not a directory): ${dir}"
+      (( ZSH_DEBUG_INIT )) && print -r -- "Skipped (not a directory): ${dir}"
     fi
   done
 }
 
 # Shared functions
-autoload_init \
-  "${ZDOTDIR}/autoload/common" \
-  "${ZDOTDIR}/autoload/devtools"
+autoload_init "base"
+autoload_init "common"
+autoload_init "devtools"
 
 # OS-specific functions
-local os_name=$(fun:os_name)
-autoload_init "${ZDOTDIR}/autoload/${os_name}"
+os_name=$(fn_os_name)
+autoload_init "${os_name}"
 unset -f autoload_init
 
 # Set path as array-unique-special (no duplicates)
@@ -126,21 +128,21 @@ bindkey '^H' backward-kill-word                                 # delete previou
 bindkey '^[[Z' undo                                             # Shift+tab undo last action
 
 # --- Plugins sections: Enable fish style features ---
-fun:zsh_import \
+fn_import \
   /usr/share/zsh/plugins \
   zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # --- Load the rest of zshrc files ---
-fun:zsh_import \
+fn_import \
   "${ZDOTDIR}/files" \
-  "01_alias" \
+  "01_common" \
   "02_${os_name}"
 
 unset os_name
 
 # --- Load starship ---
-if fun:has_command starship; then
+if fn_check_command -q starship; then
   eval "$(starship init zsh)"
 fi
 
@@ -149,9 +151,9 @@ if (( "${ZSH_DEBUG_INIT}" )); then
   local end_time=$(date +%s.%N)
 
   # Calculate elapsed time
-  local elapsed_seconds=$(echo "$end_time - $start_time" | bc)
+  local elapsed_seconds=$(stdout "$end_time - $start_time" | bc)
   local elapsed_milliseconds=$(printf "%.3f" "$(echo "$elapsed_seconds * 1000" | bc)")
 
   # Print elapsed time
-  echo "Shell initialization took $elapsed_milliseconds milliseconds."
+  stdout "Shell initialization took $elapsed_milliseconds milliseconds."
 fi

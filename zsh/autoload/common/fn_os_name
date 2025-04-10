@@ -1,0 +1,22 @@
+#!/bin/zsh
+
+fn_os_name() {
+  case "${OSTYPE}" in
+    bsd*)
+      stdout "bsd"
+      ;;
+    darwin*)
+      stdout "macos"
+      ;;
+    linux*)
+      stdout "linux"
+      ;;
+    solaris*)
+      stdout "solaris"
+      ;;
+    *)
+      stderr "Unknown: ${OSTYPE}"
+      return 1
+      ;;
+  esac
+}
