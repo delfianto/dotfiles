@@ -8,6 +8,7 @@ export ZDOTDIR=${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
 export HISTIGNORE="&:history*:[sudo ]rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
 export HISTFILE="${ZDOTDIR}/.zsh_history"
+export HISTTIMEFORMAT="%d/%m/%Y %H:%M] "
 export HISTSIZE='1000'
 export SAVEHIST='1000'
 

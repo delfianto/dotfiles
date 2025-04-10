@@ -79,6 +79,8 @@ setopt PUSHD_MINUS            # `cd -3` now means "3 directory deeper in the sta
 setopt RCEXPANDPARAM          # array expension with parameters
 setopt SHARE_HISTORY          # write and import history on every command
 setopt EXTENDED_HISTORY       # write timestamps to history
+setopt INC_APPEND_HISTORY     # history file is updated immediately after a command is entered
+setopt APPENDHISTORY          # ensures that each command entered in the current session is appended to the history file immediately after execution
 
 # --- The following lines were added by compinstall ---
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
