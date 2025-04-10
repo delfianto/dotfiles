@@ -60,23 +60,19 @@ if fn_check_command -q docker; then
   alias docker-prune="docker system prune -a -f"
 fi
 
-# --- Shell command alias ---
+# --- Rest of command alias ---
 alias cls="clear && printf '\e[3J'"
-alias which='command -v'
-alias shdir="cd ${ZDOTDIR}"
-
-# --- Make some of the file manipulation programs verbose ---
-alias mv='mv -v'
 alias cp='cp -v'
+alias mv='mv -v'
+alias sudo='sudo '
+alias which='command -v'
 
-# --- Colorize the grep command output ---
-# Good for your eyes when reading long log files
+# Colorful grep output
 alias grep='grep -i --color=auto'
 alias egrep='egrep -i --color=auto'
 alias fgrep='fgrep -i --color=auto'
 
-# --- Allow aliases to be sudo’ed ---
-alias sudo='sudo '
-
-# --- Reloads the current shell ---
+# Shell management
+alias history='fc -li'
+alias shdir="cd ${ZDOTDIR}"
 alias reload="exec ${SHELL} -l"

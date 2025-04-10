@@ -7,8 +7,8 @@ export ZDOTDIR=${ZDOTDIR:-"${HOME}/.config/dotfiles/zsh"}
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
 export WORDCHARS="${WORDCHARS//\/[&.;]}" # Don't consider certain characters part of the word
 export HISTIGNORE="&:history*:[sudo ]rm*:[c]ls*:[bf]g*:exit*:pwd*:clear*:mount*:umount*:vol*:encfs*:cfs*:[ \t]*"
-export HISTFILE="$HISTFILE:-${ZDOTDIR}/.zsh_history"
-export HISTTIMEFORMAT="[%d/%m/%Y %H:%M] "
+export HISTFILE="${HISTFILE:-${ZDOTDIR}/.zsh_history}"
+export HISTTIMEFORMAT="%F %T "
 export HISTSIZE="5000"
 export SAVEHIST="5000"
 
