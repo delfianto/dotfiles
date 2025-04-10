@@ -20,7 +20,7 @@ cmd_docker_image() {
     'build' | 'inspect' | 'ls' | 'pull' | 'push' | 'rm' | 'prune' | 'tag')
       docker image ${1} ${@:2}
       ;;
-    '')
+    *)
       stderr "Error: Unknown command argument '${1}'."
       stderr ""
       docker images --help
