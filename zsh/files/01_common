@@ -8,7 +8,7 @@ for func_name in ${(k)functions}; do
   # Check if the function name contains an underscore (likely snake_case)
   if [[ "${func_name}" == cmd_* ]]; then
     # Convert cmd_snake_case to kebab-case using parameter expansion
-    kebab_name="${func_name//_/-}" && kebab_name="${kebab_name#cmd_}"
+    kebab_name="${func_name//_/-}" && kebab_name="${kebab_name#cmd-}"
 
     # Ensure the kebab-case name is different from the original
     # and that no command (alias, function, builtin, external)
