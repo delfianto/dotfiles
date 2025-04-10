@@ -135,7 +135,8 @@ fn_import \
 fn_import \
   "${ZDOTDIR}/files" \
   "01_common" \
-  "02_${os_name}"
+  "02_${os_name}" \
+  "03_devtools"
 
 unset os_name
 

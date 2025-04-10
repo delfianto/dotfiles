@@ -1,0 +1,86 @@
+#!/bin/zsh
+# File 03_devtools; initialize path and environment variable for development tools
+
+# --- Google Cloud SDK ---
+if fn_check_command -q gcloud; then
+  export GCLOUD_SDK_DIR="$(fn_sdk_prefix lib/google-cloud-sdk)"
+
+  if [[ -r "${GCLOUD_SDK_DIR}" ]]; then
+    SHELL_NAME=$(basename "${SHELL}")
+    fn_import "${GCLOUD_SDK_DIR}/path.${SHELL_NAME}.inc"
+    fn_import "${GCLOUD_SDK_DIR}/completion.${SHELL_NAME}.inc"
+
+    alias gcs="gcloud"
+    alias gcb="gcs beta"
+    alias gsp="cloud_sql_proxy"
+
+    unset SHELL_NAME
+  fi
+fi
+
+# --- Node.js ---
+if fn_check_command -q node; then
+  export NODEJS_DIR="$(fn_sdk_prefix lib/nodejs)"
+
+  if [[ -r "${NODEJS_DIR}" ]]; then
+    alias nls='npm ls --depth=0'
+    export NPM_CONFIG_PREFIX="$(fn_sdk_prefix)"
+  else
+    unset NODEJS_DIR
+  fi
+fi
+
+# --- Python ---
+if fn_check_command -q python3; then
+  export PYTHONUSERBASE="$(fn_sdk_prefix)"
+
+  alias py='python3'
+  alias pyinst='pip3 install'
+  alias pyupgd='pip3 install --upgrade'
+  alias pytool='pip3 install --upgrade pip inittools wheel'
+  alias pyhttp='python3 -m http.server' # starts a python lightweight http server
+  alias pyjson='python3 -m json.tool'   # pipe to this alias to format json with python
+
+  jsoncat() {
+    if [[ -s "${1}" ]]; then
+      cat "${1}" | pyjson
+    else
+      stderr "File is empty."
+      return 1
+    fi
+  }
+fi
+
+# --- Ruby ---
+if fn_check_command -q ruby; then
+  RUBY_VERSION="$(ruby -e 'puts RUBY_VERSION')"
+  GEM_DIR="ruby/gems/${RUBY_VERSION%?}0"
+
+  export GEM_HOME="$(fn_sdk_prefix lib/${GEM_DIR})"
+  export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
+  export GEM_PATH="${GEM_HOME}:/usr/lib/${GEM_DIR}"
+
+  if [[ ! -d "${GEM_HOME}" ]]; then
+    eval "mkdir -p ${GEM_HOME}/{specifications,bin}" &> /dev/null
+  fi
+
+  fn_path_munge "${GEM_HOME}/bin"
+  unset RUBY_VERSION GEM_DIR
+fi
+
+# --- SDK Manager ---
+export SDKMAN_DIR="$(fn_sdk_prefix sdkman)"
+export SDKMAN_INIT="${SDKMAN_DIR}/bin/sdkman-init.sh"
+
+if [[ -r "${SDKMAN_INIT}" ]]; then
+  export GROOVY_TURN_OFF_JAVA_WARNINGS="true"
+  export GRADLE_USER_HOME="${HOME}/.gradle"
+
+  eval "mkdir -p ${SDKMAN_DIR}/ext" &> /dev/null
+  fn_import "${SDKMAN_INIT}"
+else
+  unset SDKMAN_DIR SDKMAN_INIT
+fi
+
+# Ensure ~/.local/bin is added to PATH
+fn_path_munge "${HOME}/.local/bin"
