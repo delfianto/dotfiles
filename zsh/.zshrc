@@ -2,7 +2,7 @@
 
 if (( "${ZSH_DEBUG_INIT}" )); then
   # Start timing
-  START_TIME=$(date +%s.%N)
+  start_time=$(date +%s.%N)
 fi
 
 # --- Initialize autoloaded functions ---
@@ -142,13 +142,13 @@ fi
 
 if (( "${ZSH_DEBUG_INIT}" )); then
   # End timing
-  END_TIME=$(date +%s.%N)
+  end_time=$(date +%s.%N)
 
   # Calculate elapsed time
-  ELAPSED_SECONDS=$(stdout "${END_TIME} - ${START_TIME}" | bc)
-  ELAPSED_MILLISECONDS=$(printf "%.3f" "$(echo "${ELAPSED_SECONDS} * 1000" | bc)")
+  elapsed_seconds=$(stdout "${end_time} - ${start_time}" | bc)
+  elapsed_milliseconds=$(printf "%.3f" "$(echo "${elapsed_seconds} * 1000" | bc)")
 
   # Print elapsed time
-  stdout "Shell initialization took ${ELAPSED_MILLISECONDS} milliseconds."
-  unset START_TIME END_TIME ELAPSED_SECONDS ELAPSED_MILLISECONDS
+  stdout "Shell initialization took ${elapsed_milliseconds} milliseconds."
+  unset start_time end_time elapsed_seconds elapsed_milliseconds
 fi

@@ -6,15 +6,15 @@ if fn_check_command -q gcloud; then
   export GCLOUD_SDK_DIR="$(fn_sdk_prefix lib/google-cloud-sdk)"
 
   if [[ -r "${GCLOUD_SDK_DIR}" ]]; then
-    SHELL_NAME=$(basename "${SHELL}")
-    fn_import "${GCLOUD_SDK_DIR}/path.${SHELL_NAME}.inc"
-    fn_import "${GCLOUD_SDK_DIR}/completion.${SHELL_NAME}.inc"
+    shell_name=$(basename "${SHELL}")
+    fn_import "${GCLOUD_SDK_DIR}/path.${shell_name}.inc"
+    fn_import "${GCLOUD_SDK_DIR}/completion.${shell_name}.inc"
 
     alias gcs="gcloud"
     alias gcb="gcs beta"
     alias gsp="cloud_sql_proxy"
 
-    unset SHELL_NAME
+    unset shell_name
   fi
 fi
 
@@ -53,19 +53,19 @@ fi
 
 # --- Ruby ---
 if fn_check_command -q ruby; then
-  RUBY_VERSION="$(ruby -e 'puts RUBY_VERSION')"
-  GEM_DIR="ruby/gems/${RUBY_VERSION%?}0"
+  ruby_version="$(ruby -e 'puts RUBY_VERSION')"
+  gem_dir="ruby/gems/${ruby_version%?}0"
 
-  export GEM_HOME="$(fn_sdk_prefix lib/${GEM_DIR})"
+  export GEM_HOME="$(fn_sdk_prefix lib/${gem_dir})"
   export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
-  export GEM_PATH="${GEM_HOME}:/usr/lib/${GEM_DIR}"
+  export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_dir}"
 
   if [[ ! -d "${GEM_HOME}" ]]; then
     eval "mkdir -p ${GEM_HOME}/{specifications,bin}" &> /dev/null
   fi
 
   fn_path_munge "${GEM_HOME}/bin"
-  unset RUBY_VERSION GEM_DIR
+  unset ruby_version gem_dir
 fi
 
 # --- SDK Manager ---
