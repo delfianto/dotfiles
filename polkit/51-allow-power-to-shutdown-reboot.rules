@@ -1,0 +1,11 @@
+/**
+ * org.freedesktop.consolekit.system.shutdown: Grants permission to shut down the system.
+ * org.freedesktop.consolekit.system.reboot: Grants permission to restart the system.
+ */
+polkit.addRule(function(action, subject) {
+    if ((action.id === "org.freedesktop.consolekit.system.shutdown" ||
+         action.id === "org.freedesktop.consolekit.system.reboot") &&
+        subject.isInGroup("power")) {
+        return polkit.Result.YES;
+    }
+});

@@ -1,0 +1,15 @@
+/**
+ * org.freedesktop.systemd1.kill: Allows sending a kill signal to a process.
+ * org.freedesktop.systemd1.nice: Allows changing the priority of a process (nice).
+ * org.freedesktop.systemd1.renice: Allows modifying the priority of a running process (renice).
+ * org.freedesktop.systemd1.pkill: Allows sending signals (e.g., kill) to processes by name using pkill.
+ */
+polkit.addRule(function(action, subject) {
+    if ((action.id === "org.freedesktop.systemd1.kill" ||
+         action.id === "org.freedesktop.systemd1.nice" ||
+         action.id === "org.freedesktop.systemd1.renice" ||
+         action.id === "org.freedesktop.systemd1.pkill") &&
+        subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+    }
+});

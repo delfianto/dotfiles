@@ -1,0 +1,11 @@
+polkit.addRule(function(action, subject) {
+    if (( action.id == "org.freedesktop.packagekit.package-install"  ||
+          action.id == "org.freedesktop.packagekit.package-remove"   ||
+          action.id == "org.freedesktop.packagekit.system-update"    ||
+          action.id == "org.freedesktop.packagekit.upgrade-packages" ||
+          action.id == "org.freedesktop.packagekit.install-or-remove-packages" ||
+          action.id == "org.freedesktop.packagekit.modify-system") &&
+        subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+    }
+});

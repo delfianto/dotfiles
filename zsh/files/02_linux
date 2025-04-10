@@ -11,22 +11,9 @@ alias usbdev='lsusb -tv'
 alias pcidev='lspci -tv'
 alias pcinfo='lspci -nnv'
 
-# --- Process management ---
-alias kill='sudo kill'
-alias nice='sudo nice'
-alias pkill='sudo pkill'
-alias renice='sudo renice'
-
 # --- System management ---
-alias dmesg='sudo dmesg -H'
-alias halt='sudo halt'
-alias journalctl='sudo journalctl'
+alias dmesg='dmesg -H'
 alias pacman='sudo pacman'
-alias poweroff='sudo poweroff'
-alias reboot='sudo reboot'
-alias svm='systool -vm'
-alias systemctl='sudo systemctl'
-alias virsh='sudo virsh'
 
 # --- Set git credentials helper ---
 export SSH_ASKPASS="$(which ksshaskpass)"

@@ -1,0 +1,12 @@
+/**
+ * Allow user in power group to change AMD EPP settings using the cmd_amd_epp script.
+ * Refer to $ZDOTDIR/autoload/linux/cmd_amd_epp for more information.
+ */
+polkit.addRule(function(action, subject) {
+    if (action.id === "org.freedesktop.policykit.exec" &&
+        subject.isInGroup("power")) {
+        if (action.lookup("exec").startsWith("amd-epp")) {
+            return polkit.Result.YES;
+        }
+    }
+});
