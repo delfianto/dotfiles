@@ -16,8 +16,8 @@ export ZLE_REMOVE_SUFFIX_CHARS=''         # don't eat space when typing '|' afte
 export READNULLCMD="${PAGER}"             # use the default pager instead of `more`
 export WORDCHARS="${WORDCHARS//\/[&.;]}"  # don't consider certain characters part of the word
 
-export EDITOR="${EDITOR:-/usr/bin/nano}"
-export VISUAL="${VISUAL:-/usr/bin/zeditor}"
+export EDITOR="${EDITOR:-/usr/bin/nvim}"
+export VISUAL="${VISUAL:-/usr/bin/nano}"
 export PAGER="${PAGER:-/usr/bin/less}"
 
 # --- Configure terminal pager ---

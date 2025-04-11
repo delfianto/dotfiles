@@ -26,20 +26,20 @@ unset func_name kebab_name
 
 # --- Command replacements ---
 if fn_check_command -q bat; then
-  alias cat='bat'
+  alias cat="bat"
 fi
 
 if fn_check_command -q duf; then
-  alias df='duf'
+  alias df="duf"
 else
-  alias df='df -h'
+  alias df="df -h"
 fi
 
 if fn_check_command -q gdu; then
-  alias du='gdu'
+  alias du="gdu"
 else
-  alias du='du -h'
-  alias ds='du -hs'
+  alias du="du -h"
+  alias ds="du -hs"
 fi
 
 if fn_check_command -q eza; then
@@ -54,19 +54,24 @@ else
   alias lla="ls ${LS_ARGS} -al"
 fi
 
+if fn_check_command -q nvim; then
+  alias vi="nvim"
+  alias vim="nvim"
+fi
+
 # --- Rest of command alias ---
 alias cls="clear && printf '\e[3J'"
-alias cp='cp -v'
-alias mv='mv -v'
-alias sudo='sudo '
-alias which='command -v'
+alias cp="cp -v"
+alias mv="mv -v"
+alias sudo="sudo "
+alias which="command -v"
 
 # Colorful grep output
-alias grep='grep -i --color=auto'
-alias egrep='egrep -i --color=auto'
-alias fgrep='fgrep -i --color=auto'
+alias grep="grep -i --color=auto"
+alias egrep="egrep -i --color=auto"
+alias fgrep="fgrep -i --color=auto"
 
 # Shell management
-alias history='fc -li'
+alias history="fc -li"
 alias shdir="cd ${ZDOTDIR}"
 alias reload="exec ${SHELL} -l"
