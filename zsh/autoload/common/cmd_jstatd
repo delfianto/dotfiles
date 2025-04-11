@@ -10,8 +10,7 @@ cmd_jstatd() {
     return 1
   fi
 
-  if (( ! ${+commands[$exec]} )); then
-    echo "$exec is not found in your system PATH"
+  if ! fn_check_command "$exec"; then
     return 1
   fi
 
