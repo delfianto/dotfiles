@@ -1,27 +1,74 @@
 #!/bin/zsh
 
 cmd_pulse_eq() {
-  if [[ -z "${1}" ]]; then
-    stdout "Usage: ${0} [ device_name ]"
-    return 0
+  local preset_dir="${XDG_CONFIG_HOME:-$HOME/.config}/easyeffects/output"
+
+  # --- Sanity checks ---
+  if ! fn_check_command easyeffects; then
+    return 1
   fi
 
-  local conf="${ZDOTDIR}/private/pulse-eq.conf"
-
-  if [[ -f "${conf}" ]]; then
-    source "${conf}"
-  else
-    stderr "Could not source ${conf}"
-    return 2
+  # Check if the preset directory exists
+  if [[ ! -d "$preset_dir" ]]; then
+    stderr "Error: EasyEffects preset directory not found at '$preset_dir'"
+    return 1
   fi
 
-  local preset="${device_map[$1]}"
+  # Find preset files
+  # The (N.) glob qualifier: N=nullglob (no error if no match), .=regular files only
+  local preset_files=("$preset_dir"/*.json(N.))
 
-  if [[ -z "${preset}" ]]; then
-    stderr "Cannot find preset for device name '${1}'"
-    return 3
+  if (( ${#preset_files[@]} == 0 )); then
+    stderr "Error: No EasyEffects preset files (.json) found in '$preset_dir'."
+    stderr "Please ensure EasyEffects has saved presets."
+    return 1
   fi
 
-  pulseeffects --load-preset "${preset}"
-  gsettings set com.github.wwmm.pulseeffects last-used-output-preset "${preset}"
+  # --- Main Logic ---
+  local preset_names=()
+  for file in $preset_files; do
+    # :t gets the tail (basename), :r gets the root (removes extension)
+    preset_names+=("${file:t:r}")
+  done
+
+  # Add a "Quit" option to the *end* of the sorted list
+  local preset_options=("${preset_names[@]}" "Quit")
+  local num_options=${#preset_options[@]}
+
+  # Display the menu and prompt the user
+  while true; do
+    stdout "Available EasyEffects Output Presets:"
+    for i in {1..$num_options}; do
+      stdout "  $i) ${preset_options[i]}"
+    done
+
+    stdout ""
+    # Prompt user for input
+    read -r reply_num\?'Please select an option (enter number): '
+
+    # Validate input
+    if [[ "$reply_num" =~ ^[0-9]+$ ]] && (( reply_num >= 1 && reply_num <= num_options )); then
+      choice="${preset_options[reply_num]}"
+
+      if [[ "$choice" == "Quit" ]]; then
+        stdout "Exiting preset switcher."
+        break
+      else
+        if easyeffects --load-preset "$choice"; then
+          stdout "Successfully applied preset '$choice'."
+        else
+          stderr "Error: Failed to apply preset '$choice'. Check EasyEffects logs."
+        fi
+
+        # Exit the while loop after action
+        break
+      fi
+    else
+      stdout ""
+      stderr "Invalid selection: '$reply_num'. Please enter a number between 1 and $num_options."
+      stdout ""
+    fi
+  done
+
+  return 0
 }
