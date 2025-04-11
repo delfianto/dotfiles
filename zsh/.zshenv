@@ -11,14 +11,14 @@ export HISTTIMEFORMAT="%F %T "
 export HISTSIZE="5000"
 export SAVEHIST="5000"
 
+export EDITOR=/usr/bin/nvim
+export VISUAL=/usr/bin/nano
+export PAGER=/usr/bin/less
+
 export ZLE_RPROMPT_INDENT=0               # don't leave an empty space after right prompt
 export ZLE_REMOVE_SUFFIX_CHARS=''         # don't eat space when typing '|' after a tab completion
 export READNULLCMD="${PAGER}"             # use the default pager instead of `more`
 export WORDCHARS="${WORDCHARS//\/[&.;]}"  # don't consider certain characters part of the word
-
-export EDITOR="${EDITOR:-/usr/bin/nvim}"
-export VISUAL="${VISUAL:-/usr/bin/nano}"
-export PAGER="${PAGER:-/usr/bin/less}"
 
 # --- Configure terminal pager ---
 # This affects every invocation of `less`.
