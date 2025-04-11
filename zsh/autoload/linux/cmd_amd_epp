@@ -37,14 +37,14 @@ function cmd_amd_epp {
       ;;
     '-i' | '--info')
       for filepath in "${epp_paths[@]}"; do
-        if [[ -r "${filepath}" ]]; then
+        if [[ -r "$filepath" ]]; then
           # 1. ${filepath#*/cpu/cpu} removes the shortest prefix ending in */cpu/cpu
           #    (e.g., "0/cpufreq/energy_performance_preference")
           # 2. ${ ... %%/*} removes the longest suffix starting with /* from the result of step 1
           #    (e.g., "0")
           local cpunum=${${filepath#*/cpu/cpu}%%/*}
           local value=$(< "$filepath")
-          printf -- "- CPU%02d: %s\n" "${cpunum}" "${value}"
+          printf -- "- CPU%02d: %s\n" "$cpunum" "$value"
         fi
       done | column -c "${COLUMNS:-$(tput cols)}"
       ;;
@@ -75,15 +75,15 @@ function cmd_amd_epp {
       epp_value="power"
       ;;
     *)
-      print -u2 "Error: Invalid argument '${1}'" >&2
+      print -u2 "Error: Invalid argument '$1'" >&2
       ${funcstack[1]} --help
       return 1
       ;;
   esac
 
-  if [[ -n "${epp_value}" ]]; then
-    stdout "Attempting to set EPP to '${epp_value}' for ${#epp_paths[@]} CPU(s)..."
-    stdout "${epp_value}" | sudo tee ${epp_paths} &> /dev/null
+  if [[ -n "$epp_value" ]]; then
+    stdout "Attempting to set EPP to '$epp_value' for ${#epp_paths[@]} CPU(s)..."
+    stdout "$epp_value" | sudo tee $epp_paths &> /dev/null
 
     if (( PIPESTATUS[2] == 0 )); then
       stdout "Successfully set EPP for all CPUs."

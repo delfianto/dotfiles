@@ -17,9 +17,9 @@ cmd_verify_and_report() {
     return 1
   fi
 
-  local archive_file="${1}"
-  if [[ ! -f "${archive_file}" ]]; then
-    stderr "Error: File '${archive_file}' does not exist."
+  local archive_file="$1"
+  if [[ ! -f "$archive_file" ]]; then
+    stderr "Error: File '$archive_file' does not exist."
     return 1
   fi
 
@@ -28,14 +28,14 @@ cmd_verify_and_report() {
   local upper_ext="${file_extension:u}"
 
   # --- Determine verification command to run ---
-  local tool_name="${lower_ext}"
+  local tool_name="$lower_ext"
   local tool_args=""
 
   local exit_code=0
   local status_message=""
   local verification_command=""
 
-  case "${lower_ext}" in
+  case "$lower_ext" in
     'zip')
       tool_args="-T"
       ;;
@@ -43,7 +43,7 @@ cmd_verify_and_report() {
       tool_args="-tf"
       ;;
     'rar')
-      if (( ! ${+commands[rar]} )); then
+      if fn_check_command -q rar; then
         # Alternative verification command for RAR files
         tool_name="unrar"
       fi
@@ -51,7 +51,7 @@ cmd_verify_and_report() {
       tool_args="t"
       ;;
     '7z')
-      if (( ! ${+commands[7z]} )); then
+      if fn_check_command -q 7z; then
         # Alternative verification command for 7z files
         tool_name="7za"
       fi
@@ -77,11 +77,11 @@ cmd_verify_and_report() {
   esac
 
   # --- Check for verification command ---
-  if ! command -v "${tool_name}" 2>&1 >/dev/null; then
+  if ! fn_check_command -q "$tool_name"; then
     exit_code=2
     status_message="COMMAND_NOT_FOUND"
   else
-    verification_command=("${tool_name}" "${tool_args}" "${archive_file}")
+    verification_command=("$tool_name" "$tool_args" "$archive_file")
   fi
 
   # --- Execute command if determined and not already failed ---
@@ -102,25 +102,25 @@ cmd_verify_and_report() {
   # --- Print the verification status ---
   case "${status_message}" in
     'OK')
-      stdout "${upper_ext}: '${archive_file}' - OK"
+      stdout "$upper_ext: '$archive_file' - OK"
       ;;
     'CORRUPTED')
-      stderr "${upper_ext}: '${archive_file}' - CORRUPTED"
+      stderr "$upper_ext: '$archive_file' - CORRUPTED"
       ;;
     'UNSUPPORTED_FORMAT')
-      stderr "Unsupported archive format: '${file_extension}' for file '${archive_file}'"
+      stderr "Unsupported archive format: '$file_extension' for file '$archive_file'"
       ;;
     'COMMAND_NOT_FOUND')
       local install_hint=""
       [[ "$tool_name" == "rar" ]] && install_hint=" Please install it to verify RAR archives."
       [[ "$tool_name" == "7z" ]] && install_hint=" Please install p7zip package to verify 7z archives."
-      stderr "Error: '${tool_name}' command not found. ${install_hint}"
+      stderr "Error: '$tool_name' command not found. $install_hint"
       ;;
     *) # Includes INTERNAL_ERROR or any unexpected status
-      stderr "Error: Could not determine status for '${archive_file}' (${status_message:-unknown})."
+      stderr "Error: Could not determine status for '$archive_file' (${status_message:-unknown})."
       exit_code=5
       ;;
   esac
 
-  return "${exit_code}"
+  return "$exit_code"
 }

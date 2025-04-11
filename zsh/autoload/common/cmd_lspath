@@ -2,7 +2,7 @@
 
 cmd_lspath() {
   local parts=(${(s/:/)PATH})
-  for i in ${parts}; do
-    stdout "❯ ${i}"
+  for i in $parts; do
+    stdout "❯ $i"
   done
 }

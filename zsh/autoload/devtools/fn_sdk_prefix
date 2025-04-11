@@ -1,11 +1,11 @@
 #!/bin/zsh
 
 fn_sdk_prefix() {
-  local prefix=$(cmd_fpath "${SDK_HOME}/${1}")
+  local prefix=$(cmd_fpath "$SDK_HOME/$1")
 
-  if [[ -z "${prefix}" ]]; then
-    stdout "${SDK_HOME}/${1}"
+  if [[ -z "$prefix" ]]; then
+    stdout "$SDK_HOME/$1"
   else
-    stdout "${prefix}"
+    stdout "$prefix"
   fi
 }

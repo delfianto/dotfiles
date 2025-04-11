@@ -1,14 +1,14 @@
 #!/bin/zsh
 
 cmd_iommu() {
-  case "${1}" in
+  case "$1" in
     'p' | 'pci')
-      sudo lspci -vv -s "${2}"
+      sudo lspci -vv -s "$2"
       ;;
     'g' | 'group')
       local groups='/bin/ls -dv /sys/kernel/iommu_groups/*'
 
-      for group in $(eval "${groups}"); do
+      for group in $(eval "$groups"); do
         printf "IOMMU Group %02d:\n ${group##*/}"
         for device in ${group}/devices/*; do
           local out=$(lspci -nns "${device##*/}")
@@ -23,10 +23,10 @@ cmd_iommu() {
           # Combine the 'pretty print' output, exclude nvme device
           # from output processing; some pcie ssd from Adata does
           # not show any meaningful info other than 'device (rev xx)'.
-          if [[ -z $(stdout "${out}" | grep 'Volatile') ]]; then
-            stdout "${pci} ${out#*: }"
+          if [[ -z $(stdout "$out" | grep 'Volatile') ]]; then
+            stdout "$pci ${out#*: }"
           else
-            stdout "${out}"
+            stdout "$out"
           fi
         done
         echo
@@ -35,14 +35,14 @@ cmd_iommu() {
     'u' | 'usb')
       for usb_ctrl in $(find /sys/bus/usb/devices/usb* -maxdepth 0 -type l); do
         pci_path="$(dirname "$(realpath "${usb_ctrl}")")"
-        stdout "Bus $(cat "${usb_ctrl}/busnum") --> $(basename $pci_path)
+        stdout "Bus $(cat "$usb_ctrl/busnum") --> $(basename $pci_path)
                 (IOMMU group $(basename $(realpath $pci_path/iommu_group)))"
-        lsusb -s "$(cat "${usb_ctrl}/busnum"):"
+        lsusb -s "$(cat "$usb_ctrl/busnum"):"
         stdout
       done
       ;;
     *)
-      stdout "${1}"
+      stdout "$1"
       # TODO: Put some help text here
       ;;
   esac

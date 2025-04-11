@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 cmd_zsh_functions() {
-  case "${1}" in
+  case "$1" in
     '-l' | 'list')
       print -l ${(ok)functions}
       ;;

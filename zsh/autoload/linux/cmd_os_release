@@ -6,7 +6,7 @@ cmd_os_release() {
   # Parse /etc/os-release and store in an associative array
   while IFS='=' read -r key value; do
     value="${value//\"/""}"
-    os_info[$key]=$value
+    os_info[${key:l}]="${value}"
   done < /etc/os-release
 
   local format="${1:---shell}"
@@ -15,14 +15,14 @@ cmd_os_release() {
     '-s' | '--shell')
       # Output in shell-friendly format
       for key in ${(k)os_info}; do
-        stdout "${key:l}: ${os_info[$key]}"
+        stdout "${key}: ${os_info[$key]}"
       done
       ;;
     '-j' | '--json')
       # Output in JSON format
       local json="{"
       for key in ${(k)os_info}; do
-        json+="\"${key:l}\": \"${os_info[$key]}\","
+        json+="\"${key}\": \"${os_info[$key]}\","
       done
       json="${json%,}}"
 

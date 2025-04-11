@@ -2,7 +2,7 @@
 
 cmd_fpath() {
   if fn_check_command -q realpath; then
-    realpath -m "${@}"
+    realpath -m "$@"
     return $?
   fi
 
@@ -19,5 +19,5 @@ for arg in sys.argv[1:]:
 EOF
 )
 
-  python3 -c "${code}" "${@}"
+  python3 -c "$code" "$@"
 }

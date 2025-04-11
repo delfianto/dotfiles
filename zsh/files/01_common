@@ -6,18 +6,18 @@
 local func_name kebab_name
 for func_name in ${(k)functions}; do
   # Check if the function name contains an underscore (likely snake_case)
-  if [[ "${func_name}" == cmd_* ]]; then
+  if [[ "$func_name" == cmd_* ]]; then
     # Convert cmd_snake_case to kebab-case using parameter expansion
     kebab_name="${func_name//_/-}" && kebab_name="${kebab_name#cmd-}"
 
     # Ensure the kebab-case name is different from the original
     # and that no command (alias, function, builtin, external)
     # already exists with the kebab-case name.
-    if [[ -n "${kebab_name}" ]] &&
-       [[ "${kebab_name}" != "${func_name}" ]] &&
-       ! command -v "${kebab_name}" > /dev/null 2>&1; then
-      alias "${kebab_name}=${func_name}"
-      (( ZSH_DEBUG_INIT )) && stdout "Aliased: ${kebab_name} -> ${func_name}"
+    if [[ -n "$kebab_name" ]] &&
+       [[ "$kebab_name" != "$func_name" ]] &&
+       ! command -v "$kebab_name" > /dev/null 2>&1; then
+      alias "$kebab_name=$func_name"
+      (( ZSH_DEBUG_INIT )) && stdout "Aliased: $kebab_name -> $func_name"
     fi
   fi
 done
@@ -43,15 +43,15 @@ else
 fi
 
 if fn_check_command -q eza; then
-  alias ls="eza ${LS_ARGS}"
-  alias ll="eza ${LS_ARGS} -l"
-  alias la="eza ${LS_ARGS} -a"
-  alias lla="eza ${LS_ARGS} -al"
+  alias ls="eza $LS_ARGS"
+  alias ll="eza $LS_ARGS -l"
+  alias la="eza $LS_ARGS -a"
+  alias lla="eza $LS_ARGS -al"
 else
-  alias ls="ls ${LS_ARGS}"
-  alias ll="ls ${LS_ARGS} -l"
-  alias la="ls ${LS_ARGS} -a"
-  alias lla="ls ${LS_ARGS} -al"
+  alias ls="ls $LS_ARGS"
+  alias ll="ls $LS_ARGS -l"
+  alias la="ls $LS_ARGS -a"
+  alias lla="ls $LS_ARGS -al"
 fi
 
 if fn_check_command -q nvim; then
@@ -73,5 +73,5 @@ alias fgrep="fgrep -i --color=auto"
 
 # Shell management
 alias history="fc -li"
-alias shdir="cd ${ZDOTDIR}"
-alias reload="exec ${SHELL} -l"
+alias shdir="cd $ZDOTDIR"
+alias reload="exec $SHELL -l"

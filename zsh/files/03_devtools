@@ -5,10 +5,10 @@
 if fn_check_command -q gcloud; then
   export GCLOUD_SDK_DIR="$(fn_sdk_prefix lib/google-cloud-sdk)"
 
-  if [[ -r "${GCLOUD_SDK_DIR}" ]]; then
-    shell_name=$(basename "${SHELL}")
-    fn_import "${GCLOUD_SDK_DIR}/path.${shell_name}.inc"
-    fn_import "${GCLOUD_SDK_DIR}/completion.${shell_name}.inc"
+  if [[ -r "$GCLOUD_SDK_DIR" ]]; then
+    shell_name=$(basename "$SHELL")
+    fn_import "$GCLOUD_SDK_DIR/path.$shell_name.inc"
+    fn_import "$GCLOUD_SDK_DIR/completion.$shell_name.inc"
 
     alias gcs="gcloud"
     alias gcb="gcs beta"
@@ -22,7 +22,7 @@ fi
 if fn_check_command -q node; then
   export NODEJS_DIR="$(fn_sdk_prefix lib/nodejs)"
 
-  if [[ -r "${NODEJS_DIR}" ]]; then
+  if [[ -r "$NODEJS_DIR" ]]; then
     alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(fn_sdk_prefix)"
   else
@@ -42,8 +42,8 @@ if fn_check_command -q python3; then
   alias pyjson='python3 -m json.tool'   # pipe to this alias to format json with python
 
   jsoncat() {
-    if [[ -s "${1}" ]]; then
-      cat "${1}" | pyjson
+    if [[ -s "$1" ]]; then
+      cat "$1" | pyjson
     else
       stderr "File is empty."
       return 1
@@ -56,31 +56,31 @@ if fn_check_command -q ruby; then
   ruby_version="$(ruby -e 'puts RUBY_VERSION')"
   gem_dir="ruby/gems/${ruby_version%?}0"
 
-  export GEM_HOME="$(fn_sdk_prefix lib/${gem_dir})"
-  export GEM_SPEC_CACHE="${GEM_HOME}/specifications"
-  export GEM_PATH="${GEM_HOME}:/usr/lib/${gem_dir}"
+  export GEM_HOME="$(fn_sdk_prefix lib/$gem_dir)"
+  export GEM_SPEC_CACHE="$GEM_HOME/specifications"
+  export GEM_PATH="$GEM_HOME:/usr/lib/$gem_dir"
 
-  if [[ ! -d "${GEM_HOME}" ]]; then
-    eval "mkdir -p ${GEM_HOME}/{specifications,bin}" &> /dev/null
+  if [[ ! -d "$GEM_HOME" ]]; then
+    eval "mkdir -p $GEM_HOME/{specifications,bin}" &> /dev/null
   fi
 
-  fn_path_munge "${GEM_HOME}/bin"
+  fn_path_munge "$GEM_HOME/bin"
   unset ruby_version gem_dir
 fi
 
 # --- SDK Manager ---
 export SDKMAN_DIR="$(fn_sdk_prefix sdkman)"
-export SDKMAN_INIT="${SDKMAN_DIR}/bin/sdkman-init.sh"
+export SDKMAN_INIT="$SDKMAN_DIR/bin/sdkman-init.sh"
 
-if [[ -r "${SDKMAN_INIT}" ]]; then
+if [[ -r "$SDKMAN_INIT" ]]; then
   export GROOVY_TURN_OFF_JAVA_WARNINGS="true"
-  export GRADLE_USER_HOME="${HOME}/.gradle"
+  export GRADLE_USER_HOME="$HOME/.gradle"
 
-  eval "mkdir -p ${SDKMAN_DIR}/ext" &> /dev/null
-  fn_import "${SDKMAN_INIT}"
+  eval "mkdir -p $SDKMAN_DIR/ext" &> /dev/null
+  fn_import "$SDKMAN_INIT"
 else
   unset SDKMAN_DIR SDKMAN_INIT
 fi
 
 # Ensure ~/.local/bin is added to PATH
-fn_path_munge "${HOME}/.local/bin"
+fn_path_munge "$HOME/.local/bin"

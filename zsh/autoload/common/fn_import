@@ -1,21 +1,21 @@
 #!/bin/zsh
 
 fn_import() {
-  local base_dir="${1}" # Base directory, can be "" for current dir, or "$ZDOTDIR/files"
-  shift                 # Remove the first argument from the positional parameters
+  local base_dir="$1" # Base directory, can be "" for current dir, or "$ZDOTDIR/files"
+  shift               # Remove the first argument from the positional parameters
 
-  for arg in "${@}"; do
-    local file="${base_dir}/${arg}" # Construct the file path
+  for arg in "$@"; do
+    local file="$base_dir/$arg" # Construct the file path
 
     # If base_dir is empty, it will result in just "/arg", but that works fine.
-    if [[ -n "${base_dir}" ]]; then
-      file="${base_dir}/${arg}"
+    if [[ -n "$base_dir" ]]; then
+      file="$base_dir/$arg"
     fi
 
-   (( ZSH_DEBUG_INIT )) && stdout "Attempting to load ${file}..."
-    if [[ -f "${file}" ]]; then
-      (( ZSH_DEBUG_INIT )) && stdout "Loading ${file}"
-      source "${file}"
+   (( ZSH_DEBUG_INIT )) && stdout "Attempting to load $file..."
+    if [[ -f "$file" ]]; then
+      (( ZSH_DEBUG_INIT )) && stdout "Loading $file"
+      source "$file"
     fi
   done
 }

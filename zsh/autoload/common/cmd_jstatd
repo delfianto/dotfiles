@@ -5,20 +5,20 @@ cmd_jstatd() {
   local host="${host:-localhost}"
   local port="${port:-9090}"
 
-  if [[ -z "${JAVA_HOME}" ]]; then
+  if [[ -z "$JAVA_HOME" ]]; then
     echo "JAVA_HOME is not set"
     return 1
   fi
 
   if (( ! ${+commands[$exec]} )); then
-    echo "${exec} is not found in your system PATH"
+    echo "$exec is not found in your system PATH"
     return 1
   fi
 
-  local policy=${HOME}/.config/jstatd.all.policy
+  local policy="$HOME/.config/jstatd.all.policy"
 
-  [[ -r ${policy} ]] || {
-    cat >"${policy}" <<'POLICY'
+  [[ -r "$policy" ]] || {
+    cat >"$policy" <<'POLICY'
 grant codebase "file:${java.home}/lib/tools.jar" {
 permission java.security.AllPermission;
 };
@@ -26,12 +26,12 @@ POLICY
     chmod 600 "${policy}"
   }
 
-  "${exec}" \
+  "$exec" \
     -Djava.rmi.server.logCall=true \
-    -Djava.rmi.server.hostname="${host}" \
-    -Djava.security.policy="${policy}" \
-    -p "${port}" || {
-    stderr "Failed to start ${exec}"
+    -Djava.rmi.server.hostname="$host" \
+    -Djava.security.policy="$policy" \
+    -p "$port" || {
+    stderr "Failed to start $exec"
     return 1
   }
 }
