@@ -14,7 +14,7 @@ cmd_jstatd() {
     return 1
   fi
 
-  local policy="$HOME/.config/jstatd.all.policy"
+  local policy="${XDG_CONFIG_HOME:-$HOME/.config}/jstatd.all.policy"
 
   [[ -r "$policy" ]] || {
     cat >"$policy" <<'POLICY'
