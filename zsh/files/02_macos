@@ -14,7 +14,7 @@ if [[ -d "$HOMEBREW_PREFIX" ]] && [[ -r "$HOMEBREW_PREFIX" ]]; then
     gnu_pkgs=(coreutils findutils gnu-indent gnu-which gnu-sed gnu-tar)
 
     for gnu in "${gnu_pkgs[@]}"; do
-      local gnu_lib="$HOMEBREW_PREFIX/opt/${gnu}/libexec"
+      local gnu_lib="$HOMEBREW_PREFIX/opt/$gnu/libexec"
 
       if [[ -r "$gnu_lib" ]]; then
         fn_path_munge "$gnu_lib/gnubin"

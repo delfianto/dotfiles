@@ -12,6 +12,7 @@ alias pcinfo="lspci -nnv"
 
 # --- System management ---
 alias dmesg="sudo dmesg -H"
+alias dracut="sudo dracut"
 alias pacman="sudo pacman"
 
 # --- Set git credentials helper ---

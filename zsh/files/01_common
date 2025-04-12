@@ -15,7 +15,7 @@ for func_name in ${(k)functions}; do
     # already exists with the kebab-case name.
     if [[ -n "$kebab_name" ]] &&
        [[ "$kebab_name" != "$func_name" ]] &&
-       ! command -v "$kebab_name" > /dev/null 2>&1; then
+       ! fn_check_command -q "$kebab_name"; then
       alias "$kebab_name=$func_name"
       (( ZSH_DEBUG_INIT )) && stdout "Aliased: $kebab_name -> $func_name"
     fi
