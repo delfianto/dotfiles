@@ -24,22 +24,35 @@ cmd_pulse_eq() {
     return 1
   fi
 
-  # --- Main Logic ---
+  # --- Create the menu entries ---
   local preset_names=()
+  local flat_response_preset=""
+
   for file in $preset_files; do
     # :t gets the tail (basename), :r gets the root (removes extension)
-    preset_names+=("${file:t:r}")
+    local name="${file:t:r}"
+
+    if [[ "$name" == "Flat Response" ]]; then
+      flat_response_preset="$name"
+    else
+      preset_names+=("$name")
+    fi
   done
 
-  # Add a "Quit" option to the *end* of the sorted list
-  local preset_options=("${preset_names[@]}" "Quit")
-  local num_options=${#preset_options[@]}
+  # Add "Flat Response" and "Quit" option to the *end* of the sorted list
+  if [[ -n "$flat_response_preset" ]]; then
+    preset_names+=("$flat_response_preset")
+  fi
 
+  preset_names+=("Quit")
+  local num_options=${#preset_names[@]}
+
+  # --- Main logic ---
   # Display the menu and prompt the user
   while true; do
     stdout "Available EasyEffects Output Presets:"
     for i in {1..$num_options}; do
-      stdout "  $i) ${preset_options[i]}"
+      stdout "  $i) ${preset_names[i]}"
     done
 
     stdout ""
@@ -48,7 +61,7 @@ cmd_pulse_eq() {
 
     # Validate input
     if [[ "$reply_num" =~ ^[0-9]+$ ]] && (( reply_num >= 1 && reply_num <= num_options )); then
-      choice="${preset_options[reply_num]}"
+      choice="${preset_names[reply_num]}"
 
       if [[ "$choice" == "Quit" ]]; then
         stdout "Exiting preset switcher."
