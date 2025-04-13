@@ -1,11 +1,16 @@
-/**
- * org.freedesktop.consolekit.system.shutdown: Grants permission to shut down the system.
- * org.freedesktop.consolekit.system.reboot: Grants permission to restart the system.
- */
 polkit.addRule(function(action, subject) {
-    if ((action.id === "org.freedesktop.consolekit.system.shutdown" ||
-         action.id === "org.freedesktop.consolekit.system.reboot") &&
-        subject.isInGroup("power")) {
-        return polkit.Result.YES;
+    if (subject.isInGroup("wheel")) {
+        var allowedActions = [
+            "org.freedesktop.consolekit.system.shutdown", // Shut down the system.
+            "org.freedesktop.consolekit.system.reboot",   // Restart the system.
+        ];
+
+        if (allowedActions.indexOf(action.id) !== -1) {
+            // Grant permission without asking for a password
+            return polkit.Result.YES;
+        }
     }
+
+    // Fall back to default Polkit behavior
+    return polkit.Result.AUTH_ADMIN_KEEP;
 });

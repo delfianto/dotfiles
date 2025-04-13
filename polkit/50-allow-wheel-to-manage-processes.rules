@@ -1,15 +1,18 @@
-/**
- * org.freedesktop.systemd1.kill: Allows sending a kill signal to a process.
- * org.freedesktop.systemd1.nice: Allows changing the priority of a process (nice).
- * org.freedesktop.systemd1.renice: Allows modifying the priority of a running process (renice).
- * org.freedesktop.systemd1.pkill: Allows sending signals (e.g., kill) to processes by name using pkill.
- */
 polkit.addRule(function(action, subject) {
-    if ((action.id === "org.freedesktop.systemd1.kill" ||
-         action.id === "org.freedesktop.systemd1.nice" ||
-         action.id === "org.freedesktop.systemd1.renice" ||
-         action.id === "org.freedesktop.systemd1.pkill") &&
-        subject.isInGroup("wheel")) {
-        return polkit.Result.YES;
+    if (subject.isInGroup("wheel")) {
+        var allowedActions = [
+            "org.freedesktop.systemd1.kill",   // Send kill signal to a process.
+            "org.freedesktop.systemd1.nice",   // Change process priority (nice).
+            "org.freedesktop.systemd1.renice", // Modify process priority (renice).
+            "org.freedesktop.systemd1.pkill"   // Send signal to processes by name using pkill.
+        ];
+
+        if (allowedActions.indexOf(action.id) !== -1) {
+            // Grant permission without asking for a password
+            return polkit.Result.YES;
+        }
     }
+
+    // Fall back to default Polkit behavior
+    return polkit.Result.AUTH_ADMIN_KEEP;
 });

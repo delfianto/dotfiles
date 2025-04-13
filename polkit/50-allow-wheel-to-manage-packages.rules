@@ -1,11 +1,20 @@
 polkit.addRule(function(action, subject) {
-    if (( action.id == "org.freedesktop.packagekit.package-install"  ||
-          action.id == "org.freedesktop.packagekit.package-remove"   ||
-          action.id == "org.freedesktop.packagekit.system-update"    ||
-          action.id == "org.freedesktop.packagekit.upgrade-packages" ||
-          action.id == "org.freedesktop.packagekit.install-or-remove-packages" ||
-          action.id == "org.freedesktop.packagekit.modify-system") &&
-        subject.isInGroup("wheel")) {
-        return polkit.Result.YES;
+    if (subject.isInGroup("wheel")) {
+        var allowedActions = [
+            "org.freedesktop.packagekit.package-install",
+            "org.freedesktop.packagekit.package-remove",
+            "org.freedesktop.packagekit.system-update",
+            "org.freedesktop.packagekit.upgrade-packages",
+            "org.freedesktop.packagekit.install-or-remove-packages",
+            "org.freedesktop.packagekit.modify-system"
+        ];
+
+        if (allowedActions.indexOf(action.id) !== -1) {
+            // Grant permission without asking for a password
+            return polkit.Result.YES;
+        }
     }
+
+    // Fall back to default Polkit behavior
+    return polkit.Result.AUTH_ADMIN_KEEP;
 });

@@ -1,13 +1,18 @@
-/**
- * org.freedesktop.systemd1.manage-units: Grants permission to start, stop, restart, and reload systemd units.
- * org.freedesktop.systemd1.reload: Grants permission to reload the systemd manager (systemctl daemon-reload).
- * org.freedesktop.journal.read: Grants permission to read the systemd journal logs using journalctl.
- */
 polkit.addRule(function(action, subject) {
-    if ((action.id === "org.freedesktop.systemd1.manage-units" ||
-         action.id === "org.freedesktop.systemd1.reload" ||
-         action.id === "org.freedesktop.journal.read") &&
-        subject.isInGroup("wheel")) {
-        return polkit.Result.YES;
+    if (subject.isInGroup("wheel")) {
+        var allowedActions = [
+            "org.freedesktop.systemd1.manage-units",   // start, stop, enable, disable, restart, etc.
+            "org.freedesktop.systemd1.reload",         // systemctl reload <unit>
+            "org.freedesktop.systemd1.reload-daemon",  // systemctl daemon-reload
+            "org.freedesktop.journal.read"             // Read system journal
+        ];
+
+        if (allowedActions.indexOf(action.id) !== -1) {
+            // Grant permission without asking for a password
+            return polkit.Result.YES;
+        }
     }
+
+    // Fall back to default Polkit behavior
+    return polkit.Result.AUTH_ADMIN_KEEP;
 });

@@ -6,7 +6,11 @@ polkit.addRule(function(action, subject) {
     if (action.id === "org.freedesktop.policykit.exec" &&
         subject.isInGroup("power")) {
         if (action.lookup("exec").startsWith("amd-epp")) {
+            // Grant permission without asking for a password
             return polkit.Result.YES;
         }
     }
+
+    // Fall back to default Polkit behavior
+    return polkit.Result.AUTH_ADMIN_KEEP;
 });
