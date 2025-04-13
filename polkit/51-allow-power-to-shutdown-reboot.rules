@@ -1,16 +1,16 @@
 polkit.addRule(function(action, subject) {
+    // Check whether the user is a member of the wheel group.
     if (subject.isInGroup("wheel")) {
+
+        // Define the allowed actions
         var allowedActions = [
             "org.freedesktop.consolekit.system.shutdown", // Shut down the system.
             "org.freedesktop.consolekit.system.reboot",   // Restart the system.
         ];
 
+        // If the current action is in our list, allow it
         if (allowedActions.indexOf(action.id) !== -1) {
-            // Grant permission without asking for a password
             return polkit.Result.YES;
         }
     }
-
-    // Fall back to default Polkit behavior
-    return polkit.Result.AUTH_ADMIN_KEEP;
 });

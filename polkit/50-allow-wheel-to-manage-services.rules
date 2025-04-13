@@ -1,18 +1,18 @@
 polkit.addRule(function(action, subject) {
+    // Check whether the user is a member of the wheel group.
     if (subject.isInGroup("wheel")) {
+
+        // Define the allowed actions
         var allowedActions = [
-            "org.freedesktop.systemd1.manage-units",   // start, stop, enable, disable, restart, etc.
+            "org.freedesktop.systemd1.manage-units",   // systemctl start, stop, enable, disable, restart, etc.
             "org.freedesktop.systemd1.reload",         // systemctl reload <unit>
             "org.freedesktop.systemd1.reload-daemon",  // systemctl daemon-reload
-            "org.freedesktop.journal.read"             // Read system journal
+            "org.freedesktop.journal.read"             // Reading system journal (e.g., journalctl)
         ];
 
+        // If the current action is in our list, allow it
         if (allowedActions.indexOf(action.id) !== -1) {
-            // Grant permission without asking for a password
             return polkit.Result.YES;
         }
     }
-
-    // Fall back to default Polkit behavior
-    return polkit.Result.AUTH_ADMIN_KEEP;
 });
