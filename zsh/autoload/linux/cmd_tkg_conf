@@ -15,8 +15,8 @@ cmd_tkg_conf() {
 
       if fn_is_link "$user_cfg"; then
         "$VISUAL" "$user_cfg"
-      elif fn_is_file "$user_cfg"; then
-        "$VISUAL" "$user_cfg"
+      elif fn_is_file "$real_cfg"; then
+        "$VISUAL" "$real_cfg"
       fi
       ;;
     '-s' | '--link')
