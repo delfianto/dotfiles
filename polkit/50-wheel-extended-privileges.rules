@@ -9,17 +9,9 @@ polkit.addRule(function(action, subject) {
             "org.freedesktop.packagekit.package-remove",   // Uninstall a package
             "org.freedesktop.packagekit.system-update",    // Update all currently installed packages
 
-            // Process management
-            "org.freedesktop.systemd1.kill",               // Send kill signal to a process.
-            "org.freedesktop.systemd1.nice",               // Change process priority (nice).
-            "org.freedesktop.systemd1.renice",             // Modify process priority (renice).
-            "org.freedesktop.systemd1.pkill",              // Send signal to processes by name using pkill.
-
             // Service management
             "org.freedesktop.systemd1.manage-units",       // systemctl start, stop, enable, disable, restart, etc.
-            "org.freedesktop.systemd1.reload",             // systemctl reload <unit>
             "org.freedesktop.systemd1.reload-daemon",      // systemctl daemon-reload
-            "org.freedesktop.journal.read"                 // Read system journal (e.g., journalctl)
         ];
 
         // If the current action is in our list, allow it
