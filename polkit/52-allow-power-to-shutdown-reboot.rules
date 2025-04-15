@@ -1,6 +1,6 @@
 polkit.addRule(function(action, subject) {
-    // Check whether the user is a member of the wheel group.
-    if (subject.isInGroup("wheel")) {
+    // Check whether the user logged in locally and is a member of the power group.
+    if (subject.active && subject.isInGroup("power")) {
 
         // Define the allowed actions
         var allowedActions = [
