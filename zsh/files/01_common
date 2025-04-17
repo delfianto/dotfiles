@@ -1,14 +1,35 @@
 #!/bin/zsh
 # File 01_common; Shell initialization script for all platforms
-
+ZSH_DEBUG_INIT=1
 # --- Create kebab-case aliases for cmd_snake_case functions ---
-# Iterate over all defined functions (keys of the 'functions' special associative array)
+do_alias() {
+  alias "$1=$2"
+  (( ZSH_DEBUG_INIT )) && stdout "Aliased: $1 -> $2"
+}
+
 local func_name kebab_name
+local shadowed_cmds=()
+local shadow_cmd="${ZSH_SHADOW_CMD:-$MYCONF/shadow_cmd}"
+
+# Check for the command shadow rule
+if fn_is_file -q "$shadow_cmd"; then
+  local shadow_rules="$(< "$shadow_cmd")"
+  shadowed_cmds+=( ${(f)shadow_rules} )
+fi
+
+# Iterate over all defined functions (keys of the 'functions' special associative array)
 for func_name in ${(k)functions}; do
   # Check if the function name contains an underscore (likely snake_case)
   if [[ "$func_name" == cmd_* ]]; then
     # Convert cmd_snake_case to kebab-case using parameter expansion
     kebab_name="${func_name//_/-}" && kebab_name="${kebab_name#cmd-}"
+
+    # Allow shadowing if kebab_name is listed in the shadow_cmd file
+    if (( ${shadowed_cmds[(I)$kebab_name]} )); then
+      stdout "Shadowing command: $kebab_name"
+      do_alias "$kebab_name" "$func_name"
+      continue
+    fi
 
     # Ensure the kebab-case name is different from the original
     # and that no command (alias, function, builtin, external)
@@ -16,13 +37,15 @@ for func_name in ${(k)functions}; do
     if [[ -n "$kebab_name" ]] &&
        [[ "$kebab_name" != "$func_name" ]] &&
        ! fn_check_command -q "$kebab_name"; then
-      alias "$kebab_name=$func_name"
-      (( ZSH_DEBUG_INIT )) && stdout "Aliased: $kebab_name -> $func_name"
+      do_alias "$kebab_name" "$func_name"
     fi
   fi
 done
 
-unset func_name kebab_name
+unset -f do_alias
+unset func_name kebab_name \
+  shadow_cmd shadow_rules \
+  shadowed_cmds
 
 # --- Command replacements ---
 if fn_check_command -q bat; then

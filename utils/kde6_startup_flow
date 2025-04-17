@@ -10,7 +10,7 @@
 # Open Window on Active Screen (Plasma 6 Fork): https://github.com/MagiusCHE/p6-owac
 #
 # Configuration is done via a JSON file defined by KDE_STARTUP_FLOW environment variable.
-# If the variable is not set, it defaults to ~/.config/dotfiles/private/startup_flow.json.
+# If the variable is not set, it defaults to ~/.config/dotfiles/myconf/startup_flow.json.
 #
 # The JSON file should contain the following structure:
 # {
@@ -70,7 +70,7 @@ function check_exec() {
 check_exec jq
 
 # --- Configuration File ---
-local config_file=${KDE_STARTUP_FLOW:-"$HOME/.config/dotfiles/private/startup_flow.json"}
+local config_file=${KDE_STARTUP_FLOW:-"$HOME/.config/dotfiles/myconf/startup_flow.json"}
 
 if [[ ! -f "$config_file" ]]; then
   print -r -- "Configuration file not found: $config_file"

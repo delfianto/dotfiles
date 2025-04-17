@@ -1,4 +1,5 @@
 # ignored directories
+myconf/
 private/
 .zinit/
 .zsh_sessions/

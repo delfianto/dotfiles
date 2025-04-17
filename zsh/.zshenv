@@ -11,6 +11,8 @@ export XDG_CONFIG_DIRS="${XDG_CONFIG_DIRS:-/etc/xdg}"
 export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}"
 
 # --- Set zsh dotfile location ---
+export DOTDIR="${DOTDIR:-${XDG_CONFIG_HOME}/dotfiles}"
+export MYCONF="${MYCONF:-${XDG_CONFIG_HOME}/dotfiles/myconf}"
 export ZDOTDIR=${ZDOTDIR:-"${XDG_CONFIG_HOME}/dotfiles/zsh"}
 
 # --- Don't keep duplicates and ignore specific sets of command from history ---
