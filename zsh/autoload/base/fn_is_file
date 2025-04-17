@@ -17,7 +17,7 @@ fn_is_file() {
 
   local file="$1"
 
-  if [[ -f "$file" ]] && [[ -r "$file" ]]; then
+  if [[ -f "$file" && -r "$file" ]]; then
     (( ! quiet )) && stdout "File: $(realpath $1)"
     return 0
   fi
