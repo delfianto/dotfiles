@@ -1,6 +1,6 @@
 #!/bin/zsh
 # File 01_common; Shell initialization script for all platforms
-ZSH_DEBUG_INIT=1
+
 # --- Create kebab-case aliases for cmd_snake_case functions ---
 do_alias() {
   alias "$1=$2"
