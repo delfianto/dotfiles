@@ -26,7 +26,7 @@ for func_name in ${(k)functions}; do
 
     # Allow shadowing if kebab_name is listed in the shadow_cmd file
     if (( ${shadowed_cmds[(I)$kebab_name]} )); then
-      stdout "Shadowing command: $kebab_name"
+      (( ZSH_DEBUG_INIT )) && stdout "Shadowing command: $kebab_name"
       do_alias "$kebab_name" "$func_name"
       continue
     fi
