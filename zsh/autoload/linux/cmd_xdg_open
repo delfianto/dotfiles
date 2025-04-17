@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+if fn_check_command handlr; then
+  handlr open "$@"
+else
+  xdg-open "$@"
+fi
