@@ -1,6 +1,9 @@
 #!/bin/zsh
+# File: is_file;
+# Checks if the given path is a readable regular file.
+# Usage: if is_file "/path/to/check"; then ...
 
-fn_is_file() {
+is_file() {
   local quiet=0
   while [[ "$1" == -* ]]; do
     case "$1" in

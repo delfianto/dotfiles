@@ -10,7 +10,7 @@ cmd_jstatd() {
     return 1
   fi
 
-  if ! fn_check_command "$exec"; then
+  if ! has_cmd "$exec"; then
     return 1
   fi
 

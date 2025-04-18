@@ -1,0 +1,8 @@
+#!/bin/zsh
+# File: is_linux;
+# Checks if current operating system is linux.
+# Usage: if is_linux; then ...
+
+is_linux() {
+  [[ "$OSTYPE" == "linux*" ]]
+}

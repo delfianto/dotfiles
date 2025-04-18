@@ -28,7 +28,7 @@ autoload_init "common"
 autoload_init "devtools"
 
 # OS-specific functions
-os_name=$(fn_os_name)
+os_name=$(os_name)
 autoload_init "${os_name}"
 unset -f autoload_init
 
@@ -121,13 +121,13 @@ bindkey '^H' backward-kill-word                                 # delete previou
 bindkey '^[[Z' undo                                             # Shift+tab undo last action
 
 # --- Plugins sections: Enable fish style features ---
-fn_import \
+import \
   /usr/share/zsh/plugins \
   zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # --- Load the rest of zshrc files ---
-fn_import \
+import \
   "${ZDOTDIR}/files" \
   "01_common" \
   "02_${os_name}" \
@@ -136,7 +136,7 @@ fn_import \
 unset os_name
 
 # --- Load starship ---
-if fn_check_command -q starship; then
+if has_cmd -q starship; then
   eval "$(starship init zsh)"
 fi
 

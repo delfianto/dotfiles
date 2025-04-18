@@ -1,0 +1,8 @@
+#!/bin/zsh
+# File: is_link;
+# Checks if the given path is a symbolic link.
+# Usage: if is_file "/path/to/check"; then ...
+
+is_link() {
+  [[ -L "$1" ]]
+}

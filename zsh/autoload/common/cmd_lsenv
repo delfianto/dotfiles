@@ -23,8 +23,8 @@ cmd_lsenv() {
     fi
   }
 
-  if [[ $# -gt 0 ]]; then
-    while [[ $# -gt 0 ]]; do
+  if has_args; then
+    while has_args; do
       get_env "$1"
       shift
     done

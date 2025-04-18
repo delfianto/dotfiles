@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-fn_exit_code() {
+exit_code() {
   if (( $? == 0 )); then
     stdout '🍄'
   else

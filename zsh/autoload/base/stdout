@@ -1,6 +1,8 @@
 #!/bin/zsh
+# File: stderr;
+# Safely print arguments to standard output stream (wraps print -r --)
+# Usage: stdout [args...]
 
-# Function to safely print arguments literally (wraps print -r --)
 stdout() {
   print -r -- "$@"
 }

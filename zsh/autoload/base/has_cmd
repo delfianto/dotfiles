@@ -1,6 +1,9 @@
 #!/bin/zsh
+# File: has_cmd;
+# Checks if the given argument exist in PATH.
+# Usage: if has_cmd; then ...
 
-fn_check_command() {
+has_cmd() {
   local quiet=0
   while [[ "$1" == -* ]]; do
     case "$1" in

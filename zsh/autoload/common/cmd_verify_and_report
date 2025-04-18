@@ -43,7 +43,7 @@ cmd_verify_and_report() {
       tool_args="-tf"
       ;;
     'rar')
-      if fn_check_command -q rar; then
+      if has_cmd -q rar; then
         # Alternative verification command for RAR files
         tool_name="unrar"
       fi
@@ -51,7 +51,7 @@ cmd_verify_and_report() {
       tool_args="t"
       ;;
     '7z')
-      if fn_check_command -q 7z; then
+      if has_cmd -q 7z; then
         # Alternative verification command for 7z files
         tool_name="7za"
       fi
@@ -77,7 +77,7 @@ cmd_verify_and_report() {
   esac
 
   # --- Check for verification command ---
-  if ! fn_check_command -q "$tool_name"; then
+  if ! has_cmd -q "$tool_name"; then
     exit_code=2
     status_message="COMMAND_NOT_FOUND"
   else

@@ -5,7 +5,7 @@ cmd_beer() {
 
   case "$1" in
     'setup')
-      if check_command brew; then
+      if has_cmd brew; then
         echo 'Homebrew is already installed'
         return 1
       fi

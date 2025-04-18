@@ -12,7 +12,7 @@ local shadowed_cmds=()
 local shadow_cmd="${ZSH_SHADOW_CMD:-$MYCONF/shadow_cmd}"
 
 # Check for the command shadow rule
-if fn_is_file -q "$shadow_cmd"; then
+if is_file -q "$shadow_cmd"; then
   local shadow_rules="$(< "$shadow_cmd")"
   shadowed_cmds+=( ${(f)shadow_rules} )
 fi
@@ -36,7 +36,7 @@ for func_name in ${(k)functions}; do
     # already exists with the kebab-case name.
     if [[ -n "$kebab_name" ]] &&
        [[ "$kebab_name" != "$func_name" ]] &&
-       ! fn_check_command -q "$kebab_name"; then
+       ! has_cmd -q "$kebab_name"; then
       do_alias "$kebab_name" "$func_name"
     fi
   fi
@@ -48,24 +48,24 @@ unset func_name kebab_name \
   shadowed_cmds
 
 # --- Command replacements ---
-if fn_check_command -q bat; then
+if has_cmd -q bat; then
   alias cat="bat"
 fi
 
-if fn_check_command -q duf; then
+if has_cmd -q duf; then
   alias df="duf"
 else
   alias df="df -h"
 fi
 
-if fn_check_command -q gdu; then
+if has_cmd -q gdu; then
   alias du="gdu"
 else
   alias du="du -h"
   alias ds="du -hs"
 fi
 
-if fn_check_command -q eza; then
+if has_cmd -q eza; then
   alias ls="eza $LS_ARGS"
   alias ll="eza $LS_ARGS -l"
   alias la="eza $LS_ARGS -a"
@@ -77,7 +77,7 @@ else
   alias lla="ls $LS_ARGS -al"
 fi
 
-if fn_check_command -q nvim; then
+if has_cmd -q nvim; then
   alias vi="nvim"
   alias vim="nvim"
 fi

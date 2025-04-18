@@ -1,6 +1,8 @@
 #!/bin/zsh
+# File: stderr;
+# Safely print arguments to standard error stream (wraps print -r --)
+# Usage: stderr [args...]
 
-# Function to safely print arguments literally (wraps print -r --)
 stderr() {
   print -u2 -- "$@"
 }

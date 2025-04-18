@@ -4,12 +4,12 @@ cmd_pulse_eq() {
   local preset_dir="${XDG_CONFIG_HOME:-$HOME/.config}/easyeffects/output"
 
   # --- Sanity checks ---
-  if ! fn_check_command easyeffects; then
+  if ! has_cmd easyeffects; then
     return 1
   fi
 
   # Check if the preset directory exists
-  if [[ ! -d "$preset_dir" ]]; then
+  if ! is_dir "$preset_dir"; then
     stderr "Error: EasyEffects preset directory not found at '$preset_dir'"
     return 1
   fi

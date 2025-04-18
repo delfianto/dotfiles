@@ -1,0 +1,8 @@
+#!/bin/zsh
+# File: is_empty;
+# Checks if the given argument is empty.
+# Usage: if is_empty; then ...
+
+is_empty() {
+  [[ -z "$1" ]]
+}

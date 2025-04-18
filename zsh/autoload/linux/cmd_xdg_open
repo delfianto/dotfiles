@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-if fn_check_command handlr; then
+if has_cmd handlr; then
   handlr open "$@"
 else
   xdg-open "$@"

@@ -2,13 +2,13 @@
 # File 03_devtools; initialize path and environment variable for development tools
 
 # --- Google Cloud SDK ---
-if fn_check_command -q gcloud; then
-  export GCLOUD_SDK_DIR="$(fn_sdk_prefix lib/google-cloud-sdk)"
+if has_args -q gcloud; then
+  export GCLOUD_SDK_DIR="$(sdk_prefix lib/google-cloud-sdk)"
 
   if [[ -r "$GCLOUD_SDK_DIR" ]]; then
     shell_name=$(basename "$SHELL")
-    fn_import "$GCLOUD_SDK_DIR/path.$shell_name.inc"
-    fn_import "$GCLOUD_SDK_DIR/completion.$shell_name.inc"
+    import "$GCLOUD_SDK_DIR/path.$shell_name.inc"
+    import "$GCLOUD_SDK_DIR/completion.$shell_name.inc"
 
     alias gcs="gcloud"
     alias gcb="gcs beta"
@@ -19,20 +19,20 @@ if fn_check_command -q gcloud; then
 fi
 
 # --- Node.js ---
-if fn_check_command -q node; then
-  export NODEJS_DIR="$(fn_sdk_prefix lib/nodejs)"
+if has_args -q node; then
+  export NODEJS_DIR="$(sdk_prefix lib/nodejs)"
 
   if [[ -r "$NODEJS_DIR" ]]; then
     alias nls='npm ls --depth=0'
-    export NPM_CONFIG_PREFIX="$(fn_sdk_prefix)"
+    export NPM_CONFIG_PREFIX="$(sdk_prefix)"
   else
     unset NODEJS_DIR
   fi
 fi
 
 # --- Python ---
-if fn_check_command -q python3; then
-  export PYTHONUSERBASE="$(fn_sdk_prefix)"
+if has_args -q python3; then
+  export PYTHONUSERBASE="$(sdk_prefix)"
 
   alias py='python3'
   alias pyinst='pip3 install'
@@ -52,11 +52,11 @@ if fn_check_command -q python3; then
 fi
 
 # --- Ruby ---
-if fn_check_command -q ruby; then
+if has_args -q ruby; then
   ruby_version="$(ruby -e 'puts RUBY_VERSION')"
   gem_dir="ruby/gems/${ruby_version%?}0"
 
-  export GEM_HOME="$(fn_sdk_prefix lib/$gem_dir)"
+  export GEM_HOME="$(sdk_prefix lib/$gem_dir)"
   export GEM_SPEC_CACHE="$GEM_HOME/specifications"
   export GEM_PATH="$GEM_HOME:/usr/lib/$gem_dir"
 
@@ -64,12 +64,12 @@ if fn_check_command -q ruby; then
     eval "mkdir -p $GEM_HOME/{specifications,bin}" &> /dev/null
   fi
 
-  fn_path_munge "$GEM_HOME/bin"
+  path_munge "$GEM_HOME/bin"
   unset ruby_version gem_dir
 fi
 
 # --- SDK Manager ---
-export SDKMAN_DIR="$(fn_sdk_prefix sdkman)"
+export SDKMAN_DIR="$(sdk_prefix sdkman)"
 export SDKMAN_INIT="$SDKMAN_DIR/bin/sdkman-init.sh"
 
 if [[ -r "$SDKMAN_INIT" ]]; then
@@ -77,10 +77,10 @@ if [[ -r "$SDKMAN_INIT" ]]; then
   export GRADLE_USER_HOME="$HOME/.gradle"
 
   eval "mkdir -p $SDKMAN_DIR/ext" &> /dev/null
-  fn_import "$SDKMAN_INIT"
+  import "$SDKMAN_INIT"
 else
   unset SDKMAN_DIR SDKMAN_INIT
 fi
 
 # Ensure ~/.local/bin is added to PATH
-fn_path_munge "$HOME/.local/bin"
+path_munge "$HOME/.local/bin"

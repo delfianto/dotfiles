@@ -17,27 +17,27 @@ if [[ -d "$HOMEBREW_PREFIX" ]] && [[ -r "$HOMEBREW_PREFIX" ]]; then
       local gnu_lib="$HOMEBREW_PREFIX/opt/$gnu/libexec"
 
       if [[ -r "$gnu_lib" ]]; then
-        fn_path_munge "$gnu_lib/gnubin"
+        path_munge "$gnu_lib/gnubin"
       fi
     done
   fi
 
   # Homebrew local/sbin
-  fn_path_munge "$HOMEBREW_PREFIX/sbin"
+  path_munge "$HOMEBREW_PREFIX/sbin"
 
   # Ruby
-  fn_path_munge "$HOMEBREW_PREFIX/opt/ruby/bin"
+  path_munge "$HOMEBREW_PREFIX/opt/ruby/bin"
 
   # Python
-  fn_path_munge "$HOMEBREW_PREFIX/opt/python/libexec/bin"
+  path_munge "$HOMEBREW_PREFIX/opt/python/libexec/bin"
 
   # Cask options
-  fn_zsh_import "$ZDOTDIR/private/homebrew.zsh"
+  import "$ZDOTDIR/private/homebrew.zsh"
   export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 fi
 
 # --- ls enhancement ---
-if fn_has_command gls; then
+if has_cmd gls; then
   alias ls="gls $LS_ARGS"
   alias ll="gls $LS_ARGS -l"
   alias la="gls $LS_ARGS -a"

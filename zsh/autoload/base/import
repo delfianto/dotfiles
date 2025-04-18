@@ -1,6 +1,9 @@
 #!/bin/zsh
+# File: import;
+# Check whether the given arguments is a valid file and source it if so.
+# Usage: import dir arg1 arg2 ...
 
-fn_import() {
+import() {
   local base_dir="$1" # Base directory, can be "" for current dir, or "$ZDOTDIR/files"
   shift               # Remove the first argument from the positional parameters
 

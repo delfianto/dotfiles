@@ -26,7 +26,7 @@ cmd_os_release() {
       done
       json="${json%,}}"
 
-      if fn_check_command -q jq; then
+      if has_cmd -q jq; then
         stdout "${json}" | jq .
       else
         stdout "${json}"

@@ -1,6 +1,8 @@
 #!/bin/zsh
+# File: ls_type
+# Detects the type of `ls` command available on the system.
 
-fn_ls_type() {
+ls_type() {
   if $(ls --color -d "$HOME" >/dev/null 2>&1); then
     stdout "gnu"
   elif $(ls -G -d "$HOME" >/dev/null 2>&1); then

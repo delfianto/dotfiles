@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 cmd_fpath() {
-  if fn_check_command -q realpath; then
+  if has_cmd -q realpath; then
     realpath -m "$@"
     return $?
   fi

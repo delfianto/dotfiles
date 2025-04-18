@@ -13,9 +13,9 @@ cmd_tkg_conf() {
       local user_cfg="$cwd/user-settings.cfg"
       local real_cfg="$XDG_CONFIG_HOME/dotfiles/frogminer/$(basename $cwd).cfg"
 
-      if fn_is_link "$user_cfg"; then
+      if is_link "$user_cfg"; then
         "$VISUAL" "$user_cfg"
-      elif fn_is_file "$real_cfg"; then
+      elif is_file "$real_cfg"; then
         "$VISUAL" "$real_cfg"
       fi
       ;;
@@ -27,11 +27,11 @@ cmd_tkg_conf() {
       local real_cfg="$real_dir/$(basename $cwd).cfg"
       local user_cfg="$cwd/user-settings.cfg"
 
-      if fn_is_file "$real_cfg"; then
-        if [[ -d "$conf_dir" && ! -L "$conf_dir" ]]; then
+      if is_file "$real_cfg"; then
+        if is_real_dir "$conf_dir"; then
           stderr "Error: '$conf_dir' already exists. Please remove it first."
           return 1
-        elif [[ ! -L "$conf_dir" ]]; then
+        elif ! is_link "$conf_dir"; then
           stdout "Creating symlink: $real_dir -> $conf_dir"
           ln -s "$real_dir" "$conf_dir"
         fi

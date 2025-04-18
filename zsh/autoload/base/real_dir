@@ -1,0 +1,8 @@
+#!/bin/zsh
+# File: real_dir;
+# Checks if the given path is a readable regular directory and not symbolic link.
+# Usage: if real_dir "/path/to/check"; then ...
+
+real_dir() {
+  [[ -d "$1" && -r "$1" && ! -L "$1" ]]
+}

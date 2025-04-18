@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-fn_sdk_prefix() {
+sdk_prefix() {
   local prefix=$(cmd_fpath "$SDK_HOME/$1")
 
   if [[ -z "$prefix" ]]; then

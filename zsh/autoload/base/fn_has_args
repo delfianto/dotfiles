@@ -1,5 +1,0 @@
-#!/bin/zsh
-
-fn_has_args() {
-  [[ $# -gt 0 ]]
-}
