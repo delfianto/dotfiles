@@ -1,8 +1,0 @@
-#!/bin/zsh
-# File: readable;
-# Checks if the given path can be read.
-# Usage: if readable "/path/to/check"; then ...
-
-readable() {
-  [[ -r "$1" ]]
-}

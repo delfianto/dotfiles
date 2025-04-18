@@ -1,8 +1,0 @@
-#!/bin/zsh
-# File: has_arg;
-# Checks if the calling script or function received exactly one argument.
-# Usage: if has_arg; then ...
-
-has_arg() {
-  [[ $# -eq 1 ]]
-}

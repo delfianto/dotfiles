@@ -16,7 +16,7 @@ cmd_jstatd() {
 
   local policy="${XDG_CONFIG_HOME:-$HOME/.config}/jstatd.all.policy"
 
-  is_file "$policy" || {
+  [[ -f "$policy" ]] || {
     cat >"$policy" <<'POLICY'
 grant codebase "file:${java.home}/lib/tools.jar" {
 permission java.security.AllPermission;

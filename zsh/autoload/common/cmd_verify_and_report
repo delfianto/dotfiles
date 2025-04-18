@@ -18,7 +18,7 @@ cmd_verify_and_report() {
   fi
 
   local archive_file="$1"
-  if ! is_file "$archive_file"; then
+  if [[ ! -f "$archive_file" ]]; then
     stderr "Error: File '$archive_file' does not exist."
     return 1
   fi

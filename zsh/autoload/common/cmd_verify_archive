@@ -4,7 +4,7 @@ cmd_verify_archive() {
   local num_threads=1
 
   # --- Parse command-line options ---
-  while has_args; do
+  while [[ $# -gt 0 ]]; do
     case "$1" in
       -p|--parallel)
         if [[ -n "$2" && "$2" -ge 1 ]]; then
@@ -21,7 +21,7 @@ cmd_verify_archive() {
     esac
   done
 
-  if has_noarg; then
+  if [[ $# -eq 0 ]]; then
     stderr "Usage: ${0##*/} [-p|--parallel <num_threads>] <filename1> [filename2 ...]"
     return 1
   fi

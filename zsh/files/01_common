@@ -12,7 +12,7 @@ local shadowed_cmds=()
 local shadow_cmd="${ZSH_SHADOW_CMD:-$MYCONF/shadow_cmd}"
 
 # Check for the command shadow rule
-if is_file -q "$shadow_cmd"; then
+if [[ -r "$shadow_cmd" ]]; then
   local shadow_rules="$(< "$shadow_cmd")"
   shadowed_cmds+=( ${(f)shadow_rules} )
 fi

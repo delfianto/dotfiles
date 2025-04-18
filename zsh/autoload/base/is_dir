@@ -1,8 +1,0 @@
-#!/bin/zsh
-# File: has_args;
-# Checks if the given path is a readable directory.
-# Usage: if is_dir "/path/to/check"; then ...
-
-is_dir() {
-  [[ -d "$1" && -r "$1 ]]
-}

@@ -37,7 +37,7 @@ function cmd_amd_epp {
       ;;
     '-i' | '--info')
       for filepath in "${epp_paths[@]}"; do
-        if readable "$filepath"; then
+        if [[ -r "$filepath" ]]; then
           # 1. ${filepath#*/cpu/cpu} removes the shortest prefix ending in */cpu/cpu
           #    (e.g., "0/cpufreq/energy_performance_preference")
           # 2. ${ ... %%/*} removes the longest suffix starting with /* from the result of step 1

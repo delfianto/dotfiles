@@ -16,9 +16,13 @@ import() {
     fi
 
    (( ZSH_DEBUG_INIT )) && stdout "Attempting to load $file..."
-    if [[ -f "$file" ]]; then
+
+   if [[ -f "$file" && -r "$file" ]]; then
       (( ZSH_DEBUG_INIT )) && stdout "Loading $file"
       source "$file"
+    else
+      (( ZSH_DEBUG_INIT )) && stderr "Error: Could not read $file"
+      return 1
     fi
   done
 }

@@ -1,8 +1,0 @@
-#!/bin/zsh
-# File: has_noarg;
-# Checks if the calling script or function does not receive any arguments.
-# Usage: if has_noarg; then ...
-
-has_noarg() {
-  [[ $# -eq 0 ]]
-}

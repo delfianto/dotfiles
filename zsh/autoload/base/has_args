@@ -1,8 +1,0 @@
-#!/bin/zsh
-# File: has_args;
-# Checks if the calling script or function received any arguments.
-# Usage: if has_args; then ...
-
-has_args() {
-  [[ $# -gt 0 ]]
-}

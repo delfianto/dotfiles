@@ -9,7 +9,7 @@ cmd_pulse_eq() {
   fi
 
   # Check if the preset directory exists
-  if ! is_dir "$preset_dir"; then
+  if [[ ! -d "$preset_dir" ]]; then
     stderr "Error: EasyEffects preset directory not found at '$preset_dir'"
     return 1
   fi

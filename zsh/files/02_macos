@@ -4,7 +4,7 @@
 # --- Initialize homebrew stuff ---
 export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
 
-if [[ -d "$HOMEBREW_PREFIX" ]] && [[ -r "$HOMEBREW_PREFIX" ]]; then
+if [[ -d "$HOMEBREW_PREFIX" && -r "$HOMEBREW_PREFIX" ]]; then
   export LC_ALL="en_US.UTF-8"
   export HOMEBREW_GNU_UTILS="${HOMEBREW_GNU_UTILS:-1}"
 

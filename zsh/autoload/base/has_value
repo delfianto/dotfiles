@@ -1,8 +1,0 @@
-#!/bin/zsh
-# File: has_value;
-# Checks if the given argument is not empty.
-# Usage: if has_value; then ...
-
-has_value() {
-  [[ -n "$1" ]]
-}

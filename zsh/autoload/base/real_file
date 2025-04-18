@@ -1,8 +1,0 @@
-#!/bin/zsh
-# File: real_file;
-# Checks if the given path is a readable regular file and not symbolic link.
-# Usage: if real_file "/path/to/check"; then ...
-
-real_file() {
-  [[ -f "$1" && -r "$1" && ! -L "$1" ]]
-}

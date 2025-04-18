@@ -2,10 +2,10 @@
 # File 03_devtools; initialize path and environment variable for development tools
 
 # --- Google Cloud SDK ---
-if has_args -q gcloud; then
+if has_cmd -q gcloud; then
   export GCLOUD_SDK_DIR="$(sdk_prefix lib/google-cloud-sdk)"
 
-  if [[ -r "$GCLOUD_SDK_DIR" ]]; then
+  if [[ -d "$GCLOUD_SDK_DIR" && -r "$GCLOUD_SDK_DIR" ]]; then
     shell_name=$(basename "$SHELL")
     import "$GCLOUD_SDK_DIR/path.$shell_name.inc"
     import "$GCLOUD_SDK_DIR/completion.$shell_name.inc"
@@ -19,10 +19,10 @@ if has_args -q gcloud; then
 fi
 
 # --- Node.js ---
-if has_args -q node; then
+if has_cmd -q node; then
   export NODEJS_DIR="$(sdk_prefix lib/nodejs)"
 
-  if [[ -r "$NODEJS_DIR" ]]; then
+  if [[ -d "$NODEJS_DIR" && -r "$NODEJS_DIR" ]]; then
     alias nls='npm ls --depth=0'
     export NPM_CONFIG_PREFIX="$(sdk_prefix)"
   else
@@ -31,7 +31,7 @@ if has_args -q node; then
 fi
 
 # --- Python ---
-if has_args -q python3; then
+if has_cmd -q python3; then
   export PYTHONUSERBASE="$(sdk_prefix)"
 
   alias py='python3'
@@ -52,7 +52,7 @@ if has_args -q python3; then
 fi
 
 # --- Ruby ---
-if has_args -q ruby; then
+if has_cmd -q ruby; then
   ruby_version="$(ruby -e 'puts RUBY_VERSION')"
   gem_dir="ruby/gems/${ruby_version%?}0"
 
@@ -72,7 +72,7 @@ fi
 export SDKMAN_DIR="$(sdk_prefix sdkman)"
 export SDKMAN_INIT="$SDKMAN_DIR/bin/sdkman-init.sh"
 
-if [[ -r "$SDKMAN_INIT" ]]; then
+if [[ -e "$SDKMAN_INIT" ]]; then
   export GROOVY_TURN_OFF_JAVA_WARNINGS="true"
   export GRADLE_USER_HOME="$HOME/.gradle"
 

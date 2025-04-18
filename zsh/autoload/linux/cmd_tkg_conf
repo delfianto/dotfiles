@@ -27,11 +27,11 @@ cmd_tkg_conf() {
       local real_cfg="$real_dir/$(basename $cwd).cfg"
       local user_cfg="$cwd/user-settings.cfg"
 
-      if is_file "$real_cfg"; then
-        if real_dir "$conf_dir"; then
+      if [[ -f "$real_cfg" && -r "$real_cfg" && ! -L "$real_cfg" ]]; then
+        if [[ -d "$conf_dir" && -r "$conf_dir" && ! -L "$conf_dir" ]]; then
           stderr "Error: '$conf_dir' already exists. Please remove it first."
           return 1
-        elif ! is_link "$conf_dir"; then
+        elif [[ ! -L "$conf_dir" ]] "$conf_dir"; then
           stdout "Creating symlink: $real_dir -> $conf_dir"
           ln -s "$real_dir" "$conf_dir"
         fi
