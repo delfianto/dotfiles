@@ -14,7 +14,7 @@ cmd_lsenv() {
 
     if (( ${+env_vars[$key]} )); then
       local val="${env_vars[$key]}"
-      if [[ -z "${val// /}" ]]; then
+      if is_empty "${val// /}"; then
         val="[EMPTY]"
       fi
       stdout "$key: $val"

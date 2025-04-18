@@ -28,7 +28,7 @@ cmd_tkg_conf() {
       local user_cfg="$cwd/user-settings.cfg"
 
       if is_file "$real_cfg"; then
-        if is_real_dir "$conf_dir"; then
+        if real_dir "$conf_dir"; then
           stderr "Error: '$conf_dir' already exists. Please remove it first."
           return 1
         elif ! is_link "$conf_dir"; then
