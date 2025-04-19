@@ -135,6 +135,11 @@ import \
 
 unset os_name
 
+# --- Load FZF ---
+if has_cmd -q fzf; then
+  source <(fzf --zsh)
+fi
+
 # --- Load starship ---
 if has_cmd -q starship; then
   eval "$(starship init zsh)"

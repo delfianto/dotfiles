@@ -8,7 +8,6 @@ alias hwmon="watch -n1 sensors"
 # --- Device info alias ---
 alias usbdev="lsusb -tv"
 alias pcidev="lspci -tv"
-alias pcinfo="lspci -nnv"
 
 # --- System management ---
 alias dmesg="sudo dmesg -H"
