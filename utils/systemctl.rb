@@ -28,13 +28,13 @@ COMMAND_MAP = {
   'dis' => ['disable', true, true], 'disable' => ['disable', true, true],
   'mask' => ['mask', true, true],
   'unmask' => ['unmask', true, true],
-  'is-en' => ['is-enabled', false, false], 'is-enabled' => ['is-enabled', false, false],
-  'is-act' => ['is-active', false, false], 'is-active' => ['is-active', false, false],
-  'is-fail' => ['is-failed', false, false], 'is-failed' => ['is-failed', false, false],
-  'ls' => ['list-units', false, false], 'list' => ['list-units', false, false],
-  'lsf' => ['list-unit-files', false, false], 'list-files' => ['list-unit-files', false, false],
-  'lst' => ['list-timers', false, false, '--all'], 'list-timers' => ['list-timers', false, false, '--all'], # Note extra arg
-  'cat' => ['cat', false, false],
+  'is-en' => ['is-enabled', false, false],
+  'is-act' => ['is-active', false, false],
+  'is-fail' => ['is-failed', false, false],
+  'ls' => ['list-units', false, false], 'units' => ['list-units', false, false],
+  'lsf' => ['list-unit-files', false, false], 'files' => ['list-unit-files', false, false],
+  'lst' => ['list-timers', false, false, '--all'], 'timers' => ['list-timers', false, false, '--all'],
+  'cat' => ['cat', false, false, '--no-pager'],
   'edit' => ['edit', true, false],
   'daemon' => ['daemon-reload', true, false], # Special case: no unit args allowed
   'reboot' => ['reboot', true, false],
@@ -89,13 +89,14 @@ class Systemctl
       return handle_daemon_command(units_and_options)
     end
 
-    # Map the keyword to a systemctl command or handle unknown commands
+    # Map the keyword to a systemctl command
     mapped = COMMAND_MAP[command_keyword]
+
     if mapped
       systemctl_cmd, needs_sudo_default, check_status_after, *extra_args = mapped
     else
-      # Pass unknown commands directly
-      warn "Info: Passing unknown command '#{command_keyword}' directly to systemctl without sudo."
+      # Passthrough unmapped commands
+      warn "==> Passing argument '#{command_keyword}' directly."
       systemctl_cmd = command_keyword
       needs_sudo_default = false
       check_status_after = false
@@ -150,11 +151,11 @@ class Systemctl
       unless enabled_ok && active_ok && failed_ok
         warn "Error checking status for #{unit} (enabled: #{status_en.exitstatus}, active: #{status_act.exitstatus}, failed: #{status_fail.exitstatus})"
         overall_rc = 1
-        next # Skip printing for this unit if any check had a real error
+        next # Skip to next unit on error
       end
 
-      is_enabled = status_en.success? # 0 = enabled
-      is_active = status_act.success? # 0 = active
+      is_enabled = status_en.success?  # 0 = enabled
+      is_active = status_act.success?  # 0 = active
       is_failed = status_fail.success? # 0 = failed
 
       printf "%s%-15s%s enabled: %s%5s%s; active: %s%5s%s; failed: %s%5s%s\n",
@@ -163,6 +164,7 @@ class Systemctl
              is_active ? ACTIVE_COLOR : INACTIVE_COLOR, is_active.to_s, RESET_COLOR,
              is_failed ? FAILED_COLOR : NOT_FAILED_COLOR, is_failed.to_s, RESET_COLOR
     end
+
     overall_rc
   end
 
@@ -187,7 +189,7 @@ class Systemctl
     if use_sudo
       unless sudo_available?
         warn "Warning: sudo command not found, cannot elevate privileges for '#{command_array.join(' ')}'."
-        return 255 # Indicate failure due to missing sudo
+        return 255
       end
       sudo_prefix = ['sudo']
     end
@@ -197,22 +199,20 @@ class Systemctl
 
     # Use system with splat operator (*) for security and correct handling
     system(*full_cmd_array)
-    $?.exitstatus # Return the exit status
+    $?.exitstatus
   end
 
   # Runs a status check after certain successful commands
   def run_status_check(exit_code, check_needed, units_and_options)
-      return unless check_needed && exit_code == 0 && !units_and_options.empty?
+    return unless check_needed && exit_code == 0 && !units_and_options.empty?
 
-      # Filter out options (args starting with '-') to get only unit names
-      units_for_status = units_and_options.reject { |arg| arg.start_with?('-') }
-      return if units_for_status.empty?
+    # Filter out options (args starting with '-') to get only unit names
+    units_for_status = units_and_options.reject { |arg| arg.start_with?('-') }
+    return if units_for_status.empty?
 
-      puts "--> Checking status after command..."
-      status_command = @cmd_base + ['status'] + units_for_status
-      # Status check usually doesn't need sudo, even for system units
-      execute_command(status_command, false)
-      # We don't return the status check's exit code, only the main command's
+    # Status check usually doesn't need sudo, even for system units
+    status_command = @cmd_base + ['status', '--no-pager'] + units_for_status
+    execute_command(status_command, false)
   end
 
   # Checks if the 'sudo' command is available
@@ -222,7 +222,6 @@ class Systemctl
 
   # Prints the usage instructions
   def print_usage
-    # (Usage string content is identical to your original script)
     # Using a heredoc for readability
     puts <<~EOF
     Usage: sc [user|-u] <command> [unit...] [systemctl_options...]
