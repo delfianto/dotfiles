@@ -1,5 +1,5 @@
 [include]
-  path = ~/.config/dotfiles/myconf/gitconfig
+  path = ~/.config/dotfiles/myconf/user.gitconfig
 
 [core]
   autocrlf = input
