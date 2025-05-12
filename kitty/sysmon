@@ -1,0 +1,13 @@
+# Tab 1
+new_tab System Monitor
+layout grid
+
+launch --location=vsplit btop
+launch --location=vsplit nvtop
+
+# Tab 2
+new_tab System Logs
+layout grid
+
+launch --location=vsplit sudo dmesg -w
+launch --location=vsplit journalctl -f -n 1000
