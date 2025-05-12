@@ -1,11 +1,5 @@
-#    ___           __
-#   / _ \___  ____/ /__
-#  / // / _ \/ __/  '_/
-# /____/\___/\__/_/\_\
-#
-
-
 config="$HOME/.config/gtk-3.0/settings.ini"
+
 if [ ! -f $HOME/.config/ml4w/settings/dock-disabled ]; then
     killall nwg-dock-hyprland
     sleep 0.5

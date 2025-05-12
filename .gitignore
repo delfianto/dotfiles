@@ -1,4 +1,5 @@
 # ignored directories
+ml4w/cache/
 myconf/
 private/
 .zinit/

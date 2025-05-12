@@ -2,8 +2,7 @@
 Customized ZSH shell script and dotfiles for Linux and macOS development box
 
 ## Credits
-The dotfiles for Hyprland environment are based on the ML4W Dotfiles, which can be found at [https://github.com/mylinuxforwork/dotfiles]. Credits go to [@mylinuxforwork](Stephan Raabe)
-for the original work.
+The dotfiles for Hyprland environment are based on the [ML4W Dotfiles](https://github.com/mylinuxforwork/dotfiles). Credits goes to [Stephan Raabe](https://github.com/mylinuxforwork) for the original work.
 
 ## Installation
 ```

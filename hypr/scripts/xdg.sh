@@ -1,10 +1,4 @@
-#!/bin/bash
-# __  ______   ____
-# \ \/ /  _ \ / ___|
-#  \  /| | | | |  _
-#  /  \| |_| | |_| |
-# /_/\_\____/ \____|
-#
+#!/bin/zsh
 
 # Setup Timers
 _sleep1="0.1"
@@ -33,16 +27,6 @@ systemctl --user stop xdg-desktop-portal-kde
 systemctl --user stop xdg-desktop-portal-wlr
 systemctl --user stop xdg-desktop-portal-hyprland
 sleep $_sleep1
-
-# Start xdg-desktop-portal-hyprland
-# /usr/lib/xdg-desktop-portal-hyprland &
-# sleep $_sleep1
-
-# Start xdg-desktop-portal-gtk
-# if [ -f /usr/lib/xdg-desktop-portal-gtk ]; then
-#    /usr/lib/xdg-desktop-portal-gtk &
-#    sleep $_sleep1
-#fi
 
 # Start xdg-desktop-portal
 /usr/lib/xdg-desktop-portal &
