@@ -1,0 +1,223 @@
+#!/bin/zsh
+# Autoloaded Zsh function wrapper for systemctl with automatic sudo
+
+_sc_usage() {
+  # Provides help text
+  cat << EOF
+Usage: sc [user|-u] <command> [unit...] [systemctl_options...]
+
+Wrapper for the systemctl command. Automatically uses 'sudo' for commands
+that typically require root privileges when operating on system units (not user units).
+
+Commands require sudo automatically (for system units):
+  on|start, off|stop, re|restart, rl|reload, tr|try-restart,
+  en|enable, dis|disable, mask, unmask, daemon, edit,
+  reboot, poweroff, suspend, hibernate
+
+Commands run without sudo automatically:
+  st|status, is, is-en, is-act, is-fail, ls|list, lsf|list-files,
+  lst|list-timers, cat, help
+
+Use 'sudo sc ...' explicitly for other commands needing elevation.
+
+Commands:
+  st|status       Show unit status (systemctl status)
+  on|start        Start unit(s) (systemctl start)
+  off|stop        Stop unit(s) (systemctl stop)
+  re|restart      Restart unit(s) (systemctl restart)
+  rl|reload       Reload unit(s) configuration (systemctl reload)
+  tr|try-restart  Try to restart unit(s) (systemctl try-restart)
+  en|enable       Enable unit(s) to start on boot (systemctl enable)
+                  Use 'en --now <unit>' to enable and start immediately.
+  dis|disable     Disable unit(s) (systemctl disable)
+  mask            Mask unit(s), making them impossible to start (systemctl mask)
+  unmask          Unmask unit(s) (systemctl unmask)
+
+  is              Check enabled, active, and failed states for unit(s)
+  is-en           Check if unit(s) are enabled (systemctl is-enabled)
+  is-act          Check if unit(s) are active (systemctl is-active)
+  is-fail         Check if unit(s) failed (systemctl is-failed)
+
+  ls|list         List loaded units (systemctl list-units)
+  lsf|list-files  List installed unit files (systemctl list-unit-files)
+  lst|list-timers List systemd timers (systemctl list-timers --all)
+
+  cat             Show unit file contents (systemctl cat)
+  edit            Edit unit file (systemctl edit)
+  daemon          Reload systemd manager configuration (systemctl daemon-reload)
+
+  reboot          Reboot the system (systemctl reboot)
+  poweroff        Shutdown the system (systemctl poweroff)
+  suspend         Suspend the system (systemctl suspend)
+  hibernate       Hibernate the system (systemctl hibernate)
+
+  [user|-u]       Operate on the user's service manager (systemctl --user ...)
+  help|-h|--help  Show this help message
+
+Examples:
+  sc status nginx.service            # No sudo needed
+  sc start nginx.service             # Runs: sudo systemctl start nginx.service
+  sc user start my-app.service       # Runs: systemctl --user start my-app.service (NO sudo)
+  sc enable --now bluetooth          # Runs: sudo systemctl enable --now bluetooth
+  sc is bluetooth cups               # No sudo needed
+  sudo sc set-property foo CPUQuota=10% # Explicit sudo for unhandled command
+
+Any other command or unrecognized first argument is passed directly to systemctl *without* automatic sudo.
+EOF
+}
+
+cmd_sc() {
+  local cmd_base="systemctl"
+  local run_cmd # Stores the final systemctl subcommand
+  local command_keyword # Stores the user's keyword (e.g. 'st', 'on', 'is')
+  local user_flag=0
+  local sudo_prefix="" # Will be set to "sudo " if needed
+  local needs_sudo=0   # Flag to indicate if sudo should be applied
+  local check_status=0 # Flag to check for unit status after command execution
+
+  # Check if the first argument requests user mode
+  if [[ "$1" == "user" || "$1" == "-u" ]]; then
+    cmd_base="systemctl --user"
+    user_flag=1
+    shift # Remove 'user' or '-u' from arguments
+  fi
+
+  # If no arguments remain after checking for 'user', handle appropriately
+  if [[ $# -eq 0 ]]; then
+    if (( user_flag )); then
+      $cmd_base list-units --type=service # No sudo for user commands
+    else
+      _sc_usage # Show help if just 'sc' is called
+    fi
+    return 0
+  fi
+
+  # Store the command keyword before the case potentially shifts it
+  command_keyword="$1"
+
+  # --- Map the args and set sudo flag ---
+  case "$command_keyword" in
+    st|status)       run_cmd="status"; needs_sudo=0; shift ;;
+    on|start)        run_cmd="start"; needs_sudo=1; check_status=1; shift ;;
+    off|stop)        run_cmd="stop"; needs_sudo=1; check_status=1; shift ;;
+    re|restart)      run_cmd="restart"; needs_sudo=1; check_status=1; shift ;;
+    rl|reload)       run_cmd="reload"; needs_sudo=1; check_status=1; shift ;;
+    tr|try-restart)  run_cmd="try-restart"; needs_sudo=1; check_status=1; shift ;;
+    en|enable)       run_cmd="enable"; needs_sudo=1; check_status=1; shift ;;
+    dis|disable)     run_cmd="disable"; needs_sudo=1; check_status=1; shift ;;
+    mask)            run_cmd="mask"; needs_sudo=1; check_status=1; shift ;;
+    unmask)          run_cmd="unmask"; needs_sudo=1; check_status=1; shift ;;
+    is-en)           run_cmd="is-enabled"; needs_sudo=0; shift ;;
+    is-act)          run_cmd="is-active"; needs_sudo=0; shift ;;
+    is-fail)         run_cmd="is-failed"; needs_sudo=0; shift ;;
+    ls|list)         run_cmd="list-units"; needs_sudo=0; shift ;;
+    lsf|list-files)  run_cmd="list-unit-files"; needs_sudo=0; shift ;;
+    lst|list-timers) run_cmd="list-timers --all"; needs_sudo=0; shift ;;
+    cat)             run_cmd="cat"; needs_sudo=0; shift ;;
+    edit)            run_cmd="edit"; needs_sudo=1; shift ;;
+    daemon)
+      if [[ $# -eq 1 ]]; then
+        run_cmd="daemon-reload"; needs_sudo=1; shift
+      else
+        echo "Error: 'daemon' command takes no unit arguments." >&2; _sc_usage; return 1
+      fi ;;
+    reboot|poweroff|suspend|hibernate)
+      run_cmd="$command_keyword"; needs_sudo=1; shift ;;
+
+    # 'is' command implementation
+    # (handles its own execution, no sudo)
+    is)
+      shift # Remove 'is' keyword
+      if [[ $# -eq 0 ]]; then
+        echo "Usage: sc [user|-u] is <unit...>" >&2; _sc_usage; return 1
+      fi
+
+      # Variable to store the result, also add some pretty colors to the output
+      local unit enabled_status active_status failed_status is_enabled is_active is_failed overall_rc=0
+      local enabled_color="\033[0;32m" disabled_color="\033[0;31m" active_color="\033[0;32m" \
+            inactive_color="\033[0;31m" failed_color="\033[0;31m" not_failed_color="\033[0;32m" \
+            reset_color="\033[0m" unit_name_color="\033[1;34m" # Bold Blue for unit name
+
+      for unit in "$@"; do
+        $cmd_base is-enabled "$unit" &>/dev/null; enabled_status=$?
+        if [[ $enabled_status -gt 1 ]]; then echo "Error checking enabled status for $unit" >&2; overall_rc=1; continue; fi
+        [[ $enabled_status -eq 0 ]] && is_enabled="true" || is_enabled="false"
+
+        $cmd_base is-active "$unit" &>/dev/null; active_status=$?
+        if [[ $active_status -gt 3 ]]; then echo "Error checking active status for $unit" >&2; overall_rc=1; continue; fi
+        [[ $active_status -eq 0 ]] && is_active="true" || is_active="false"
+
+        $cmd_base is-failed "$unit" &>/dev/null; failed_status=$?
+        if [[ $failed_status -gt 1 ]]; then echo "Error checking failed status for $unit" >&2; overall_rc=1; continue; fi
+        [[ $failed_status -eq 0 ]] && is_failed="true" || is_failed="false"
+
+        printf "%b%-10s%b enabled: %b%5s%b; active: %b%5s%b; failed: %b%5s%b\n" \
+            "$unit_name_color" "$unit" "$reset_color" \
+            $([[ "$is_enabled" == "true" ]] && echo -n "$enabled_color" || echo -n "$disabled_color") "$is_enabled" "$reset_color" \
+            $([[ "$is_active" == "true" ]] && echo -n "$active_color" || echo -n "$inactive_color") "$is_active" "$reset_color" \
+            $([[ "$is_failed" == "true" ]] && echo -n "$failed_color" || echo -n "$not_failed_color") "$is_failed" "$reset_color"
+      done
+
+      return $overall_rc
+      ;; # End of 'is' command
+
+    help|-h|--help)
+      _sc_usage; return 0 ;;
+
+    *)
+      # Default: Pass command directly. DO NOT automatically add sudo.
+      run_cmd="$command_keyword"; needs_sudo=0; shift ;;
+  esac
+
+  # --- Handle sudo elevation ---
+  # Apply sudo only if needs_sudo is true AND we are NOT in user mode
+  if (( needs_sudo && ! user_flag )); then
+    if (( ${+commands[sudo]} )); then
+      sudo_prefix="sudo "
+    else
+      echo "Warning: sudo command not found, cannot elevate privileges for '$run_cmd'." >&2
+      return 255
+    fi
+  fi
+
+  # --- Execute the command ---
+  # The 'is' and 'help' cases should have already returned.
+  if [[ -n "$run_cmd" ]]; then
+    # Store the arguments intended for the main command/status check
+    local main_cmd_args=("$@")
+
+    # Show command being run
+    echo "==> Executing: $sudo_prefix$cmd_base $run_cmd ${main_cmd_args[*]}"
+
+    # Execute using the constructed command string
+    eval "$sudo_prefix$cmd_base $run_cmd \"\${main_cmd_args[@]}\""
+    local exit_code=$? # Capture the exit code
+
+    # Check status ONLY if flagged, command succeeded, and we have arguments
+    if (( check_status && exit_code == 0 && ${#main_cmd_args[@]} > 0 )); then
+      # Filter out options (args starting with '-') to get only unit names for status
+      local unit_names_for_status=()
+      local arg
+
+      for arg in "${main_cmd_args[@]}"; do
+        # Keep arguments that do not start with a hyphen
+        [[ "$arg" != -* ]] && unit_names_for_status+=("$arg")
+      done
+
+      # Only run status if we actually found potential unit names after filtering
+      if (( ${#unit_names_for_status[@]} > 0 )); then
+        # echo "\-- Checking status for: ${unit_names_for_status[*] --}" # Info message
+        # Run status using the appropriate base (system/user) but NO sudo
+        # Status usually doesn't need sudo, and this avoids a second password prompt
+        # Errors from status are less critical than the main command's success/failure
+        $cmd_base status "${unit_names_for_status[@]}"
+      fi
+    fi
+
+    return $exit_code
+  else
+    # This path should ideally not be reached if logic is correct
+    echo "Internal error: command execution path reached unexpectedly." >&2
+    return 1
+  fi
+}
