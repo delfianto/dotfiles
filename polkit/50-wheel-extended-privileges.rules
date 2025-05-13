@@ -10,8 +10,9 @@ polkit.addRule(function(action, subject) {
             "org.freedesktop.packagekit.system-update",    // Update all currently installed packages
 
             // Service management
-            "org.freedesktop.systemd1.manage-units",       // systemctl start, stop, enable, disable, restart, etc.
-            "org.freedesktop.systemd1.reload-daemon",      // systemctl daemon-reload
+            // implies org.freedesktop.systemd1.manage-units and org.freedesktop.systemd1.reload-daemon
+            // This includes actions like: start, stop, enable, disable, restart, daemon-reload.
+            "org.freedesktop.systemd1.manage-unit-files",
         ];
 
         // If the current action is in our list, allow it
