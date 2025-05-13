@@ -56,5 +56,5 @@ if (( $#commands[(i)lesspipe(|.sh)] )); then
 fi
 
 export LS_ARGS="${LS_ARGS:---color=auto --group-directories-first --time-style=long-iso -h}"
-export SDK_HOME="${SDK_HOME:-/usr/local}"
+export SDK_HOME="${SDK_HOME:-$HOME/.local}"
 export ZSH_DEBUG_INIT="${ZSH_DEBUG_INIT:-0}"

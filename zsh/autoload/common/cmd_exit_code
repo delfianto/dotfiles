@@ -1,9 +1,0 @@
-#!/bin/zsh
-
-exit_code() {
-  if (( $? == 0 )); then
-    stdout '🍄'
-  else
-    stdout '💀'
-  fi
-}

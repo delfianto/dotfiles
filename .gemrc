@@ -1,1 +1,12 @@
-gem: --no-document
+# https://guides.rubygems.org/command-reference/#gem-environment
+---
+backtrace: true
+benchmark: false
+bulk_threshold: 1000
+gem: --no-ri --no-rdoc
+install: --no-wrappers
+update: --no-wrappers
+update_sources: true
+sources:
+  - http://rubygems.org/
+verbose: true

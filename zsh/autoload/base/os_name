@@ -1,4 +1,6 @@
 #!/bin/zsh
+# File : os_name; Show name of operating system family.
+# Usage: os_name
 
 os_name() {
   case "$OSTYPE" in

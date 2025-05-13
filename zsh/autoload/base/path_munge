@@ -1,6 +1,5 @@
 #!/bin/zsh
-# File: path_munge
-# Validate and add a directory to the PATH variable.
+# File : path_munge; Validate and add a directory to the PATH variable.
 # Usage: path_munge [directory] [before|after]
 
 path_munge() {

@@ -1,6 +1,5 @@
 #!/bin/zsh
-# File: stderr;
-# Safely print arguments to standard error stream (wraps print -r --)
+# File : stderr; Safely print arguments to standard error stream (wraps print -r --)
 # Usage: stderr [args...]
 
 stderr() {

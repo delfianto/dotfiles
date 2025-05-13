@@ -1,7 +1,6 @@
 #!/bin/zsh
-# File: import;
-# Check whether the given arguments is a valid file and source it if so.
-# Usage: import dir arg1 arg2 ...
+# File : import; Check whether the given arguments is a valid file and source it if so.
+# Usage: import [dir] [args...].
 
 import() {
   local base_dir="$1" # Base directory, can be "" for current dir, or "$ZDOTDIR/files"

@@ -1,7 +1,6 @@
 #!/bin/zsh
-# File: has_cmd;
-# Checks if the given argument exist in PATH.
-# Usage: if has_cmd; then ...
+# File : has_cmd; Checks if the given argument exist in PATH.
+# Usage: if has_cmd [cmd_name]; then ... fi
 
 has_cmd() {
   local quiet=0

@@ -2,19 +2,5 @@
 # sc ~ zsh autoloader wrapper for systemctl.rb utility
 
 cmd_sc() {
-  if ! has_cmd -q ruby; then
-    stderr "Ruby is not installed. Please install Ruby to use this command."
-    return 1
-  fi
-
-  local script="$DOTDIR/utils/systemctl.rb"
-
-  if [[ -x $script ]]; then
-    "$script" "$@"
-  elif [[ -f $script ]]; then
-    ruby "$script" "$@"
-  else
-    stderr "Systemctl script not found: $script"
-    return 1
-  fi
+  exec_rb systemctl.rb "$@"
 }

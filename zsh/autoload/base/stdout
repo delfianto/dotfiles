@@ -1,6 +1,5 @@
 #!/bin/zsh
-# File: stderr;
-# Safely print arguments to standard output stream (wraps print -r --)
+# File : stderr; Safely print arguments to standard output stream (wraps print -r --)
 # Usage: stdout [args...]
 
 stdout() {
