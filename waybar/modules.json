@@ -21,7 +21,7 @@
   "hyprland/workspaces#dp3": {
     "output": "DP-3",
     "format": "{id}: {name}",
-    "persistent-workspaces": { "DP-3": 8 }
+    "persistent-workspaces": { "DP-3": 5 }
   },
   "wlr/taskbar": {
     "format": "{icon}",
