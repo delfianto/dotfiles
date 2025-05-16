@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
 # lib_checker.rb: Check and load Ruby gems based on parameters.
 
