@@ -5,10 +5,13 @@ private/
 .zinit/
 .zsh_sessions/
 
+# lock files
+*.lock
+
 # zsh dynamic files
-.histfile
-.zcompdump
-.zsh_history
+*.histfile
+*.zcompdump
+*.zsh_history
 
 # systemd target directory
 systemd/user/*.wants/
