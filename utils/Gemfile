@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gem "slop"
+
+group :development, :test do
+  gem "rubocop", require: false
+  gem "solargraph", require: false
+end
