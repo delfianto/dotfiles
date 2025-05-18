@@ -1,9 +1,8 @@
 # ignored directories
-ml4w/cache/
-myconf/
-private/
 .zinit/
 .zsh_sessions/
+myconf/
+ml4w/cache/
 
 # lock files
 *.lock
@@ -14,4 +13,4 @@ private/
 *.zsh_history
 
 # systemd target directory
-systemd/user/*.wants/
+**/systemd/user/*.wants
