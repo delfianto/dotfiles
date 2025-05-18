@@ -5,9 +5,10 @@
 
 # Load required libraries
 require_relative "lib_checker"
-LibChecker.load([
-  "slop",
-  "shellwords"
+LibChecker.load(%w[
+  open3
+  slop
+  shellwords
 ].freeze)
 
 class CLIRunner
