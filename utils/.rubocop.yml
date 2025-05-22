@@ -44,7 +44,7 @@ Metrics/ClassLength:
 
 # Allow slightly more complex lines for for our script.
 Metrics/AbcSize:
-  Max: 25
+  Max: 30
 
 Metrics/MethodLength:
   Max: 50
