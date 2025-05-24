@@ -1,0 +1,4 @@
+mod_info:
+  home:
+    - :.gemrc
+    - :.gitconfig
