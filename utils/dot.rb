@@ -195,41 +195,52 @@ class DotLinker
   end
 
   def symlink(dest, link)
-    force_flag = check_for_dir(dest, link)
+    ops_flag = check_ops_flag(dest, link)
+
+    if ops_flag[:backup]
+      backup(dest, link)
+    elsif !ops_flag[:force]
+      @log.info "#{@mod_log} Removing link at #{short_log(link)}"
+      FileUtils.rm(link, noop: @dry_run)
+    end
 
     # In FileUtils link method, the first argument (src) is the link name
     # and the second (dest) is the target. This is the opposite of the ln command.
     @log.info "#{@mod_log} Creating link { #{short_log(dest)} -> #{short_log(link)} }"
-    FileUtils.ln_s(dest, link, force: force_flag, noop: @dry_run)
+    FileUtils.ln_s(dest, link, force: ops_flag[:force], noop: @dry_run)
+  rescue Errno::ENOENT => e
+    LoggerConfig.log_exception(@log, "#{@mod_log} Error on file operations!", e)
+    false
+  rescue StandardError => e
+    LoggerConfig.log_exception(@log, "#{@mod_log} Unexpected error!", e)
+    false
   end
 
-  def check_for_dir(dest, link)
-    # If nothing exists, we can create it.
-    unless File.exist?(link)
-      @log.info "#{@mod_log} Existing link not found, proceeding"
-      return false
-    end
+  # Define operation flags based on the type of destination and link path
+  def check_ops_flag(dest, link)
+    # When the force flag is false it means that we must remove the symlink manually
+    # as FileUtils does not have the capability to override existing symlink (ln -sfn).
+    # This is the case when the existing symlink points to a directory
+    ops = { force: false, backup: false }
 
-    # If there's an existing link and the target is a file,
-    # we can proceed with using force flag (ln -sf).
-    if File.symlink?(link) && File.file?(dest)
-      @log.info "#{@mod_log} Existing link found with a file as target, using force flag"
-      return true
-    end
-
-    # Otherwise we must do the following steps as FileUtils does not
-    # have the capability to override existing symlink (ln -sfn)
-    # for a directory.
-
-    # Remove existing symlink if it exists.
     if File.symlink?(link)
-      @log.info "#{@mod_log} Existing link found with a directory as target"
-      @log.info "#{@mod_log} Removing link at #{short_log(link)}"
-      FileUtils.rm(link, noop: @dry_run)
-      return false
+      if File.directory?(dest)
+        @log.info "#{@mod_log} Existing link found with a directory as target"
+      elsif File.file?(dest)
+        @log.info "#{@mod_log} Existing link found with a file as target, using force flag"
+        ops[:force] = true
+      elsif !File.exist?(link)
+        @log.info "#{@mod_log} Found an existing broken link: #{link}"
+        ops[:force] = true
+      end
+    else
+      ops[:backup] = true
     end
 
-    # If the link is an real file or directory, we need to backup it.
+    ops
+  end
+
+  def backup(dest, link)
     bak_root = File.join(File.dirname(link), "_dot_backup")
     FileUtils.mkdir_p(bak_root, noop: @dry_run)
 
@@ -238,14 +249,6 @@ class DotLinker
 
     @log.info "#{@mod_log} Creating backup: #{short_log(bak_path)}"
     FileUtils.move(link, bak_path, noop: @dry_run)
-
-    false
-  rescue Errno::ENOENT => e
-    LoggerConfig.log_exception(@log, "#{@mod_log} Error on file operations!", e)
-    false
-  rescue StandardError => e
-    LoggerConfig.log_exception(@log, "#{@mod_log} Unexpected error!", e)
-    false
   end
 
   # Class DotLinker

@@ -1,0 +1,6 @@
+mod_info:
+  config_home:
+    - :fastfetch
+    - :kitty
+    - :nvim
+    - :vim
