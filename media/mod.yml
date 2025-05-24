@@ -1,0 +1,6 @@
+mod_info:
+  .config:
+    - :mpv
+    - :vlc
+  .config:easyeffects:
+    - output:easyeffects

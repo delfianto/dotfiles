@@ -61,6 +61,13 @@ module LoggerConfig
     # )
     # Logging.logger.root.add_appenders(Logging.appenders['file_configured'])
   end
+
+  # Helper function to log an exception with its message and stacktrace.
+  def self.log_exception(log, msg, exc, level: :error)
+    log.send(level, msg)
+    log.send(level, exc.message)
+    exc.backtrace.each { |line| log.send(level, "  #{line}") }
+  end
 end
 
 # This line ensures that simply requiring this file will set up the logging.
