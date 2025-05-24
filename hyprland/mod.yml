@@ -1,0 +1,19 @@
+mod_info:
+  config_home:
+    - :dunst
+    - :gtk-3.0
+    - :gtk-4.0
+    - :hypr
+    - :matugen
+    - :ml4w
+    - :qt6ct
+    - :rofi
+    - :swaync
+    - :wal
+    - :waybar
+    - :waypaper
+    - :wlogout
+    - :xdg-desktop-portal
+    - :xsettingsd
+  home:
+    - :.Xresources
