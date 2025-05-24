@@ -1,7 +1,7 @@
 #!/bin/zsh
 # File 03_devtools; initialize path and environment variable for development tools
 
-# --- Google Cloud SDK ---
+# Google Cloud SDK
 if has_cmd -q gcloud; then
   export GCLOUD_SDK_DIR="$(sdk_prefix lib/google-cloud-sdk)"
 
@@ -18,7 +18,7 @@ if has_cmd -q gcloud; then
   fi
 fi
 
-# --- Node.js ---
+# Node.js
 if has_cmd -q node; then
   export NODEJS_DIR="$(sdk_prefix lib/nodejs)"
 
@@ -30,7 +30,7 @@ if has_cmd -q node; then
   fi
 fi
 
-# --- Python ---
+# Python
 if has_cmd -q python3; then
   export PYTHONUSERBASE="$(sdk_prefix)"
 
@@ -51,7 +51,7 @@ if has_cmd -q python3; then
   }
 fi
 
-# --- Ruby ---
+# Ruby
 if has_cmd -q ruby; then
   ruby_version="$(ruby -e 'puts RUBY_VERSION')"
   gem_dir="ruby/gems/${ruby_version%?}0"
@@ -68,7 +68,7 @@ if has_cmd -q ruby; then
   unset ruby_version gem_dir
 fi
 
-# --- SDK Manager ---
+# SDK Manager
 export SDKMAN_DIR="$(sdk_prefix sdkman)"
 export SDKMAN_INIT="$SDKMAN_DIR/bin/sdkman-init.sh"
 

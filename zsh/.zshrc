@@ -128,7 +128,7 @@ import \
 
 # --- Load the rest of zshrc files ---
 import \
-  "${ZDOTDIR}/files" \
+  "${ZDOTDIR}/bootstrap" \
   "01_common" \
   "02_${os_name}" \
   "03_devtools"

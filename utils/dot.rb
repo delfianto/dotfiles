@@ -9,6 +9,15 @@ LibChecker.load(%w[
   yaml
 ].freeze)
 
+BASE_DIR_MAPPINGS = {
+  home: Dir.home,
+  cache_home: File.join(Dir.home, ".cache"),
+  config_home: File.join(Dir.home, ".config"),
+  data_home: File.join(Dir.home, ".local", "share"),
+  local_bin: File.join(Dir.home, ".local", "bin"),
+  local_dir: File.join(Dir.home, ".local")
+}.freeze
+
 class DotLinker
   MOD_LOGS = "MOD:"
   MOD_FILE = "mod.yml"
@@ -19,6 +28,11 @@ class DotLinker
     @log = Logging.logger[self]
     @dry_run = false
     @mod_log = ""
+
+    if @dry_run
+      @log.warn("--- DRY RUN ---")
+      @log.warn("--- No actual linking will be performed ---")
+    end
 
     @log.info "Dotfiles path: #{short_log(@dotfiles_dir)}"
   end
@@ -82,16 +96,14 @@ class DotLinker
     end
 
     result_hash = paths_to_process.each_with_object({}) do |(dest_key, items), hash|
-      link_part = dest_key.to_s.delete("[]").split(":")
-
       items.each do |item|
         @log.debug "#{@mod_log} --- ENTRY ---"
-        entry = map_module_item(item)
-        link = link_path(link_part, entry)
-        dest = dest_path(link_part, mod_name, entry)
+        path = map_entry_paths(item)
+        link = build_link_path(dest_key, mod_name, path[:link])
+        dest = build_dest_path(mod_name, path[:dest])
 
         unless File.exist?(dest)
-          @log.warn "#{@mod_log} #{link_part} Target does not exist: #{short_log(dest)}"
+          @log.warn "#{@mod_log} Target does not exist: #{short_log(dest)}"
           next
         end
 
@@ -102,24 +114,38 @@ class DotLinker
     result_hash.freeze
   end
 
-  def link_path(link_part, entry)
-    link_base = File.join(Dir.home, *link_part)
-    link = File.join(link_base, entry[:link])
-    @log.debug "#{@mod_log} #{link_part} Link: #{short_log(link)}"
+  def build_link_path(dest_key, mod_name, path)
+    paths = dest_key.gsub("$", mod_name).split(":")
+    first_path = paths.first
 
+    base_path = BASE_DIR_MAPPINGS.fetch(
+      first_path.to_sym,
+      File.join(Dir.home, first_path)
+    )
+
+    components = [base_path, *paths[1..], path]
+    link = File.join(*components.compact)\
+
+    @log.debug "#{@mod_log} Base: #{short_log(base_path)}"
+    @log.debug "#{@mod_log} Link: #{short_log(link)}"
     link
   end
 
-  def dest_path(link_part, mod_name, entry)
-    dest = File.join(@dotfiles_dir, mod_name, entry[:dest])
-    @log.debug "#{@mod_log} #{link_part} Target: #{short_log(dest)}"
+  def build_dest_path(mod_name, path)
+    components = [@dotfiles_dir, mod_name, path]
+    dest = File.join(*components.compact)
 
+    @log.debug "#{@mod_log} Dest: #{short_log(dest)}"
     dest
   end
 
   # Maps the source and destination paths from the item.
-  def map_module_item(item)
-    link_part = item.to_s.split(":")
+  # :link is the symbolic link name
+  # :dest is the actual real object destination
+  # command line equivalents: `ln -s :dest :link`
+  def map_entry_paths(item)
+    paths = item.to_s.gsub("*", "").split(":")
+    return { link: nil, dest: nil } if paths.empty?
 
     # Raise an error if the item format is invalid
     # This assumes the item should have at least one segment
@@ -131,17 +157,17 @@ class DotLinker
     # - "source:" is valid
     # - "source" is valid
     # - "source:target:extra" is invalid
-    raise ArgumentError, "Invalid item format: #{item}" unless link_part.size < 3
+    raise ArgumentError, "Invalid item format: #{item}" unless paths.size < 3
 
-    if link_part.size == 1
+    if paths.size == 1
       {
-        link: link_part[0],
-        dest: link_part[0]
+        link: paths[0],
+        dest: paths[0]
       }
     else
       {
-        link: link_part[0],
-        dest: link_part[1]
+        link: paths[0],
+        dest: paths[1]
       }
     end
   end
@@ -169,7 +195,6 @@ class DotLinker
   end
 
   def symlink(dest, link)
-    @dry_run && @log.info("#{@mod_log} DRY RUN: Would create any symlink")
     force_flag = check_for_dir(dest, link)
 
     # In FileUtils link method, the first argument (src) is the link name

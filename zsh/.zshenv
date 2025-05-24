@@ -12,8 +12,8 @@ export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}"
 
 # --- Set zsh dotfile location ---
 export DOTDIR="${DOTDIR:-${XDG_CONFIG_HOME}/dotfiles}"
-export MYCONF="${MYCONF:-${XDG_CONFIG_HOME}/dotfiles/myconf}"
-export ZDOTDIR=${ZDOTDIR:-"${XDG_CONFIG_HOME}/dotfiles/zsh"}
+export MYCONF="${MYCONF:-${XDG_CONFIG_HOME}/myconf}"
+export ZDOTDIR=${ZDOTDIR:-"${XDG_CONFIG_HOME}/zsh"}
 
 # --- Don't keep duplicates and ignore specific sets of command from history ---
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
