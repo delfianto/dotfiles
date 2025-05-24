@@ -26,8 +26,11 @@ class DotLinker
   def initialize
     @dotfiles_dir = File.expand_path("..", __dir__)
     @log = Logging.logger[self]
-    @dry_run = false
     @mod_log = ""
+
+    @relative = false
+    @dry_run = true
+    @verbose = true
 
     if @dry_run
       @log.warn("--- DRY RUN ---")
@@ -57,8 +60,9 @@ class DotLinker
       @log.info "#{@mod_log} Module path: #{mod_dir_log}"
 
       maps = map_module_path(mod_name)
-      maps.each do |dest, link|
-        symlink(dest, link)
+      maps.each do |dest_path, link_path|
+        @log.info "#{@mod_log} --- ENTRY ---"
+        symlink(dest_path, link_path)
       end
     end
   end
@@ -95,27 +99,27 @@ class DotLinker
       return {}.freeze
     end
 
-    result_hash = paths_to_process.each_with_object({}) do |(dest_key, items), hash|
+    result_hash = paths_to_process.each_with_object({}) do |(target_key, items), hash|
       items.each do |item|
         @log.debug "#{@mod_log} --- ENTRY ---"
         path = map_entry_paths(item)
-        link = build_link_path(dest_key, mod_name, path[:link])
-        dest = build_dest_path(mod_name, path[:dest])
+        link_path = build_link_path(target_key, mod_name, path[:link_path])
+        dest_path = build_dest_path(mod_name, path[:dest_path])
 
-        unless File.exist?(dest)
-          @log.warn "#{@mod_log} Target does not exist: #{short_log(dest)}"
+        unless File.exist?(dest_path)
+          @log.warn "#{@mod_log} Target does not exist: #{short_log(dest_path)}"
           next
         end
 
-        hash[dest.to_s] = link.to_s
+        hash[dest_path.to_s] = link_path.to_s
       end
     end
 
     result_hash.freeze
   end
 
-  def build_link_path(dest_key, mod_name, path)
-    paths = dest_key.gsub("$", mod_name).split(":")
+  def build_link_path(target_key, mod_name, path)
+    paths = target_key.gsub("$", mod_name).split(":")
     first_path = paths.first
 
     base_path = BASE_DIR_MAPPINGS.fetch(
@@ -124,28 +128,28 @@ class DotLinker
     )
 
     components = [base_path, *paths[1..], path]
-    link = File.join(*components.compact)\
+    link_path = File.join(*components.compact)
 
     @log.debug "#{@mod_log} Base: #{short_log(base_path)}"
-    @log.debug "#{@mod_log} Link: #{short_log(link)}"
-    link
+    @log.debug "#{@mod_log} Link: #{short_log(link_path)}"
+    link_path
   end
 
   def build_dest_path(mod_name, path)
     components = [@dotfiles_dir, mod_name, path]
-    dest = File.join(*components.compact)
+    dest_path = File.join(*components.compact)
 
-    @log.debug "#{@mod_log} Dest: #{short_log(dest)}"
-    dest
+    @log.debug "#{@mod_log} Dest: #{short_log(dest_path)}"
+    dest_path
   end
 
   # Maps the source and destination paths from the item.
-  # :link is the symbolic link name
-  # :dest is the actual real object destination
-  # command line equivalents: `ln -s :dest :link`
+  # :link_path is the symbolic link_path name
+  # :dest_path is the actual real object destination
+  # command line equivalents: `ln -s :dest_path :link_path`
   def map_entry_paths(item)
     paths = item.to_s.gsub("*", "").split(":")
-    return { link: nil, dest: nil } if paths.empty?
+    return { link_path: nil, dest_path: nil } if paths.empty?
 
     # Raise an error if the item format is invalid
     # This assumes the item should have at least one segment
@@ -161,13 +165,13 @@ class DotLinker
 
     if paths.size == 1
       {
-        link: paths[0],
-        dest: paths[0]
+        link_path: paths[0],
+        dest_path: paths[0]
       }
     else
       {
-        link: paths[0],
-        dest: paths[1]
+        link_path: paths[0],
+        dest_path: paths[1]
       }
     end
   end
@@ -194,20 +198,18 @@ class DotLinker
     {}
   end
 
-  def symlink(dest, link)
-    ops_flag = check_ops_flag(dest, link)
+  def symlink(dest_path, link_path)
+    ops_flag = check_ops_flag(dest_path, link_path)
 
     if ops_flag[:backup]
-      backup(dest, link)
-    elsif !ops_flag[:force]
-      @log.info "#{@mod_log} Removing link at #{short_log(link)}"
-      FileUtils.rm(link, noop: @dry_run)
+      backup(dest_path, link_path)
+    elsif ops_flag[:remove_first]
+      @log.info "#{@mod_log} Removing existing link: #{short_log(link_path)}"
+      FileUtils.rm(link_path, noop: @dry_run, verbose: @verbose)
     end
 
-    # In FileUtils link method, the first argument (src) is the link name
-    # and the second (dest) is the target. This is the opposite of the ln command.
-    @log.info "#{@mod_log} Creating link { #{short_log(dest)} -> #{short_log(link)} }"
-    FileUtils.ln_s(dest, link, force: ops_flag[:force], noop: @dry_run)
+    @log.info "#{@mod_log} Creating link { #{short_log(dest_path)} -> #{short_log(link_path)} }"
+    FileUtils.ln_s(dest_path, link_path, force: ops_flag[:force], noop: @dry_run, verbose: @verbose)
   rescue Errno::ENOENT => e
     LoggerConfig.log_exception(@log, "#{@mod_log} Error on file operations!", e)
     false
@@ -216,39 +218,58 @@ class DotLinker
     false
   end
 
-  # Define operation flags based on the type of destination and link path
-  def check_ops_flag(dest, link)
-    # When the force flag is false it means that we must remove the symlink manually
+  # Define operation flags based on the type of destination and link_path path
+  def check_ops_flag(dest_path, link_path)
+    # When the remove_first flag is true it means that we must remove the symlink manually
     # as FileUtils does not have the capability to override existing symlink (ln -sfn).
     # This is the case when the existing symlink points to a directory
-    ops = { force: false, backup: false }
+    ops = { backup: false, force: false, remove_first: false }
 
-    if File.symlink?(link)
-      if File.directory?(dest)
-        @log.info "#{@mod_log} Existing link found with a directory as target"
-      elsif File.file?(dest)
-        @log.info "#{@mod_log} Existing link found with a file as target, using force flag"
-        ops[:force] = true
-      elsif !File.exist?(link)
-        @log.info "#{@mod_log} Found an existing broken link: #{link}"
-        ops[:force] = true
-      end
-    else
+    if !File.exist?(link_path) && !File.symlink?(link_path)
+      # Case 1: Link path does not exist at all
+      # All ops remain false, just proceed to link.
+      @log.info "#{@mod_log} No existing item at #{short_log(link_path)}"
+    elsif File.symlink?(link_path)
+      # Case 2: Link path is an existing symlink
+      check_symlink(dest_path, link_path, ops)
+    elsif File.exist?(link_path)
+      # Case 3: Link path is an existing file or directory (but not a symlink)
+      @log.info "#{@mod_log} Existing file/directory found at #{short_log(link_path)}"
       ops[:backup] = true
     end
 
     ops
   end
 
-  def backup(dest, link)
-    bak_root = File.join(File.dirname(link), "_dot_backup")
-    FileUtils.mkdir_p(bak_root, noop: @dry_run)
+  def check_symlink(dest_path, link_path, ops)
+    if !File.exist?(link_path)
+      # Case 2a: Broken symlink
+      @log.info "#{@mod_log} Found broken link: #{short_log(link_path)}"
+      ops[:force] = true # Force will overwrite the broken symlink
+    elsif File.directory?(File.readlink(link_path)) && File.directory?(dest_path)
+      # Case 2b: Existing symlink points to a directory, and new target is also a directory.
+      # This aims for 'ln -sfn' behavior: remove old symlink, then create new one.
+      @log.info "#{@mod_log} Found existing link: #{short_log(link_path)}"
+      @log.info "#{@mod_log} Target is a directory, preparing to re-link"
+      ops[:remove_first] = true
+    else
+      # Case 2c: Symlink exists, is not broken, and not the dir-to-dir case above.
+      # This includes symlink-to-file, symlink-to-non_dir_target etc.
+      @log.info "#{@mod_log} Found existing link: #{short_log(link_path)}"
+      @log.info "#{@mod_log} Link will be overwritten by force!"
+      ops[:force] = true
+    end
+  end
 
-    bak_name = "#{File.basename(dest)}_backup_#{Time.now.strftime('%F_%T')}"
+  def backup(dest_path, link_path)
+    bak_root = File.join(File.dirname(link_path), "_dot_backup")
+    FileUtils.mkdir_p(bak_root, noop: @dry_run, verbose: @verbose)
+
+    bak_name = "#{File.basename(dest_path)}_backup_#{Time.now.strftime('%F_%T')}"
     bak_path = File.join(bak_root, bak_name)
 
     @log.info "#{@mod_log} Creating backup: #{short_log(bak_path)}"
-    FileUtils.move(link, bak_path, noop: @dry_run)
+    FileUtils.move(link_path, bak_path, noop: @dry_run, verbose: @verbose)
   end
 
   # Class DotLinker
