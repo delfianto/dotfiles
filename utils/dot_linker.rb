@@ -185,7 +185,7 @@ class DotLinker
     dest_p = paths.size > 1 ? paths[1] : paths[0] # If no colon, dest is same as link
 
     if link_p.nil? || link_p.empty?
-      mlog(:warn, "Invalid item format, link part is empty: #{item}")
+      mlog("Using module dir for link name")
       return { link_path: nil, dest_path: nil }.freeze
     end
 
@@ -230,7 +230,7 @@ class DotLinker
     # REPO_SYMLINK_NAME = "dotfiles"
     # repo_symlink_full_path becomes ~/.config/dotfiles
     dotfiles_link = File.join(base_target_dir, REPO_SYMLINK_NAME)
-    mlog("Checking dotfiles link {{link} -> {target}}",
+    mlog("Checking dotfiles link { {link} -> {target} }",
          { link: dotfiles_link, target: @dotfiles_dir })
 
     if File.symlink?(dotfiles_link)
@@ -254,7 +254,7 @@ class DotLinker
 
     true
   rescue SystemCallError => e
-    mlog("Error managing dotfiles link {{link} -> {target}}!",
+    mlog("Error managing dotfiles link { {link} -> {target} }!",
          { link: dotfiles_link, target: @dotfiles_dir, exception: e })
     raise
   end
@@ -270,7 +270,7 @@ class DotLinker
       FileUtils.rm(link_path, noop: @dry_run, verbose: @verbose)
     end
 
-    mlog("Creating link {{dest} -> {link}}", { dest: dest_path, link: link_path })
+    mlog("Creating link { {dest} -> {link} }", { dest: dest_path, link: link_path })
     FileUtils.ln_s(dest_path, link_path, force: ops_flag[:force], noop: @dry_run, verbose: @verbose)
   rescue Errno::ENOENT => e
     mlog("Error on file operations!", exception: e)
