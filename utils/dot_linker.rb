@@ -94,10 +94,10 @@ class DotLinker
 
     # Proceed with formatting and logging using level, message, and paths
     formatted_message = LogUtils.interpolate_paths(message, paths)
-    prefixed_message = "#{@mod_log} #{formatted_message}"
+    prefixed_message = @mod_log.empty? ? formatted_message : "#{@mod_log} #{formatted_message}"
 
     if exception
-      LogUtils.log_exception(@log, prefixed_message, exception)
+      LogUtils.log_exception(exception, logger: @log)
     else
       @log.send(level, prefixed_message)
     end

@@ -14,7 +14,13 @@ module LogUtils
     log = logger || Logging.logger[self] # 'self' here refers to LogUtils
 
     log.send(level, message)
-    log.send(level, "Exception: #{exc.class}: #{exc.message}")
+    log.send(level, "Exception: #{exc.class}")
+
+    exc.message.split(":", 2).each do |part|
+      entry = part.gsub(/\A\(|\)\z/, "").strip
+      log.send(level, "Exception: #{entry}")
+    end
+
     exc.backtrace&.each { |line| log.send(level, "  #{line}") }
   end
 
