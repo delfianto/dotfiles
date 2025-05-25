@@ -7,8 +7,30 @@ LibChecker.load(%w[
   logging
 ].freeze)
 
-# This module encapsulates all the setup logic for the 'logging' gem.
+# This module encapsulates all the setup logic for the 'logging' gem,
+# including optional redirection of STDOUT and STDERR to the logger.
 module LoggerConfig
+  # IO-like class that sends writes to a Logging logger at a specific level
+  class LoggerIO
+    def initialize(logger, level = :info)
+      @logger = logger
+      @level = level
+    end
+
+    def write(msg)
+      msg.to_s.each_line do |line|
+        @logger.send(@level, line.chomp)
+      end
+    end
+
+    def puts(msg = "")
+      write("#{msg}\n")
+    end
+
+    # Needed for IO compatibility
+    def flush; end
+  end
+
   def self.setup!
     # Define color scheme for the logger
     Logging.color_scheme(
@@ -25,46 +47,41 @@ module LoggerConfig
       message: :white # Default color for the log message content
     )
 
-    # 2. Define the layout pattern.
-    # [%d]  - Timestamp with 3 decimal places for milliseconds.
-    # [%c]  - Logger name (e.g., class name).
-    # [%p]  - Process ID.
-    # [%M]  - Method name (Note: its reliability can vary; explicit logging of method is often safer).
-    # [%5l] - Log level, padded to 5 characters (e.g., "INFO ", "DEBUG").
-    # [%m]  - The log message itself.
+    # Define the layout pattern
+    # https://www.rubydoc.info/gems/logging/Logging/Layouts/Pattern
     layout = Logging.layouts.pattern(
-      pattern: "[%d][%c:%p:%t][%5l] %m\n",
-      color_scheme: "my_color_scheme", # Use the color scheme defined above
+      pattern: "[%d][%10c:%p:%t][%5l] %m\n",
+      color_scheme: "my_color_scheme",
       date_pattern: "%Y-%m-%d %H:%M:%S.%L"
     )
 
-    # Configure the log appender (e.g., writing to STDOUT).
+    # Configure the stdout appender
     stdout_appender = Logging.appenders.stdout(
       "my_stdout_appender",
-      layout: layout # Use the layout defined above
+      layout: layout
     )
 
-    # log.add_appenders(stdout_appender)
-    # log.level = :debug
+    # Assign appender and level to root logger
+    Logging.logger.root.appenders = [stdout_appender]
+    Logging.logger.root.level = :debug
 
-    # Configure the root logger.
-    # All loggers created via Logging.logger[...] will inherit from the root logger
-    # unless specifically configured otherwise.
-    Logging.logger.root.appenders = [stdout_appender] # Assign the appender(s)
-    Logging.logger.root.level = :debug # Set a global default log level (e.g., :info, :debug)
-
-    # You could add more appenders here, e.g., a file appender:
-    # Logging.appenders.file(
-    #   "file_configured,
-    #   filename: "application.log,
-    #   layout: pattern_layout,
-    #   level: :info
-    # )
-    # Logging.logger.root.add_appenders(Logging.appenders['file_configured'])
+    # Redirect STDOUT and STDERR to the logger
+    redirect_std
   end
 
-  # Module LoggerConfig
+  # Redirect STDOUT and STDERR to Logging gem loggers
+  def self.redirect_std
+    # Create named loggers for STDOUT and STDERR
+    stdout_logger = Logging.logger["STDOUT"]
+    stderr_logger = Logging.logger["STDERR"]
+
+    # Replace global STDOUT and STDERR with LoggerIO objects
+    $stdout = LoggerIO.new(stdout_logger, :debug)
+    $stderr = LoggerIO.new(stderr_logger, :error)
+  end
+
+  private_class_method :redirect_std
 end
 
-# This line ensures that simply requiring this file will set up the logging.
+# Setup logging (including redirect of STDOUT/STDERR) on require
 LoggerConfig.setup!

@@ -47,10 +47,8 @@ class DotLinker
     raise ArgumentError, "No modules provided" if longest.nil?
 
     mlog("Requested modules: #{mod_names.join(', ')}")
-    padding = longest.length + MOD_LOGS.length
-
     mod_names.each do |mod_name|
-      @mod_log = "[#{MOD_LOGS}#{mod_name.upcase.ljust(padding)}]"
+      @mod_log = "[#{MOD_LOGS}#{ mod_name.upcase.ljust(longest.length)}]"
       mod_dir = File.join(@dotfiles_dir, mod_name)
 
       unless Dir.exist?(mod_dir)
