@@ -159,16 +159,16 @@ class DotLinker
 
     unless config_data && config_data[MOD_INFO].is_a?(Hash)
       mlog(:fatal, "Invalid config structure, no '#{MOD_INFO}' section found!")
-      return {}
+      return {}.freeze
     end
 
-    config_data
+    config_data.freeze
   rescue Psych::SyntaxError => e
     mlog("Invalid YAML syntax!", exception: e)
-    {}
+    {}.freeze
   rescue StandardError => e
     mlog("Could not load YAML!", exception: e)
-    {}
+    {}.freeze
   end
 
   # Maps the source and destination paths from the item.
@@ -186,10 +186,10 @@ class DotLinker
 
     if link_p.nil? || link_p.empty?
       mlog(:warn, "Invalid item format, link part is empty: #{item}")
-      return { link_path: nil, dest_path: nil }
+      return { link_path: nil, dest_path: nil }.freeze
     end
 
-    { link_path: link_p, dest_path: dest_p }
+    { link_path: link_p, dest_path: dest_p }.freeze
   end
 
   def build_link_path(target_key, mod_name, path)
@@ -300,7 +300,7 @@ class DotLinker
       ops[:backup] = true
     end
 
-    ops
+    ops.freeze
   end
 
   def check_symlink(dest_path, link_path, ops)
