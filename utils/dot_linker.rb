@@ -5,6 +5,7 @@
 require_relative "logger_config"
 LibChecker.load(%w[
   fileutils
+  pathname
   time
   yaml
 ].freeze)
@@ -22,13 +23,14 @@ class DotLinker
   MOD_LOGS = "MOD:"
   MOD_FILE = "mod.yml"
   MOD_INFO = "mod_info"
+  REPO_SYMLINK_NAME = "dotfiles"
 
   def initialize
     @dotfiles_dir = File.expand_path("..", __dir__)
     @log = Logging.logger[self]
     @mod_log = ""
 
-    @relative = false
+    @relative = true
     @dry_run = true
     @verbose = true
 
@@ -62,7 +64,7 @@ class DotLinker
       maps = map_module_path(mod_name)
       maps.each do |dest_path, link_path|
         @log.info "#{@mod_log} --- ENTRY ---"
-        symlink(dest_path, link_path)
+        create_symlink(dest_path, link_path)
       end
     end
   end
@@ -100,6 +102,12 @@ class DotLinker
     end
 
     result_hash = paths_to_process.each_with_object({}) do |(target_key, items), hash|
+      if @relative
+        target_key_sym = target_key.split(":").first.to_sym
+        base_target_dir = BASE_DIR_MAPPINGS[target_key_sym]
+        check_dotfiles_link(base_target_dir)
+      end
+
       items.each do |item|
         @log.debug "#{@mod_log} --- ENTRY ---"
         path = map_entry_paths(item)
@@ -116,6 +124,49 @@ class DotLinker
     end
 
     result_hash.freeze
+  end
+
+  # Parse the mod.yml file to get the source and destination paths.
+  def parse_yaml(mod_name)
+    mod_conf = File.join(@dotfiles_dir, mod_name, MOD_FILE)
+
+    @log.info "#{@mod_log} Module conf: #{short_log(mod_conf)}"
+    @log.info "#{@mod_log} Parsing module file..."
+    config_data = YAML.load_file(mod_conf)
+
+    unless config_data && config_data[MOD_INFO].is_a?(Hash)
+      @log.fatal "#{@mod_log} Invalid config structure, no '#{MOD_INFO}' section found!"
+      return {}
+    end
+
+    config_data
+  rescue Psych::SyntaxError => e
+    LoggerConfig.log_exception(@log, "#{@mod_log} Invalid YAML syntax!", e)
+    {}
+  rescue StandardError => e
+    LoggerConfig.log_exception(@log, "#{@mod_log} Could not load YAML!", e)
+    {}
+  end
+
+  # Maps the source and destination paths from the item.
+  # :link_path is the symbolic link_path name
+  # :dest_path is the actual real object destination
+  # command line equivalents: `ln -s :dest_path :link_path`
+  def map_entry_paths(item)
+    # Remove potential leading special chars like '*' or ':'
+    # if they are prefixes for the whole item string and
+    # split the result into at most 2 parts
+    paths = item.to_s.gsub(/^[:*]+/, "").split(":", 2)
+
+    link_p = paths[0]
+    dest_p = paths.size > 1 ? paths[1] : paths[0] # If no colon, dest is same as link
+
+    if link_p.nil? || link_p.empty?
+      @log.warn "#{@mod_log} Invalid item format, link part is empty: #{item}"
+      return { link_path: nil, dest_path: nil }
+    end
+
+    { link_path: link_p, dest_path: dest_p }
   end
 
   def build_link_path(target_key, mod_name, path)
@@ -143,63 +194,53 @@ class DotLinker
     dest_path
   end
 
-  # Maps the source and destination paths from the item.
-  # :link_path is the symbolic link_path name
-  # :dest_path is the actual real object destination
-  # command line equivalents: `ln -s :dest_path :link_path`
-  def map_entry_paths(item)
-    paths = item.to_s.gsub("*", "").split(":")
-    return { link_path: nil, dest_path: nil } if paths.empty?
+  # Ensures the base symlink (e.g., ~/.config/dotfiles -> ~/.dotfiles)
+  # already exists if relative linking is active.
+  def check_dotfiles_link(base_target_dir)
+    # For home directory ignore this logic as this is considered to be
+    # the topmost level of all possible files
+    return true if base_target_dir == Dir.home
 
-    # Raise an error if the item format is invalid
-    # This assumes the item should have at least one segment
-    # and at most two segments.
-    #
-    # For example:
-    # - "source:target" is valid
-    # - ":source" is valid
-    # - "source:" is valid
-    # - "source" is valid
-    # - "source:target:extra" is invalid
-    raise ArgumentError, "Invalid item format: #{item}" unless paths.size < 3
+    # example:
+    # base_target_dir = ~/.config,
+    # @dotfiles_dir = ~/.dotfiles
+    # REPO_SYMLINK_NAME = "dotfiles"
+    # repo_symlink_full_path becomes ~/.config/dotfiles
+    dotfiles_link = File.join(base_target_dir, REPO_SYMLINK_NAME)
+    link_msg = "{ #{short_log(dotfiles_link)} -> #{short_log(@dotfiles_dir)} }"
 
-    if paths.size == 1
-      {
-        link_path: paths[0],
-        dest_path: paths[0]
-      }
-    else
-      {
-        link_path: paths[0],
-        dest_path: paths[1]
-      }
-    end
-  end
+    @log.info "#{@mod_log} Checking dotfiles link #{link_msg}"
 
-  # Parse the mod.yml file to get the source and destination paths.
-  def parse_yaml(mod_name)
-    mod_conf = File.join(@dotfiles_dir, mod_name, MOD_FILE)
+    if File.symlink?(dotfiles_link)
+      if File.readlink(dotfiles_link) == @dotfiles_dir
+        @log.info "#{@mod_log} Dotfiles link found..."
+        return true
+      end
 
-    @log.info "#{@mod_log} Module conf: #{short_log(mod_conf)}"
-    @log.info "#{@mod_log} Parsing module file..."
-    config_data = YAML.load_file(mod_conf)
+      @log.warn "#{@mod_log} Found dotfiles link to #{dotfiles_link}"
+      FileUtils.rm(dotfiles_link, noop: @dry_run, verbose: @verbose)
+    elsif File.exist?(dotfiles_link)
+      @log.error "#{@mod_log} #{short_log(dotfiles_link)} exists and is not a symlink!"
+      @log.error "#{@mod_log} Please remove it manually or resolve this conflict"
 
-    unless config_data && config_data[MOD_INFO].is_a?(Hash)
-      @log.fatal "#{@mod_log} Invalid config structure, no '#{MOD_INFO}' section found!"
-      return {}
+      raise "Conflict with with dotfiles link path #{dotfiles_link}"
     end
 
-    config_data
-  rescue Psych::SyntaxError => e
-    LoggerConfig.log_exception(@log, "#{@mod_log} Invalid YAML syntax!", e)
-    {}
-  rescue StandardError => e
-    LoggerConfig.log_exception(@log, "#{@mod_log} Could not load YAML!", e)
-    {}
+    @log.info "#{@mod_log} Creating dotfiles link #{link_msg}"
+
+    parent_dir = File.dirname(dotfiles_link)
+    FileUtils.mkdir_p(parent_dir, noop: @dry_run, verbose: @verbose) unless Dir.exist?(parent_dir)
+    FileUtils.ln_s(@dotfiles_dir, dotfiles_link, noop: @dry_run, verbose: @verbose)
+
+    true
+  rescue SystemCallError => e
+    LoggerConfig.log_exception(@log, "#{@mod_log} Error managing dotfiles link #{link_msg}!", e)
+    raise
   end
 
-  def symlink(dest_path, link_path)
+  def create_symlink(dest_path, link_path)
     ops_flag = check_ops_flag(dest_path, link_path)
+    return false if ops_flag[:skip]
 
     if ops_flag[:backup]
       backup(dest_path, link_path)
@@ -223,7 +264,7 @@ class DotLinker
     # When the remove_first flag is true it means that we must remove the symlink manually
     # as FileUtils does not have the capability to override existing symlink (ln -sfn).
     # This is the case when the existing symlink points to a directory
-    ops = { backup: false, force: false, remove_first: false }
+    ops = { backup: false, force: false, remove_first: false, skip: false }
 
     if !File.exist?(link_path) && !File.symlink?(link_path)
       # Case 1: Link path does not exist at all
@@ -242,18 +283,28 @@ class DotLinker
   end
 
   def check_symlink(dest_path, link_path, ops)
+    link_path_actual = File.readlink(link_path)
+
     if !File.exist?(link_path)
       # Case 2a: Broken symlink
       @log.info "#{@mod_log} Found broken link: #{short_log(link_path)}"
       ops[:force] = true # Force will overwrite the broken symlink
-    elsif File.directory?(File.readlink(link_path)) && File.directory?(dest_path)
-      # Case 2b: Existing symlink points to a directory, and new target is also a directory.
-      # This aims for 'ln -sfn' behavior: remove old symlink, then create new one.
+    elsif File.directory?(link_path_actual) && File.directory?(dest_path)
       @log.info "#{@mod_log} Found existing link: #{short_log(link_path)}"
-      @log.info "#{@mod_log} Target is a directory, preparing to re-link"
-      ops[:remove_first] = true
+
+      if link_path_actual == dest_path
+        # Case 2b: Existing symlink already points to the correct dest_path.
+        # Flag as skip and continue processing other entries.
+        @log.info "#{@mod_log} Target is already correct, skipping this entry"
+        ops[:skip] = true
+      else
+        # Case 2c: Existing symlink points to a directory, and new target is also a directory.
+        # This aims for 'ln -sfn' behavior: remove old symlink, then create new one.
+        @log.info "#{@mod_log} Target is a directory, preparing to re-link"
+        ops[:remove_first] = true
+      end
     else
-      # Case 2c: Symlink exists, is not broken, and not the dir-to-dir case above.
+      # Case 2d: Symlink exists, is not broken, and not the dir-to-dir case above.
       # This includes symlink-to-file, symlink-to-non_dir_target etc.
       @log.info "#{@mod_log} Found existing link: #{short_log(link_path)}"
       @log.info "#{@mod_log} Link will be overwritten by force!"
@@ -275,5 +326,14 @@ class DotLinker
   # Class DotLinker
 end
 
-linker = DotLinker.new
-linker.process_modules(ARGV)
+if $PROGRAM_NAME == __FILE__
+  if ARGV.empty?
+    puts "No modules specified on the command line!"
+    puts "Usage   : #{$PROGRAM_NAME} [module1 module2 ...]"
+    puts "Example : #{$PROGRAM_NAME} hyprland terminal zsh"
+    exit 1
+  else
+    linker = DotLinker.new
+    linker.process_modules(ARGV)
+  end
+end
