@@ -2,12 +2,13 @@
 # frozen_string_literal: true
 
 require_relative "lib_checker"
+require_relative "log_utils"
 LibChecker.load(%w[
   logging
 ].freeze)
 
 # This module encapsulates all the setup logic for the 'logging' gem.
-module LoggerConfig
+module LoggingConfig
   def self.setup!
     # Define color scheme for the logger
     Logging.color_scheme(
@@ -62,13 +63,8 @@ module LoggerConfig
     # Logging.logger.root.add_appenders(Logging.appenders['file_configured'])
   end
 
-  # Helper function to log an exception with its message and stacktrace.
-  def self.log_exception(log, msg, exc, level: :error)
-    log.send(level, msg)
-    log.send(level, exc.message)
-    exc.backtrace.each { |line| log.send(level, "  #{line}") }
-  end
+  # Module LoggingConfig
 end
 
 # This line ensures that simply requiring this file will set up the logging.
-LoggerConfig.setup!
+LoggingConfig.setup!

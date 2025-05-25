@@ -2,7 +2,7 @@
 # dot.rb: Simple dotfile package linker in Ruby.
 # frozen_string_literal: true
 
-require_relative "logger_config"
+require_relative "log_conf"
 LibChecker.load(%w[
   fileutils
   pathname
@@ -93,18 +93,11 @@ class DotLinker
     paths = args.shift || {} # The last argument is the paths hash, or default {}
 
     # Proceed with formatting and logging using level, message, and paths
-    formatted_message = message.to_s.dup # Ensure message is a string
-
-    paths.each do |key, path_value|
-      path_string = path_value.to_s # Ensure it's a string
-      shortened_path = path_string.sub(/\A#{Regexp.escape(Dir.home)}/, "~")
-      formatted_message.gsub!(/\{#{key}\}/, shortened_path)
-    end
-
+    formatted_message = LogUtils.interpolate_paths(message, paths)
     prefixed_message = "#{@mod_log} #{formatted_message}"
 
     if exception
-      LoggerConfig.log_exception(@log, prefixed_message, exception)
+      LogUtils.log_exception(@log, prefixed_message, exception)
     else
       @log.send(level, prefixed_message)
     end
@@ -127,15 +120,16 @@ class DotLinker
     result_hash = paths_to_process.each_with_object({}) do |(target_key, items), hash|
       if @relative
         target_key_sym = target_key.split(":").first.to_sym
-        base_target_dir = BASE_DIR_MAPPINGS[target_key_sym]
-        check_dotfiles_link(base_target_dir)
+        base_target_dir = dotfiles_link(BASE_DIR_MAPPINGS[target_key_sym])
+      else
+        base_target_dir = @dotfiles_dir
       end
 
       items.each do |item|
         mlog(:debug, "--- ENTRY ---")
         path = map_entry_paths(item)
         link_path = build_link_path(target_key, mod_name, path[:link_path])
-        dest_path = build_dest_path(mod_name, path[:dest_path])
+        dest_path = build_dest_path(base_target_dir, mod_name, path[:dest_path])
 
         unless File.exist?(dest_path)
           mlog(:warn, "Target does not exist: {path}", { path: dest_path })
@@ -209,8 +203,8 @@ class DotLinker
     link_path
   end
 
-  def build_dest_path(mod_name, path)
-    components = [@dotfiles_dir, mod_name, path]
+  def build_dest_path(base_target_dir, mod_name, path)
+    components = [base_target_dir, mod_name, path]
     dest_path = File.join(*components.compact)
 
     mlog(:debug, "Dest: {path}", { path: dest_path })
@@ -219,10 +213,10 @@ class DotLinker
 
   # Ensures the base symlink (e.g., ~/.config/dotfiles -> ~/.dotfiles)
   # already exists if relative linking is active.
-  def check_dotfiles_link(base_target_dir)
+  def dotfiles_link(base_target_dir)
     # For home directory ignore this logic as this is considered to be
     # the topmost level of all possible files
-    return true if base_target_dir == Dir.home
+    return @dotfiles_dir if base_target_dir == Dir.home
 
     # example:
     # base_target_dir = ~/.config,
@@ -236,7 +230,7 @@ class DotLinker
     if File.symlink?(dotfiles_link)
       if File.readlink(dotfiles_link) == @dotfiles_dir
         mlog("Dotfiles link found...")
-        return true
+        return dotfiles_link
       end
 
       mlog(:warn, "Found dotfiles link to {path}", path: dotfiles_link)
@@ -252,7 +246,7 @@ class DotLinker
     FileUtils.mkdir_p(parent_dir, noop: @dry_run, verbose: @verbose) unless Dir.exist?(parent_dir)
     FileUtils.ln_s(@dotfiles_dir, dotfiles_link, noop: @dry_run, verbose: @verbose)
 
-    true
+    dotfiles_link
   rescue SystemCallError => e
     mlog("Error managing dotfiles link { {link} -> {target} }!",
          { link: dotfiles_link, target: @dotfiles_dir, exception: e })
@@ -270,8 +264,22 @@ class DotLinker
       FileUtils.rm(link_path, noop: @dry_run, verbose: @verbose)
     end
 
-    mlog("Creating link { {dest} -> {link} }", { dest: dest_path, link: link_path })
-    FileUtils.ln_s(dest_path, link_path, force: ops_flag[:force], noop: @dry_run, verbose: @verbose)
+    # As of Ruby 3.4.4 FileUtils.ln_s(relative: true) is bugged
+    # https://github.com/ruby/fileutils/issues/129
+    compute_link_path = lambda {
+      if @relative
+        dir = Pathname(link_path).dirname
+        Pathname(dest_path)
+          .relative_path_from(dir)
+          .to_s
+      else
+        link_path
+      end
+    }
+
+    link_path_arg = compute_link_path.call
+    mlog("Creating link { {dest} -> {link} }", { dest: dest_path, link: link_path_arg })
+    FileUtils.ln_s(dest_path, link_path_arg, force: ops_flag[:force], noop: @dry_run, verbose: @verbose)
   rescue Errno::ENOENT => e
     mlog("Error on file operations!", exception: e)
     false
@@ -311,8 +319,6 @@ class DotLinker
       mlog("Found broken link: {path}", path: link_path)
       ops[:force] = true # Force will overwrite the broken symlink
     elsif File.directory?(link_path_actual) && File.directory?(dest_path)
-      mlog("Removing existing link: {path}", { path: link_path })
-
       if link_path_actual == dest_path
         # Case 2b: Existing symlink already points to the correct dest_path.
         # Flag as skip and continue processing other entries.
