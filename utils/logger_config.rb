@@ -8,7 +8,7 @@ LibChecker.load(%w[
 ].freeze)
 
 # This module encapsulates all the setup logic for the 'logging' gem.
-module LoggingConfig
+module LoggerConfig
   def self.setup!
     # Define color scheme for the logger
     Logging.color_scheme(
@@ -63,8 +63,8 @@ module LoggingConfig
     # Logging.logger.root.add_appenders(Logging.appenders['file_configured'])
   end
 
-  # Module LoggingConfig
+  # Module LoggerConfig
 end
 
 # This line ensures that simply requiring this file will set up the logging.
-LoggingConfig.setup!
+LoggerConfig.setup!

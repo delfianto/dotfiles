@@ -2,7 +2,7 @@
 # dot.rb: Simple dotfile package linker in Ruby.
 # frozen_string_literal: true
 
-require_relative "log_conf"
+require_relative "logger_config"
 LibChecker.load(%w[
   fileutils
   pathname
@@ -179,7 +179,7 @@ class DotLinker
     dest_p = paths.size > 1 ? paths[1] : paths[0] # If no colon, dest is same as link
 
     if link_p.nil? || link_p.empty?
-      mlog("Using module dir for link name")
+      mlog(:debug, "Using module dir for link name")
       return { link_path: nil, dest_path: nil }.freeze
     end
 
