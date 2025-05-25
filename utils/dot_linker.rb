@@ -96,7 +96,6 @@ class DotLinker
     formatted_message = message.to_s.dup # Ensure message is a string
 
     paths.each do |key, path_value|
-      # \{#{key}\}
       path_string = path_value.to_s # Ensure it's a string
       shortened_path = path_string.sub(/\A#{Regexp.escape(Dir.home)}/, "~")
       formatted_message.gsub!(/\{#{key}\}/, shortened_path)
