@@ -43,11 +43,14 @@ class DotLinker
   end
 
   def process_modules(mod_names)
+    longest = mod_names.max_by(&:length)
+    raise ArgumentError, "No modules provided" if longest.nil?
+
     mlog("Requested modules: #{mod_names.join(', ')}")
-    padding = pad_len(mod_names)
+    padding = longest.length + MOD_LOGS.length
 
     mod_names.each do |mod_name|
-      @mod_log = "[#{MOD_LOGS}#{mod_name.upcase.ljust(padding)}]" # Set module log prefix here
+      @mod_log = "[#{MOD_LOGS}#{mod_name.upcase.ljust(padding)}]"
       mod_dir = File.join(@dotfiles_dir, mod_name)
 
       unless Dir.exist?(mod_dir)
@@ -61,16 +64,18 @@ class DotLinker
       maps = map_module_path(mod_name)
       maps.each do |dest_path, link_path|
         mlog("--- PROCESS ---")
-        create_symlink(dest_path, link_path)
+        symlink(dest_path, link_path)
       end
     end
-    @mod_log = "" # Reset module log prefix after processing
+
+    # Reset module log prefix after processing
+    @mod_log = ""
   end
 
   private # Make methods below this line private
 
   # Helper for module-specific logging. Automatically prepends @mod_log and formats
-  # paths using short_log. Use placeholders like {path}, {link}, {target}, etc.
+  # paths using short_log logic directly. Use placeholders like {path}, {link}, {target}, etc.
   # in the message string, and provide a hash of path keys to values.
   # Accepts an optional `exception:` keyword argument to log exceptions.
   #
@@ -87,14 +92,14 @@ class DotLinker
     message = args.shift     # The next argument is the message
     paths = args.shift || {} # The last argument is the paths hash, or default {}
 
-    # If an exception is provided, override the level to :error
-    level = :error if exception
-
     # Proceed with formatting and logging using level, message, and paths
     formatted_message = message.to_s.dup # Ensure message is a string
 
-    paths.each do |key, path|
-      formatted_message.gsub!(/\{#{key}\}/, short_log(path))
+    paths.each do |key, path_value|
+      # \{#{key}\}
+      path_string = path_value.to_s # Ensure it's a string
+      shortened_path = path_string.sub(/\A#{Regexp.escape(Dir.home)}/, "~")
+      formatted_message.gsub!(/\{#{key}\}/, shortened_path)
     end
 
     prefixed_message = "#{@mod_log} #{formatted_message}"
@@ -104,22 +109,6 @@ class DotLinker
     else
       @log.send(level, prefixed_message)
     end
-  end
-
-  def pad_len(mod_names)
-    longest = mod_names.max_by(&:length)
-    raise ArgumentError, "No modules provided" if longest.nil?
-
-    longest.length + MOD_LOGS.length
-  end
-
-  # Shortens the path for logging purposes.
-  # This method replaces the home directory with a tilde (~).
-  # Actual path operations are still using the expanded name.
-  def short_log(path)
-    return path unless path.start_with?(Dir.home)
-
-    path.sub(Dir.home, "~")
   end
 
   # Maps the module path from the YAML configuration.
@@ -271,7 +260,7 @@ class DotLinker
     raise
   end
 
-  def create_symlink(dest_path, link_path)
+  def symlink(dest_path, link_path)
     ops_flag = check_ops_flag(dest_path, link_path)
     return false if ops_flag[:skip]
 
@@ -282,7 +271,7 @@ class DotLinker
       FileUtils.rm(link_path, noop: @dry_run, verbose: @verbose)
     end
 
-    mlog("Creating link {{dest} -> {link}}", dest: dest_path, link: link_path)
+    mlog("Creating link {{dest} -> {link}}", { dest: dest_path, link: link_path })
     FileUtils.ln_s(dest_path, link_path, force: ops_flag[:force], noop: @dry_run, verbose: @verbose)
   rescue Errno::ENOENT => e
     mlog("Error on file operations!", exception: e)
