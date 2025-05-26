@@ -12,6 +12,12 @@ LibChecker.load(%w[
 module LoggerConfig
   # IO-like class that sends writes to a Logging logger at a specific level
   class LoggerIO
+    @original_stdout = $stdout
+
+    class << self
+      attr_reader :original_stdout
+    end
+
     def initialize(logger, level = :info)
       @logger = logger
       @level = level
@@ -26,6 +32,15 @@ module LoggerConfig
     def puts(msg = "")
       write("#{msg}\n")
     end
+
+    def tty?
+      LoggerConfig.original_stdout.tty?
+    rescue NoMethodError
+      # In case original_stdout doesn't have tty?
+      # (e.g. if it was already nil or some other IO object)
+      false
+    end
+    alias isatty tty?
 
     # Needed for IO compatibility
     def flush; end

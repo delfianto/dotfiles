@@ -1,0 +1,19 @@
+// .zed/tasks.json
+[
+  {
+    "label": "Ruby: Debug Current File",
+    "command": "bundle",
+    "args": ["exec", "ruby", "-r", "debug", "${file}"],
+    "use_new_terminal": true,
+    "cwd": "${project_root}",
+    "allow_macros": true
+  },
+  {
+    "label": "Ruby: Run Current File",
+    "command": "bundle",
+    "args": ["exec", "ruby", "${file}"],
+    "use_new_terminal": true,
+    "cwd": "${project_root}",
+    "allow_macros": true
+  }
+]
