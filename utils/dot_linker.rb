@@ -48,7 +48,7 @@ class DotLinker
 
     mlog("Requested modules: #{mod_names.join(', ')}")
     mod_names.each do |mod_name|
-      @mod_log = "[#{MOD_LOGS}#{ mod_name.upcase.ljust(longest.length)}]"
+      @mod_log = "[#{MOD_LOGS}#{mod_name.upcase.ljust(longest.length)}]"
       mod_dir = File.join(@dotfiles_dir, mod_name)
 
       unless Dir.exist?(mod_dir)
@@ -59,10 +59,13 @@ class DotLinker
       mlog("Module name: #{mod_name}")
       mlog("Module path: {path}", { path: mod_dir })
 
-      maps = map_module_path(mod_name)
+      mod_entries = parse_yaml(mod_name)
+      maps = map_entries(mod_name, mod_entries)
+
+      debugger # <--- Breakpoint
       maps.each do |dest_path, link_path|
         mlog("--- PROCESS ---")
-        symlink(dest_path, link_path)
+        # symlink(dest_path, link_path)
       end
     end
 
@@ -101,46 +104,6 @@ class DotLinker
     end
   end
 
-  # Maps the module path from the YAML configuration.
-  # This method reads the entries and constructs the full paths.
-  # It returns a hash with the destination as the key and the source as the value.
-  def map_module_path(mod_name)
-    config_data = parse_yaml(mod_name)
-    return config_data if config_data.empty?
-
-    # Ensure config_data[MOD_INFO] is not nil before calling reduce
-    paths_to_process = config_data[MOD_INFO]
-    unless paths_to_process
-      mlog(:warn, "#{mod_name}: No data found for #{MOD_INFO} key in YAML.")
-      return {}.freeze
-    end
-
-    result_hash = paths_to_process.each_with_object({}) do |(target_key, items), hash|
-      if @relative
-        target_key_sym = target_key.split(":").first.to_sym
-        base_target_dir = dotfiles_link(BASE_DIR_MAPPINGS[target_key_sym])
-      else
-        base_target_dir = @dotfiles_dir
-      end
-
-      items.each do |item|
-        mlog(:debug, "--- ENTRY ---")
-        path = map_entry_paths(item)
-        link_path = build_link_path(target_key, mod_name, path[:link_path])
-        dest_path = build_dest_path(base_target_dir, mod_name, path[:dest_path])
-
-        unless File.exist?(dest_path)
-          mlog(:warn, "Target does not exist: {path}", { path: dest_path })
-          next
-        end
-
-        hash[dest_path.to_s] = link_path.to_s
-      end
-    end
-
-    result_hash.freeze
-  end
-
   # Parse the mod.yml file to get the source and destination paths.
   def parse_yaml(mod_name)
     mod_conf = File.join(@dotfiles_dir, mod_name, MOD_FILE)
@@ -154,7 +117,13 @@ class DotLinker
       return {}.freeze
     end
 
-    config_data.freeze
+    path_hash = config_data[MOD_INFO]
+    unless path_hash.is_a?(Hash)
+      mlog(:warn, "#{mod_name}: No data or invalid format for '#{MOD_INFO}' key in YAML. Expected a Hash.")
+      return {}.freeze
+    end
+
+    path_hash.freeze
   rescue Psych::SyntaxError => e
     mlog("Invalid YAML syntax!", exception: e)
     {}.freeze
@@ -163,50 +132,53 @@ class DotLinker
     {}.freeze
   end
 
-  # Maps the source and destination paths from the item.
-  # :link_path is the symbolic link_path name
-  # :dest_path is the actual real object destination
-  # command line equivalents: `ln -s :dest_path :link_path`
-  def map_entry_paths(item)
-    # Remove potential leading special chars like '*' or ':'
-    # if they are prefixes for the whole item string and
-    # split the result into at most 2 parts
-    paths = item.to_s.gsub(/^[:*]+/, "").split(":", 2)
+  def map_entries(mod_name, yaml_entries)
+    dest_dir = File.join(@dotfiles_dir, mod_name)
 
-    link_p = paths[0]
-    dest_p = paths.size > 1 ? paths[1] : paths[0] # If no colon, dest is same as link
+    result_hash = yaml_entries.each_with_object({}) do |(dest_key, items), outer_hash|
+      dest_key_sym = dest_key.to_sym
+      link_dir = BASE_DIR_MAPPINGS[dest_key_sym]
 
-    if link_p.nil? || link_p.empty?
-      mlog(:debug, "Using module dir for link name")
-      return { link_path: nil, dest_path: nil }.freeze
+      unless link_dir
+        mlog(:warn, "Base directory mapping not found for key: #{dest_key}")
+        # Skip this group if its base directory isn't defined
+        next
+      end
+
+      unless items.is_a?(Array)
+        mlog(:warn, "Expected an array of items for '#{dest_key}'")
+        mlog(:warn, "Got #{items.class}. Skipping...")
+        next
+      end
+
+      outer_hash[link_dir.to_sym] =
+        sub_entry_maps(link_dir, dest_dir, mod_name, items)
     end
 
-    { link_path: link_p, dest_path: dest_p }.freeze
+    result_hash.freeze
   end
 
-  def build_link_path(target_key, mod_name, path)
-    paths = target_key.gsub("$", mod_name).split(":")
-    first_path = paths.first
+  def sub_entry_maps(link_dir, dest_dir, mod_name, items)
+    entry_hash = lambda do |item|
+      parts = item.to_s.gsub(/[*]+/, "")
+                  .gsub(/^\$/, mod_name)
+                  .split(":", 2)
 
-    base_path = BASE_DIR_MAPPINGS.fetch(
-      first_path.to_sym,
-      File.join(Dir.home, first_path)
-    )
+      link_info = parts[0]
+      link_path = File.join(link_dir, link_info)
 
-    components = [base_path, *paths[1..], path]
-    link_path = File.join(*components.compact)
+      # If no colon, dest is same as link
+      dest_info = parts.size > 1 ? parts[1] : parts[0]
+      dest_path = dest_info.empty? ? dest_dir : File.join(dest_dir, dest_info)
 
-    mlog(:debug, "Base: {path}", { path: base_path })
-    mlog(:debug, "Link: {path}", { path: link_path })
-    link_path
-  end
+      { link: link_path, dest: dest_path }.freeze
+    end
 
-  def build_dest_path(base_target_dir, mod_name, path)
-    components = [base_target_dir, mod_name, path]
-    dest_path = File.join(*components.compact)
+    sub_entries = items.each_with_object([]) do |(item), list|
+      list << entry_hash.call(item)
+    end
 
-    mlog(:debug, "Dest: {path}", { path: dest_path })
-    dest_path
+    sub_entries.freeze
   end
 
   # Ensures the base symlink (e.g., ~/.config/dotfiles -> ~/.dotfiles)

@@ -67,7 +67,7 @@ module LoggerConfig
     layout = Logging.layouts.pattern(
       pattern: "[%d][%10c:%p:%t][%5l] %m\n",
       color_scheme: "my_color_scheme",
-      date_pattern: "%Y-%m-%d %H:%M:%S.%L"
+      date_pattern: "%H:%M:%S.%L"
     )
 
     # Configure the stdout appender
