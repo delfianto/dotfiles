@@ -1,6 +1,5 @@
 mod_info:
-  .config:
+  config_home:
     - :mpv
     - :vlc
-  .config:easyeffects:
-    - output:easyeffects
+    - easyeffects/output:easyeffects

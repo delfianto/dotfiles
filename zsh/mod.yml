@@ -1,5 +1,5 @@
 mod_info:
-  config_home:$:
-    - :*
+  config_home:
+    - $:*
   home:
     - :.zshenv
