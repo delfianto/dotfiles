@@ -2,14 +2,13 @@
 # dot_linker.rb: Simple dotfile package linker in Ruby.
 # frozen_string_literal: true
 
-require "fileutils"
-require "logging"
-require "pathname"
-require "time"
-require "yaml"
+require_relative "lib/lib_checker"
 
-require_relative "lib/logger_config"
-require_relative "lib/log_utils"
+LibChecker.load(
+  gems: %w[fileutils logging pathname time yaml],
+  libs: %w[lib/logger_config lib/log_utils],
+  base: __dir__
+)
 
 BASE_DIR_MAPPINGS = {
   home: Dir.home,
