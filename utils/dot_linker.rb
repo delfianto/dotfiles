@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
-# dot.rb: Simple dotfile package linker in Ruby.
+# dot_linker.rb: Simple dotfile package linker in Ruby.
 # frozen_string_literal: true
 
-require_relative "logger_config"
-LibChecker.load(%w[
-  fileutils
-  pathname
-  time
-  yaml
-].freeze)
+require "fileutils"
+require "logging"
+require "pathname"
+require "time"
+require "yaml"
+
+require_relative "lib/logger_config"
+require_relative "lib/log_utils"
 
 BASE_DIR_MAPPINGS = {
   home: Dir.home,
@@ -60,12 +61,11 @@ class DotLinker
       mlog("Module path: {path}", { path: mod_dir })
 
       mod_entries = parse_yaml(mod_name)
-      maps = map_entries(mod_name, mod_entries)
+      maps = map_entry(mod_name, mod_entries)
 
-      debugger # <--- Breakpoint
       maps.each do |dest_path, link_path|
         mlog("--- PROCESS ---")
-        # symlink(dest_path, link_path)
+        symlink(dest_path, link_path)
       end
     end
 
@@ -132,7 +132,7 @@ class DotLinker
     {}.freeze
   end
 
-  def map_entries(mod_name, yaml_entries)
+  def map_entry(mod_name, yaml_entries)
     dest_dir = File.join(@dotfiles_dir, mod_name)
 
     result_hash = yaml_entries.each_with_object({}) do |(dest_key, items), outer_hash|
@@ -152,13 +152,13 @@ class DotLinker
       end
 
       outer_hash[link_dir.to_sym] =
-        sub_entry_maps(link_dir, dest_dir, mod_name, items)
+        map_sub_entry(link_dir, dest_dir, mod_name, items)
     end
 
     result_hash.freeze
   end
 
-  def sub_entry_maps(link_dir, dest_dir, mod_name, items)
+  def map_sub_entry(link_dir, dest_dir, mod_name, items)
     entry_hash = lambda do |item|
       parts = item.to_s.gsub(/[*]+/, "")
                   .gsub(/^\$/, mod_name)
@@ -319,11 +319,10 @@ class DotLinker
     mlog("Creating backup: {path}", { path: bak_path })
     FileUtils.move(link_path, bak_path, noop: @dry_run, verbose: @verbose)
   end
-
-  # Class DotLinker
+  # class end
 end
 
-if $PROGRAM_NAME == __FILE__
+if File.expand_path($PROGRAM_NAME) == File.expand_path(__FILE__)
   if ARGV.empty?
     puts "No modules specified on the command line!"
     puts "Usage   : #{$PROGRAM_NAME} [module1 module2 ...]"

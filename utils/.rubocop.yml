@@ -2,26 +2,19 @@ AllCops:
   TargetRubyVersion: 3.4
   NewCops: disable
 
-# --- Code Style ---
-# For scripts, extensive class/module docs is overkill.
-Style/Documentation:
-  Enabled: false
-
-# Encourages adding # frozen_string_literal: true
-Style/FrozenStringLiteralComment:
-  Enabled: true
-
-# Enforce double quote for consistency and _developer_happiness_.
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
-# Encourages using &:method over { |x| x.method }
-Style/SymbolProc:
-  Enabled: true
-
 # --- Layout / Formatting ---
 Layout/EmptyLinesAroundBlockBody:
   Enabled: true
+
+# Empty line after a guard clause is unnecessary visual noise
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+# THE MOST BONKERS RUBOCOP RULE I'VE SEEN SO FAR
+# JUST WHY WOULD ONE WANT THAT INSANE AMOUNT OF
+# WHITESPACE IS MORE MYSTERIOUS THAN THE DARK MATTER
+Layout/FirstHashElementIndentation:
+  Enabled: false
 
 # Check that the keys, separators, and values of a multi-line hash literal are aligned
 Layout/HashAlignment:
@@ -35,6 +28,11 @@ Layout/IndentationWidth:
 Layout/LineLength:
   Max: 120
 
+# --- Code Complexity Metrices ---
+# MANY OF THE DEFAULT RULES ARE BORDERLINE INSANITY
+# UNLESS YOU ARE WRITING HELLO WORLD ALL DAY, THEY ARE
+# PRACTICALLY TOO RESTRICTIVE FOR REAL WORLD DEVELOPMENT
+
 # For Rake tasks or scripts with DSLs, blocks can get long.
 Metrics/BlockLength:
   Enabled: false
@@ -42,9 +40,69 @@ Metrics/BlockLength:
 Metrics/ClassLength:
   Max: 500
 
-# Allow slightly more complex lines for for our script.
+Metrics/CyclomaticComplexity:
+  Max: 15
+
 Metrics/AbcSize:
   Max: 30
 
 Metrics/MethodLength:
   Max: 50
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+  Max: 7
+
+Metrics/PerceivedComplexity:
+  Max: 15
+
+# --- Code Style ---
+Style/AccessorGrouping:
+  Enabled: false
+
+# For scripts, extensive class/module docs is overkill.
+Style/Documentation:
+  Enabled: false
+
+# EnforcedStyle: ruby19_no_mixed_keys
+# bad
+# {:a => 1, :b => 2}
+# {c: 2, 'd' => 3} # should just use hash rockets
+#
+# good
+# {a: 1, b: 2}
+# {:c => 3, 'd' => 4}
+#
+# EnforcedShorthandSyntax: either_consistent
+# bad - mixed syntaxes
+# {foo:, bar: baz}
+#
+# good
+# {foo:, bar:}
+#
+# good - can't omit `baz`
+# {foo: foo, bar: baz}
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+  EnforcedShorthandSyntax: either_consistent
+
+# Encourages adding # frozen_string_literal: true
+Style/FrozenStringLiteralComment:
+  Enabled: true
+
+# Enforce double quote for consistency and _developer_happiness_.
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# Encourages using &:method over { |x| x.method }
+Style/SymbolProc:
+  Enabled: true
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: no_comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: no_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: no_comma

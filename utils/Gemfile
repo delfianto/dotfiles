@@ -4,6 +4,7 @@ source "https://rubygems.org"
 
 gem "logging"
 gem "slop"
+gem "syslog"
 
 group :development, :test do
   gem "debug", require: false

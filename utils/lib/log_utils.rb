@@ -1,4 +1,4 @@
-# logger_utils.rb: Utility class for logging messages.
+# log_utils.rb: Utility class for logging messages.
 # frozen_string_literal: true
 
 module LogUtils
@@ -44,6 +44,5 @@ module LogUtils
 
     formatted_message
   end
-
-  # Module LogUtils
+  # module end
 end

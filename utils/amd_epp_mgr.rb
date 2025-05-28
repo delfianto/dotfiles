@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
-# amd_epp_set.rb: Manage AMD Energy Performance Preference (EPP) settings.
+# amd_epp_mgr.rb: Manage AMD Energy Performance Preference (EPP) settings.
 # frozen_string_literal: true
 
-require_relative "lib_runner"
+require_relative "lib/cli_runner"
 
 # --- Application logic implementations ---
 class AmdEppMgr
@@ -61,8 +61,7 @@ class AmdEppMgr
       puts cpu_info_string # Fallback to unformatted output
     end
   end
-
-  # Class AmdEppMgr
+  # class end
 end
 
 # --- Configure the CLI using class-level DSL ---
@@ -159,8 +158,7 @@ class AmdEppCLI < CLIRunner
   def read_profile
     @epp_mgr.read_profile
   end
-
-  # Class AmdEppCLI
+  # class end
 end
 
 AmdEppCLI.start(ARGV) if __FILE__ == $PROGRAM_NAME

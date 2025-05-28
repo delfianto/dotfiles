@@ -1,15 +1,11 @@
-# lib_runner.rb: Superclass for CLI applications
+# cli_runner.rb: Superclass for CLI applications
 # This class provides a framework for building command-line interfaces (CLI) using the Slop gem.
 # It allows subclasses to define options, actions, and custom help sections using a simple DSL.
 # frozen_string_literal: true
 
-# Load required libraries
-require_relative "lib_checker"
-LibChecker.load(%w[
-  open3
-  slop
-  shellwords
-].freeze)
+require "open3"
+require "slop"
+require "shellwords"
 
 class CLIRunner
   # --- Class-level DSL and Configuration ---
@@ -269,5 +265,5 @@ class CLIRunner
       print_help_and_exit(1, "No action defined for these inputs. Implement '##{action_method_sym}'.")
     end
   end
-  # class CLIRunner
+  # class end
 end
