@@ -1,13 +1,11 @@
 # Tab 1
 new_tab System Monitor
 layout grid
-
-launch --location=vsplit btop
-launch --location=vsplit nvtop
+launch --location=vsplit --bias=75 btop
+launch --location=vsplit --bias=25 nvtop
 
 # Tab 2
 new_tab System Logs
 layout grid
-
 launch --location=vsplit sudo dmesg -w
 launch --location=vsplit journalctl -f -n 1000
