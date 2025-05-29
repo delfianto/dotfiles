@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gem "daemons"
+gem "drb"
+gem "syslog"
+
+group :development, :test do
+  gem "debug", require: false
+  gem "rubocop", require: false
+  gem "ruby-lsp", require: false
+  gem "solargraph", require: false
+end

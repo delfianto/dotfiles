@@ -1,0 +1,271 @@
+#!/usr/bin/env zsh
+#hyprd: A wrapper script for hyprdrive client and server
+
+# Script directory
+SCRIPT_DIR="${0:A:h}"
+RUBY_SCRIPT_DIR="$SCRIPT_DIR"
+
+show_usage() {
+  cat <<EOF
+Usage: hyprd [command] [options] [args...]
+
+Commands:
+  start       Start the hyprdrive daemon
+  stop        Stop the hyprdrive daemon
+  restart     Restart the hyprdrive daemon
+  status      Check daemon status
+  reload      Reload daemon configuration
+  <section>   Execute a command (e.g., 'hyprd apps browser')
+
+Sections:
+  apps        Application launcher commands
+  actions     System action commands
+  components  Component control commands
+
+Examples:
+  hyprd start -t                               # Start daemon in terminal (no daemonize)
+  hyprd stop --force                           # Force stop daemon
+  hyprd apps browser --new-tab www.google.com  # Launch browser with args (new-tab is optional)
+  hyprd actions volume-up --step 5             # Increase volume by 5 steps (step is optional)
+  hyprd components app-launcher --theme dark   # Toggle app launcher with theme
+
+Configuration:
+  Main config:   ~/.config/hyprdrive.yml
+  Socket config: ~/.config/hyprdrive/socket.yml
+EOF
+}
+
+check_bundle() {
+  if ! command -v bundle >/dev/null 2>&1; then
+    echo "Error: 'bundle' command not found. Please install Bundler first."
+    echo "You can install it with: gem install bundler"
+    exit 1
+  fi
+}
+
+check_gemfile() {
+  if [[ ! -f "$RUBY_SCRIPT_DIR/Gemfile" ]]; then
+    echo "Error: Gemfile not found in $RUBY_SCRIPT_DIR"
+    echo "Please ensure you have a valid Gemfile in the script directory."
+    exit 1
+  fi
+}
+
+run_ruby_script() {
+  local script="$1"
+  shift
+  bundle exec ruby "$RUBY_SCRIPT_DIR/$script" "$@"
+}
+
+check_daemon() {
+  local pid
+  local script_name="hyprdrive_daemon.rb"
+  
+  # Method 1: Check PID file
+  if [[ -f "/tmp/hyprdrive.pid" ]]; then
+    pid=$(cat "/tmp/hyprdrive.pid")
+    if kill -0 "$pid" 2>/dev/null; then
+      # Verify it's actually our daemon
+      if ps -p "$pid" -o command= | grep -q "$script_name"; then
+        return 0
+      fi
+    fi
+  fi
+
+  # Method 2: Check for running process by script name
+  pid=$(pgrep -f "$script_name" | grep -v "$$" | head -n1)
+  if [[ -n "$pid" ]]; then
+    # If we found a process but no PID file, create one
+    if [[ ! -f "/tmp/hyprdrive.pid" ]]; then
+      echo "$pid" > "/tmp/hyprdrive.pid"
+    fi
+    return 0
+  fi
+
+  # Method 3: Check for DRb socket
+  if [[ -S "/tmp/hyprdrive.sock" ]]; then
+    # Try to connect to the socket
+    if ruby -e "require 'drb/drb'; DRb.start_service; DRbObject.new_with_uri('drbunix:/tmp/hyprdrive.sock')" 2>/dev/null; then
+      # If we can connect but no PID file, try to find the process
+      pid=$(lsof -t "/tmp/hyprdrive.sock" 2>/dev/null | head -n1)
+      if [[ -n "$pid" ]]; then
+        echo "$pid" > "/tmp/hyprdrive.pid"
+        return 0
+      fi
+    fi
+  fi
+
+  return 1
+}
+
+get_daemon_pid() {
+  local pid
+  
+  # Try PID file first
+  if [[ -f "/tmp/hyprdrive.pid" ]]; then
+    pid=$(cat "/tmp/hyprdrive.pid")
+    if kill -0 "$pid" 2>/dev/null; then
+      echo "$pid"
+      return 0
+    fi
+  fi
+
+  # Try process name
+  pid=$(pgrep -f "hyprdrive_daemon.rb" | grep -v "$$" | head -n1)
+  if [[ -n "$pid" ]]; then
+    echo "$pid"
+    return 0
+  fi
+
+  # Try socket
+  if [[ -S "/tmp/hyprdrive.sock" ]]; then
+    pid=$(lsof -t "/tmp/hyprdrive.sock" 2>/dev/null | head -n1)
+    if [[ -n "$pid" ]]; then
+      echo "$pid"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+start_daemon() {
+  if check_daemon; then
+    local pid=$(get_daemon_pid)
+    echo "Daemon is already running (PID: $pid)"
+    return 1
+  fi
+
+  echo "Starting hyprdrive daemon..."
+  # Pass all remaining arguments to the daemon
+  run_ruby_script "hyprdrive_daemon.rb" start "$@"
+  sleep 1
+
+  if check_daemon; then
+    local pid=$(get_daemon_pid)
+    echo "Daemon started successfully (PID: $pid)"
+    return 0
+  else
+    echo "Failed to start daemon"
+    return 1
+  fi
+}
+
+stop_daemon() {
+  if ! check_daemon; then
+    echo "Daemon is not running"
+    return 0
+  fi
+
+  local pid=$(get_daemon_pid)
+  echo "Stopping hyprdrive daemon (PID: $pid)..."
+  
+  # Try graceful stop first
+  run_ruby_script "hyprdrive_daemon.rb" stop "$@"
+  sleep 1
+
+  # If still running, try force kill
+  if check_daemon; then
+    echo "Daemon did not stop gracefully, forcing stop..."
+    kill -TERM "$pid" 2>/dev/null
+    sleep 1
+    
+    if check_daemon; then
+      echo "Force stop failed, trying SIGKILL..."
+      kill -KILL "$pid" 2>/dev/null
+      sleep 1
+    fi
+  fi
+
+  if ! check_daemon; then
+    echo "Daemon stopped successfully"
+    rm -f "/tmp/hyprdrive.pid"
+    return 0
+  else
+    echo "Failed to stop daemon"
+    return 1
+  fi
+}
+
+restart_daemon() {
+  # Pass all remaining arguments to both stop and start
+  stop_daemon "$@"
+  sleep 1
+  start_daemon "$@"
+}
+
+check_status() {
+  if check_daemon; then
+    local pid=$(get_daemon_pid)
+    local mode="daemonized"
+    
+    # Check if process is in foreground
+    if ps -p "$pid" -o tty= | grep -q "pts"; then
+      mode="foreground"
+    fi
+    
+    echo "Daemon is running (PID: $pid, Mode: $mode)"
+    return 0
+  else
+    echo "Daemon is not running"
+    return 1
+  fi
+}
+
+reload_config() {
+  if ! check_daemon; then
+    echo "Daemon is not running"
+    return 1
+  fi
+
+  echo "Reloading configuration..."
+  run_ruby_script "hyprdrive_client.rb" "reload" "config" "$@"
+}
+
+# Initialize environment
+check_bundle
+check_gemfile
+
+# Main command processing
+case "$1" in
+  start)
+    shift  # Remove the 'start' command
+    start_daemon "$@"
+    ;;
+  stop)
+    shift  # Remove the 'stop' command
+    stop_daemon "$@"
+    ;;
+  restart)
+    shift  # Remove the 'restart' command
+    restart_daemon "$@"
+    ;;
+  status)
+    shift  # Remove the 'status' command
+    check_status "$@"
+    ;;
+  reload)
+    shift  # Remove the 'reload' command
+    reload_config "$@"
+    ;;
+  help|--help|-h)
+    show_usage
+    ;;
+  "")
+    show_usage
+    ;;
+  *)
+    # If no daemon is running and command is not a daemon control command,
+    # try to start the daemon first
+    if ! check_daemon && [[ ! "$1" =~ ^(start|stop|restart|status|reload|help|--help|-h)$ ]]; then
+      echo "Daemon is not running. Attempting to start..."
+      if ! start_daemon; then
+        echo "Failed to start daemon. Cannot execute command."
+        exit 1
+      fi
+    fi
+
+    # Execute the command through the client, passing all arguments
+    run_ruby_script "hyprdrive_client.rb" "$@"
+    ;;
+esac

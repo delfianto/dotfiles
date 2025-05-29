@@ -1,0 +1,4 @@
+uri: "drbunix:/tmp/hyprdrive.sock"
+timeout: 5
+retry_attempts: 3
+retry_delay: 1 

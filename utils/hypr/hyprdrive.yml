@@ -1,0 +1,32 @@
+hyprland:
+  apps:
+    archive: ark
+    browser: google-chrome-unstable
+    calculator: qalculate-qt
+    calendar: none
+    color_picker: none
+    editor: zeditor
+    emoji_picker: none
+    file_manager: dolphin
+    music: spotify_launcher
+    package: yay
+    screenshot: spectacle
+    sysmon_cli: none
+    sysmon_gui: none
+    terminal: kitty
+    video: clapper
+    volume: pavucontrol
+  actions:
+    lock: none
+    sleep: none
+    volume_up: none
+    volume_down: none
+    brightness_up: none
+    brightness_down: none
+  components:
+    dock: none
+    app_launcher: rofi
+    status_bar: waybar
+    xdg_portal:
+      - xdg-desktop-portal
+      - xdg-desktop-portal-hyprland
