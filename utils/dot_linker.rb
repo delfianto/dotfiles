@@ -235,7 +235,7 @@ class DotLinker
 
     # As of Ruby 3.4.4 FileUtils.ln_s(relative: true) is bugged
     # https://github.com/ruby/fileutils/issues/129
-    compute_link_path = lambda {
+    compute_link_path = lambda do
       if @relative
         dir = Pathname(link_path).dirname
         Pathname(dest_path)
@@ -244,7 +244,7 @@ class DotLinker
       else
         link_path
       end
-    }
+    end
 
     link_path_arg = compute_link_path.call
     mlog("Creating link { {dest} -> {link} }", { dest: dest_path, link: link_path_arg })
