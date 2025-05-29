@@ -16,12 +16,12 @@
   "hyprland/workspaces#dp1": {
     "output": "DP-1",
     "format": "{id}: {name}",
-    "persistent-workspaces": { "DP-1": 2 }
+    "persistent-workspaces": { "DP-1": 1 }
   },
   "hyprland/workspaces#dp3": {
     "output": "DP-3",
     "format": "{id}: {name}",
-    "persistent-workspaces": { "DP-3": 6 }
+    "persistent-workspaces": { "DP-3": 9 }
   },
   "wlr/taskbar": {
     "format": "{icon}",
