@@ -6,14 +6,13 @@
 require_relative "../lib/lib_checker"
 
 LibChecker.load(
-  gems: %w[fileutils pathname yaml drb/drb],
-  libs: %w[hyprdrive_config hyprdrive_socket],
+  gems: %w[drb/drb],
+  libs: %w[hyprdrive_socket],
   base: __dir__
 )
 
-class HyprdriveClient
+class Hyprdrive
   def initialize
-    @config = load_configuration
     @socket_config = HyprdriveSocket::Config.load
     @daemon = connect_to_daemon
   end
@@ -26,7 +25,13 @@ class HyprdriveClient
     key = kebab_to_snake(key)
 
     begin
-      @daemon.perform_action(section, key, *args)
+      result = @daemon.perform_action(section, key, *args)
+      if result =~ /PID: (\d+)/
+        # Return both the message and the PID
+        { message: result, pid: $1.to_i }
+      else
+        { message: result }
+      end
     rescue DRb::DRbConnError => e
       "Error: Lost connection to daemon - #{e.message}"
     rescue StandardError => e
@@ -34,55 +39,91 @@ class HyprdriveClient
     end
   end
 
-  private
-
-  def load_configuration
-    config_paths = [
-      File.expand_path("~/.config/hyprdrive.yml"),
-      File.expand_path("~/.config/hyprdrive.yaml"),
-      File.expand_path("hyprdrive.yml", __dir__)
-    ]
-
-    config_path = config_paths.find { |path| File.exist?(path) }
-    return nil unless config_path
-
-    yaml_data = File.read(config_path)
-    HyprdriveConfig.load_from_yaml(yaml_data)
+  def list_processes
+    return "Error: Could not connect to daemon" unless @daemon
+    @daemon.get_running_processes
   end
 
-  def connect_to_daemon
-    return nil unless @config
+  def kill_process(pid)
+    return "Error: Could not connect to daemon" unless @daemon
+    @daemon.kill_process(pid)
+  end
 
-    begin
-      DRb.start_service
-      DRbObject.new_with_uri(@socket_config.uri)
-    rescue DRb::DRbConnError => e
-      warn "Error: Could not connect to daemon at #{@socket_config.uri}"
-      warn "Make sure the daemon is running with: hyprdrive_daemon.rb start"
-      nil
-    end
+  private
+
+  def connect_to_daemon
+    DRb.start_service
+    DRbObject.new_with_uri(@socket_config.uri)
+  rescue DRb::DRbConnError => _e
+    warn "Error: Could not connect to daemon at #{@socket_config.uri}"
+    warn "Make sure the daemon is running with: hyprdrive_daemon.rb start"
+    nil
   end
 
   def kebab_to_snake(str)
-    str.to_s.gsub(/-/, '_')
+    str.to_s.gsub(/-/, "_")
   end
 end
 
 # Command line interface
 if __FILE__ == $PROGRAM_NAME
   if ARGV.empty?
-    puts "Usage  : #{$PROGRAM_NAME} <section> <key> [args...]"
-    puts "Example: #{$PROGRAM_NAME} apps browser"
-    puts "Example: #{$PROGRAM_NAME} actions volume-up"
-    puts "Example: #{$PROGRAM_NAME} components app-launcher"
+    puts "Usage: #{$PROGRAM_NAME} <command> [args...]"
+    puts "\nCommands:"
+    puts "  <section> <key> [args...]  Execute a command (e.g., 'apps browser')"
+    puts "  list                       List running processes"
+    puts "  kill <pid>                 Kill a specific process"
+    puts "\nExamples:"
+    puts "  #{$PROGRAM_NAME} apps browser"
+    puts "  #{$PROGRAM_NAME} actions volume-up"
+    puts "  #{$PROGRAM_NAME} list"
+    puts "  #{$PROGRAM_NAME} kill 12345"
     exit 1
   end
 
-  section = ARGV[0]
-  key = ARGV[1]
-  args = ARGV[2..]
+  hyprdrive = Hyprdrive.new
 
-  hyprdrive = HyprdriveClient.new
-  result = hyprdrive.execute(section, key, *args)
-  puts result
+  case ARGV[0]
+  when "list"
+    processes = hyprdrive.list_processes
+    if processes.is_a?(Array) && !processes.empty?
+      puts "Running processes:"
+      processes.each do |proc|
+        puts "PID: #{proc[:pid]}"
+        puts "  Command: #{proc[:command]} #{proc[:args].join(' ')}"
+        puts "  Started: #{proc[:start_time]}"
+        puts "  Runtime: #{proc[:runtime].round(1)} seconds"
+        puts "  Section: #{proc[:section]}"
+        puts "  Key: #{proc[:key]}"
+        puts "---"
+      end
+    else
+      puts "No processes running"
+    end
+  when "kill"
+    if ARGV[1].nil?
+      puts "Error: No PID specified"
+      exit 1
+    end
+    result = hyprdrive.kill_process(ARGV[1].to_i)
+    puts result
+  else
+    section = ARGV[0]
+    key = ARGV[1]
+    args = ARGV[2..]
+
+    if key.nil?
+      puts "Error: No key specified for section '#{section}'"
+      exit 1
+    end
+
+    result = hyprdrive.execute(section, key, *args)
+
+    if result.is_a?(Hash)
+      puts result[:message]
+      puts "Process ID: #{result[:pid]}" if result[:pid]
+    else
+      puts result
+    end
+  end
 end

@@ -90,7 +90,14 @@ Style/HashSyntax:
 Style/FrozenStringLiteralComment:
   Enabled: true
 
-# Enforce double quote for consistency and _developer_happiness_.
+Style/MethodCallWithArgsParentheses:
+  EnforcedStyle: require_parentheses
+
+Style/MethodCallWithoutArgsParentheses:
+  Enabled: true
+  EnforcedStyle: require_parentheses
+
+# Enforce double quote for consistency and _developer_happiness_
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 

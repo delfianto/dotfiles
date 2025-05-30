@@ -15,6 +15,8 @@ Commands:
   restart     Restart the hyprdrive daemon
   status      Check daemon status
   reload      Reload daemon configuration
+  list        List running processes
+  kill <pid>  Kill a specific process
   <section>   Execute a command (e.g., 'hyprd apps browser')
 
 Sections:
@@ -25,8 +27,10 @@ Sections:
 Examples:
   hyprd start -t                               # Start daemon in terminal (no daemonize)
   hyprd stop --force                           # Force stop daemon
-  hyprd apps browser --new-tab www.google.com  # Launch browser with args (new-tab is optional)
-  hyprd actions volume-up --step 5             # Increase volume by 5 steps (step is optional)
+  hyprd list                                   # List running processes
+  hyprd kill 12345                             # Kill process with PID 12345
+  hyprd apps browser --new-tab www.google.com  # Launch browser with args
+  hyprd actions volume-up --step 5             # Increase volume by 5 steps
   hyprd components app-launcher --theme dark   # Toggle app launcher with theme
 
 Configuration:
@@ -98,41 +102,17 @@ check_daemon() {
   return 1
 }
 
-get_daemon_pid() {
-  local pid
-  
-  # Try PID file first
-  if [[ -f "/tmp/hyprdrive.pid" ]]; then
-    pid=$(cat "/tmp/hyprdrive.pid")
-    if kill -0 "$pid" 2>/dev/null; then
-      echo "$pid"
-      return 0
-    fi
+require_daemon() {
+  if ! check_daemon; then
+    echo "Error: hyprdrive daemon is not running"
+    echo "Please start the daemon first with: hyprd start"
+    exit 1
   fi
-
-  # Try process name
-  pid=$(pgrep -f "hyprdrive_daemon.rb" | grep -v "$$" | head -n1)
-  if [[ -n "$pid" ]]; then
-    echo "$pid"
-    return 0
-  fi
-
-  # Try socket
-  if [[ -S "/tmp/hyprdrive.sock" ]]; then
-    pid=$(lsof -t "/tmp/hyprdrive.sock" 2>/dev/null | head -n1)
-    if [[ -n "$pid" ]]; then
-      echo "$pid"
-      return 0
-    fi
-  fi
-
-  return 1
 }
 
 start_daemon() {
   if check_daemon; then
-    local pid=$(get_daemon_pid)
-    echo "Daemon is already running (PID: $pid)"
+    echo "Daemon is already running (PID: $(cat /tmp/hyprdrive.pid))"
     return 1
   fi
 
@@ -142,8 +122,7 @@ start_daemon() {
   sleep 1
 
   if check_daemon; then
-    local pid=$(get_daemon_pid)
-    echo "Daemon started successfully (PID: $pid)"
+    echo "Daemon started successfully (PID: $(cat /tmp/hyprdrive.pid))"
     return 0
   else
     echo "Failed to start daemon"
@@ -157,29 +136,12 @@ stop_daemon() {
     return 0
   fi
 
-  local pid=$(get_daemon_pid)
-  echo "Stopping hyprdrive daemon (PID: $pid)..."
-  
-  # Try graceful stop first
+  echo "Stopping hyprdrive daemon..."
   run_ruby_script "hyprdrive_daemon.rb" stop "$@"
   sleep 1
 
-  # If still running, try force kill
-  if check_daemon; then
-    echo "Daemon did not stop gracefully, forcing stop..."
-    kill -TERM "$pid" 2>/dev/null
-    sleep 1
-    
-    if check_daemon; then
-      echo "Force stop failed, trying SIGKILL..."
-      kill -KILL "$pid" 2>/dev/null
-      sleep 1
-    fi
-  fi
-
   if ! check_daemon; then
     echo "Daemon stopped successfully"
-    rm -f "/tmp/hyprdrive.pid"
     return 0
   else
     echo "Failed to stop daemon"
@@ -188,7 +150,6 @@ stop_daemon() {
 }
 
 restart_daemon() {
-  # Pass all remaining arguments to both stop and start
   stop_daemon "$@"
   sleep 1
   start_daemon "$@"
@@ -196,15 +157,7 @@ restart_daemon() {
 
 check_status() {
   if check_daemon; then
-    local pid=$(get_daemon_pid)
-    local mode="daemonized"
-    
-    # Check if process is in foreground
-    if ps -p "$pid" -o tty= | grep -q "pts"; then
-      mode="foreground"
-    fi
-    
-    echo "Daemon is running (PID: $pid, Mode: $mode)"
+    echo "Daemon is running (PID: $(cat /tmp/hyprdrive.pid))"
     return 0
   else
     echo "Daemon is not running"
@@ -213,13 +166,24 @@ check_status() {
 }
 
 reload_config() {
-  if ! check_daemon; then
-    echo "Daemon is not running"
-    return 1
-  fi
-
+  require_daemon
   echo "Reloading configuration..."
   run_ruby_script "hyprdrive_client.rb" "reload" "config" "$@"
+}
+
+list_processes() {
+  require_daemon
+  run_ruby_script "hyprdrive_client.rb" "list"
+}
+
+kill_process() {
+  require_daemon
+  local pid="$1"
+  if [[ -z "$pid" ]]; then
+    echo "Error: No PID specified"
+    return 1
+  fi
+  run_ruby_script "hyprdrive_client.rb" "kill" "$pid"
 }
 
 # Initialize environment
@@ -229,24 +193,32 @@ check_gemfile
 # Main command processing
 case "$1" in
   start)
-    shift  # Remove the 'start' command
+    shift
     start_daemon "$@"
     ;;
   stop)
-    shift  # Remove the 'stop' command
+    shift
     stop_daemon "$@"
     ;;
   restart)
-    shift  # Remove the 'restart' command
+    shift
     restart_daemon "$@"
     ;;
   status)
-    shift  # Remove the 'status' command
+    shift
     check_status "$@"
     ;;
   reload)
-    shift  # Remove the 'reload' command
+    shift
     reload_config "$@"
+    ;;
+  list)
+    shift
+    list_processes "$@"
+    ;;
+  kill)
+    shift
+    kill_process "$@"
     ;;
   help|--help|-h)
     show_usage
@@ -255,16 +227,9 @@ case "$1" in
     show_usage
     ;;
   *)
-    # If no daemon is running and command is not a daemon control command,
-    # try to start the daemon first
-    if ! check_daemon && [[ ! "$1" =~ ^(start|stop|restart|status|reload|help|--help|-h)$ ]]; then
-      echo "Daemon is not running. Attempting to start..."
-      if ! start_daemon; then
-        echo "Failed to start daemon. Cannot execute command."
-        exit 1
-      fi
-    fi
-
+    # For any other command, require the daemon to be running
+    require_daemon
+    
     # Execute the command through the client, passing all arguments
     run_ruby_script "hyprdrive_client.rb" "$@"
     ;;

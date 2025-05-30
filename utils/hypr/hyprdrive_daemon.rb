@@ -4,7 +4,7 @@
 require_relative "../lib/lib_checker"
 
 LibChecker.load(
-  gems: %w[daemons drb/drb yaml],
+  gems: %w[daemons drb/drb yaml fileutils],
   libs: %w[hyprdrive_config hyprdrive_socket],
   base: __dir__
 )
@@ -15,40 +15,33 @@ BLACKLISTED_COMMANDS = %w[
   parted shred systemctl chown chmod
 ].map(&:downcase).freeze
 
-# Default configuration file path
-DEFAULT_CONFIG_PATH = File.expand_path("hyprdrive.yml")
-
-# User defined configuration file path
-USER_CONFIG_DIR = File.expand_path("~/.config")
-USER_CONFIG_FILES = [
-  File.join(USER_CONFIG_DIR, "hyprdrive.yml"),
-  File.join(USER_CONFIG_DIR, "hyprdrive.yaml")
+# Configuration path priority
+CONFIG_PATHS = [
+  File.expand_path("~/.config/hyprdrive.yml"),
+  File.expand_path("~/.config/hyprdrive.yaml"),
+  File.expand_path("hyprdrive.yml")
 ].freeze
 
 # This class will be exposed via DRb. Its methods will be callable by clients.
 class HyprdriveDaemon
   def initialize
     find_config_file = lambda do
-      # Check for user-supplied configuration files first
-      user_config_path = USER_CONFIG_FILES.find { |file_path| File.exist?(file_path) }
+      config_path = CONFIG_PATHS.find { |file_path| File.exist?(file_path) }
+      raise "Missing hyprdrive configuration!" unless config_path
 
-      if user_config_path
-        puts "Daemon: Using user configuration file: #{user_config_path}"
-        user_config_path
-      else
-        puts "Daemon: User configuration not found, using default: #{DEFAULT_CONFIG_PATH}"
-        DEFAULT_CONFIG_PATH
-      end
+      puts "Daemon: Using user configuration file: #{config_path}"
+      config_path
     end
 
-    @config_yaml_path = find_config_file.call
-    @config = load_configuration
+    @yaml_path = find_config_file.call
+    @config = load_config
+    @process_list = {}
     puts "Daemon: Initialization complete."
   end
 
-  def load_configuration
-    puts "Daemon: Loading configuration from #{@config_yaml_path}..."
-    yaml_data = File.read(@config_yaml_path)
+  def load_config
+    puts "Daemon: Loading configuration from #{@yaml_path}..."
+    yaml_data = File.read(@yaml_path)
     HyprdriveConfig.load_from_yaml(yaml_data)
   rescue StandardError => e
     warn "Daemon: Failed to load configuration: #{e.message}"
@@ -56,7 +49,7 @@ class HyprdriveDaemon
   end
 
   def reload_config
-    @config = load_configuration
+    @config = load_config
     if @config
       "Daemon: Configuration reloaded successfully."
     else
@@ -64,66 +57,132 @@ class HyprdriveDaemon
     end
   end
 
-  # Client will call this method
-  def perform_action(section_name, key_name, *_args)
+  # Public methods for DRb
+  def perform_action(section_name, key_name, *args)
     return "Daemon: Configuration not loaded." unless @config
     return "Daemon: Invalid section or key." unless section_name && key_name
 
     section_sym = section_name.to_sym
     key_sym = key_name.to_sym
 
-    section_object = get_section(section_sym)
-    return "Daemon: Unknown section '#{section_name}'." unless section_object
+    section = @config.hyprland.public_send(section_sym) if @config.hyprland.respond_to?(section_sym)
+    return "Daemon: Unknown section '#{section_name}'." unless section
 
-    command = get_command(section_object, key_sym)
-    execute_command(section_name, key_name, command)
+    command_builder = lambda do
+      attr = case section
+             when HyprdriveConfig::AppsConfig, HyprdriveConfig::ActionsConfig
+               :custom_actions
+             when HyprdriveConfig::ComponentsConfig
+               :custom_components
+             end
+
+      # Try direct attribute access first
+      return section.public_send(key_sym) if section.respond_to?(key_sym)
+
+      # Fallback to checking custom sections
+      return nil unless attr && section.respond_to?(attr)
+
+      custom_hash = section.public_send(attr)
+      custom_hash[key_sym] if custom_hash.is_a?(Hash)
+    end
+
+    command = command_builder.call
+    execute_command(section_name, key_name, command, *args)
+  end
+
+  def process_list
+    @process_list.map do |pid, info|
+      {
+        pid: pid,
+        command: info[:command],
+        args: info[:args],
+        start_time: info[:start_time],
+        section: info[:section],
+        key: info[:key],
+        runtime: Time.now - info[:start_time]
+      }
+    end
+  end
+
+  def kill_process(pid)
+    return "Daemon: Process #{pid} not found" unless @process_list.key?(pid)
+
+    begin
+      Process.kill("TERM", pid)
+      sleep 1
+      Process.kill("KILL", pid) if Process.wait(pid, Process::WNOHANG).nil?
+
+      @process_list.delete(pid)
+      "Daemon: Process #{pid} terminated"
+    rescue StandardError => e
+      "Daemon: Error terminating process #{pid}: #{e.message}"
+    end
   end
 
   private
 
-  def get_section(section_sym)
-    @config.hyprland.public_send(section_sym) if @config.hyprland.respond_to?(section_sym)
-  end
-
-  def get_command(section_object, key_sym)
-    # Try direct attribute access first
-    return section_object.public_send(key_sym) if section_object.respond_to?(key_sym)
-
-    # Fallback to checking custom sections
-    custom_attr_name = determine_custom_attribute_name(section_object)
-    return nil unless custom_attr_name && section_object.respond_to?(custom_attr_name)
-
-    custom_hash = section_object.public_send(custom_attr_name)
-    custom_hash[key_sym] if custom_hash.is_a?(Hash)
-  end
-
-  def determine_custom_attribute_name(section_object)
-    case section_object
-    when HyprdriveConfig::AppsConfig, HyprdriveConfig::ActionsConfig
-      :custom_actions
-    when HyprdriveConfig::ComponentsConfig
-      :custom_components
-    end
-  end
-
-  def execute_command(section_name, key_name, command)
-    if command.nil?
-      return "Daemon: Action '#{key_name}' not found or has no command in section '#{section_name}'."
-    end
-
-    if command == "none"
-      return "Daemon: Action '#{key_name}' is configured as 'none'."
-    end
+  def execute_command(section_name, key_name, command, *args)
+    return "Daemon: Action '#{key_name}' not found in section '#{section_name}'." if command.nil?
+    return "Daemon: Action '#{key_name}' is configured as 'none'." if command == "none"
 
     puts "Daemon: Action '#{key_name}' in section '#{section_name}' -> '#{command}'"
 
     if command_blacklisted?(command.to_s)
       warn "Daemon: Attempt to execute blacklisted command: '#{command}' " \
            "from section '#{section_name}', key '#{key_name}'"
+
       return "Daemon: Command '#{command}' is blacklisted and cannot be executed."
     end
 
-    "Daemon: Action '#{key_name}' -> Value: #{command.inspect}"
+    # Parse command and arguments
+    cmd_parts = command.split
+    base_cmd = cmd_parts.first
+    cmd_args = cmd_parts[1..] + args
+
+    # Execute the command
+    begin
+      pid = spawn_command(base_cmd, *cmd_args)
+      if pid
+        @process_list[pid] = {
+          command: command,
+          args: cmd_args,
+          start_time: Time.now,
+          section: section_name,
+          key: key_name
+        }
+        "Daemon: Action '#{key_name}' started (PID: #{pid})"
+      else
+        "Daemon: Failed to start action '#{key_name}'"
+      end
+    rescue StandardError => e
+      "Daemon: Error executing action '#{key_name}': #{e.message}"
+    end
+  end
+
+  def spawn_command(cmd, *args)
+    # Create a unique identifier for this process
+    process_id = "#{cmd}_#{Time.now.to_i}"
+
+    # Prepare the command with arguments
+    full_cmd = [cmd, *args].join(" ")
+
+    # Spawn the process
+    pid = Process.spawn(full_cmd, {
+      pgroup      => true, # Create new process group
+      %i[out err] => "/tmp/hyprdrive_#{process_id}.log" # Log output
+    })
+
+    # Start a thread to monitor the process
+    Thread.new do
+      Process.wait(pid)
+      @process_list.delete(pid)
+      # Clean up log file
+      FileUtils.rm_f("/tmp/hyprdrive_#{process_id}.log")
+    rescue StandardError => e
+      warn "Daemon: Error monitoring process #{pid}: #{e.message}"
+    end
+
+    pid
   end
 
   # Helper method to check if a command string contains a blacklisted command.
