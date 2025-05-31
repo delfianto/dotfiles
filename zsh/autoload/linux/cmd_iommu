@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 cmd_iommu() {
   case "$1" in

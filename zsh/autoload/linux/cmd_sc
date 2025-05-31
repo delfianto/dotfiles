@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # sc ~ zsh autoloader wrapper for systemctl.rb utility
 
 cmd_sc() {

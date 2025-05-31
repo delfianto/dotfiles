@@ -1,5 +1,4 @@
-#!/bin/zsh
-
+# -*- mode: sh -*-
 cmd_svc() {
   if ! has_cmd brew; then
     return 1

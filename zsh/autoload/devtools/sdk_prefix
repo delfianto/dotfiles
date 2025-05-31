@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 sdk_prefix() {
   local prefix=$(cmd_fpath "$SDK_HOME/$1")

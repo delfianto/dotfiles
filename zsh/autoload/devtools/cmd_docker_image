@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 cmd_docker_image() {
   if ! has_cmd docker; then

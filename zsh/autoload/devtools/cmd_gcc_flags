@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 cmd_gcc_flags() {
   if has_cmd gcc; then

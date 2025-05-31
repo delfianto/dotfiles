@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 cmd_lspath() {
   local parts=(${(s/:/)PATH})

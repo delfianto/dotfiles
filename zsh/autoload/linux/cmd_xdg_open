@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 if has_cmd handlr; then
   handlr open "$@"

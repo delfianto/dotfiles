@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 cmd_os_release() {
   typeset -A os_info

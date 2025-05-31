@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File : stderr; Safely print arguments to standard error stream (wraps print -r --)
 # Usage: stderr [args...]
 

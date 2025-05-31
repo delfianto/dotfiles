@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File : is_empty; Checks if current argument is empty or blank.
 # Usage: if is_empty "$var"; then ... fi
 

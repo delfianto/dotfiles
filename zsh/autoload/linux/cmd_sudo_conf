@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 cmd_sudo_conf() {
   if [[ -z "$1" ]]; then

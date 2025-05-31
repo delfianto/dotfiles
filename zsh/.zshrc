@@ -127,11 +127,8 @@ import \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # --- Load the rest of zshrc files ---
-import \
-  "${ZDOTDIR}/bootstrap" \
-  "01_common" \
-  "02_${os_name}" \
-  "03_devtools"
+import "${ZDOTDIR}/bootstrap" \
+  "common.zsh" "${os_name}.zsh"
 
 unset os_name
 

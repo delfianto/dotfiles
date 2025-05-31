@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # @file : cmd_amd_epp
 # @brief: AMD EPP (Energy Performance Preference) command
 # @usage: cmd_amd_epp [-a | -z | -s | -x | -h]

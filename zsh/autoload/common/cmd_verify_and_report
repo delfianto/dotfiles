@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File: cmd:verify_and_report; function for verifying archive file integrity
 
 # Usage: verify_archive <archive_file_path>

@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File : exec_rb; Execute a Ruby util script given in the argument.
 # Usage: exec_rb [util_script_name.rb|util_script_name|full_path_to_script] [args...]
 

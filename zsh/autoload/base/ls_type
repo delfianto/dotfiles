@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File : ls_type; Detects the type of `ls` command available on the system.
 # Usage: ls_type
 

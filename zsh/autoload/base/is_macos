@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File : is_macos; Checks if current operating system is macOS.
 # Usage: if is_macos; then ... fi
 

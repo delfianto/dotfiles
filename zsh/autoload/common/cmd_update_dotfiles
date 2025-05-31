@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 
 cmd_update_dotfiles() {
   cd "$ZDOTDIR"

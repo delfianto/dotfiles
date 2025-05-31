@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File : has_cmd; Checks if the given argument exist in PATH.
 # Usage: if has_cmd [cmd_name]; then ... fi
 
