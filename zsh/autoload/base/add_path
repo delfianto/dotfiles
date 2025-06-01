@@ -1,8 +1,8 @@
 # -*- mode: sh -*-
-# File : path_munge; Validate and add a directory to the PATH variable.
-# Usage: path_munge [directory] [before|after]
+# File : path_add; Validate and add a directory to the PATH variable.
+# Usage: path_add [dir_name] [before|after]
 
-path_munge() {
+add_path() {
   if [[ -d "$1" ]] && [[ -r "$1" ]] &&
     ! echo "$PATH" | grep -Eq "(^|:)$1($|:)"; then
     if [[ "$2" = "after" ]]; then

@@ -12,7 +12,7 @@ export ZDOTDIR="${ZDOTDIR:-${HOME}/.config/zsh}"
 export PATH="$HOME/.local/bin:$PATH"
 
 source_env() {
-  local env_file="$ZDOTDIR/.env.$1"; shift
+  local env_file="$ZDOTDIR/env.$1.zsh"; shift
 
   if [[ -r "$env_file" ]]; then
     source "$env_file"

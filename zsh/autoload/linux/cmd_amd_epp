@@ -4,5 +4,5 @@
 # @usage: cmd_amd_epp [-a | -z | -s | -x | -h]
 
 function cmd_amd_epp {
-  exec_rb amd_epp_mgr "$@"
+  exec_ruby amd_epp_mgr "$@"
 }

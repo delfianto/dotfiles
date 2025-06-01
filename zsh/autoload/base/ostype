@@ -2,7 +2,7 @@
 # File : os_name; Show name of operating system family.
 # Usage: os_name
 
-os_name() {
+ostype() {
   case "$OSTYPE" in
     bsd*)
       stdout "bsd"

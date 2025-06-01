@@ -28,8 +28,8 @@ autoload_init "common"
 autoload_init "devtools"
 
 # OS-specific functions
-os_name=$(os_name)
-autoload_init "${os_name}"
+ostype=$(ostype)
+autoload_init "${ostype}"
 unset -f autoload_init
 
 # Set path as array-unique-special (no duplicates)
@@ -128,9 +128,9 @@ import \
 
 # --- Load the rest of zshrc files ---
 import "${ZDOTDIR}/bootstrap" \
-  "common.zsh" "${os_name}.zsh"
+  "common.zsh" "${ostype}.zsh"
 
-unset os_name
+unset ostype
 
 # --- Load FZF ---
 if has_cmd -q fzf; then

@@ -2,7 +2,7 @@
 # File : exec_rb; Execute a Ruby util script given in the argument.
 # Usage: exec_rb [util_script_name.rb|util_script_name|full_path_to_script] [args...]
 
-exec_rb() {
+exec_ruby() {
   if ! has_cmd -q ruby; then
     stderr "Error: Ruby is not installed. Please install Ruby to use this command."
     return 1

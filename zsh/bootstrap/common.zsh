@@ -9,35 +9,35 @@ do_alias() {
 
 local func_name kebab_name
 local shadowed_cmds=()
-local shadow_cmd="${ZSH_SHADOW_CMD:-$MYCONF/shadow_cmd}"
+local shadow_cmd="${ZSH_SHADOW_CMD:-${MYCONF}/shadow_cmd}"
 
 # Check for the command shadow rule
-if [[ -r "$shadow_cmd" ]]; then
-  local shadow_rules="$(< "$shadow_cmd")"
+if [[ -r "${shadow_cmd}" ]]; then
+  local shadow_rules="$(< "${shadow_cmd}")"
   shadowed_cmds+=( ${(f)shadow_rules} )
 fi
 
 # Iterate over all defined functions (keys of the 'functions' special associative array)
 for func_name in ${(k)functions}; do
   # Check if the function name contains an underscore (likely snake_case)
-  if [[ "$func_name" == cmd_* ]]; then
+  if [[ "${func_name}" == cmd_* ]]; then
     # Convert cmd_snake_case to kebab-case using parameter expansion
     kebab_name="${func_name//_/-}" && kebab_name="${kebab_name#cmd-}"
 
     # Allow shadowing if kebab_name is listed in the shadow_cmd file
-    if (( ${shadowed_cmds[(I)$kebab_name]} )); then
-      (( ZSH_DEBUG_INIT )) && stdout "Shadowing command: $kebab_name"
-      do_alias "$kebab_name" "$func_name"
+    if (( ${shadowed_cmds[(I)${kebab_name}]} )); then
+      (( ZSH_DEBUG_INIT )) && stdout "Shadowing command: ${kebab_name}"
+      do_alias "${kebab_name}" "${func_name}"
       continue
     fi
 
     # Ensure the kebab-case name is different from the original
     # and that no command (alias, function, builtin, external)
     # already exists with the kebab-case name.
-    if [[ -n "$kebab_name" ]] &&
-       [[ "$kebab_name" != "$func_name" ]] &&
-       ! has_cmd -q "$kebab_name"; then
-      do_alias "$kebab_name" "$func_name"
+    if [[ -n "${kebab_name}" ]] &&
+       [[ "${kebab_name}" != "${func_name}" ]] &&
+       ! has_cmd -q "${kebab_name}"; then
+      do_alias "${kebab_name}" "${func_name}"
     fi
   fi
 done
@@ -66,15 +66,15 @@ else
 fi
 
 if has_cmd -q eza; then
-  alias ls="eza $LS_ARGS"
-  alias ll="eza $LS_ARGS -l"
-  alias la="eza $LS_ARGS -a"
-  alias lla="eza $LS_ARGS -al"
+  alias ls="eza ${LS_ARGS}"
+  alias ll="eza ${LS_ARGS} -l"
+  alias la="eza ${LS_ARGS} -a"
+  alias lla="eza ${LS_ARGS} -al"
 else
-  alias ls="ls $LS_ARGS"
-  alias ll="ls $LS_ARGS -l"
-  alias la="ls $LS_ARGS -a"
-  alias lla="ls $LS_ARGS -al"
+  alias ls="ls ${LS_ARGS}"
+  alias ll="ls ${LS_ARGS} -l"
+  alias la="ls ${LS_ARGS} -a"
+  alias lla="ls ${LS_ARGS} -al"
 fi
 
 if has_cmd -q nvim; then
@@ -96,5 +96,5 @@ alias fgrep="fgrep -i --color=auto"
 
 # Shell management
 alias history="fc -li"
-alias shdir="cd $ZDOTDIR"
-alias reload="exec $SHELL -l"
+alias shdir="cd ${ZDOTDIR}"
+alias reload="exec ${SHELL} -l"

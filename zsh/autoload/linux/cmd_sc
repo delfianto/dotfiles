@@ -2,5 +2,5 @@
 # sc ~ zsh autoloader wrapper for systemctl.rb utility
 
 cmd_sc() {
-  exec_rb systemctl.rb "$@"
+  exec_ruby systemctl.rb "$@"
 }

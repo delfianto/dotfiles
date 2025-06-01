@@ -134,7 +134,7 @@ ForegroundVisited=155,89,182
 
 [DirSelect Dialog]
 DirSelectDialog Size=1280,960
-History Items[$e]=file:$HOME/.dotfiles/utils,file:$HOME/Build/dotfiles,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles,file:$HOME/.dotfiles/utils,file:$HOME/.dotfiles/utils,file:$HOME/.dotfiles
+History Items[$e]=file:$HOME/Build/dotfiles/zsh,file:$HOME/.dotfiles/zsh,file:$HOME/.dotfiles/utils,file:$HOME/Build/dotfiles,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles/utils,file:$HOME/Build/dotfiles,file:$HOME/.dotfiles/utils,file:$HOME/.dotfiles/utils,file:$HOME/.dotfiles
 Splitter State=\x00\x00\x00\xff\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x9d\x00\x00\x02\xa8\x00\xff\xff\xff\xff\x01\x00\x00\x00\x01\x00
 
 [Icons]
