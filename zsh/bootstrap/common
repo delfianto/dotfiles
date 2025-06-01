@@ -1,11 +1,5 @@
-#!/bin/zsh
-# File 01_common; Shell initialization script for all platforms
-
-# Create kebab-case aliases for cmd_snake_case functions
-do_alias() {
-  alias "$1=$2"
-  (( ZSH_DEBUG_INIT )) && stdout "Aliased: $1 -> $2"
-}
+# -*- mode: sh -*-
+# Shell initialization script for all platforms
 
 local func_name kebab_name
 local shadowed_cmds=()
@@ -27,7 +21,8 @@ for func_name in ${(k)functions}; do
     # Allow shadowing if kebab_name is listed in the shadow_cmd file
     if (( ${shadowed_cmds[(I)${kebab_name}]} )); then
       (( ZSH_DEBUG_INIT )) && stdout "Shadowing command: ${kebab_name}"
-      do_alias "${kebab_name}" "${func_name}"
+      (( ZSH_DEBUG_INIT )) && stdout "Aliased: ${kebab_name} -> ${func_name}"
+      alias "${kebab_name}" "${func_name}"
       continue
     fi
 
@@ -37,12 +32,12 @@ for func_name in ${(k)functions}; do
     if [[ -n "${kebab_name}" ]] &&
        [[ "${kebab_name}" != "${func_name}" ]] &&
        ! has_cmd -q "${kebab_name}"; then
-      do_alias "${kebab_name}" "${func_name}"
+      (( ZSH_DEBUG_INIT )) && stdout "Aliased: ${kebab_name} -> ${func_name}"
+      alias "${kebab_name}" "${func_name}"
     fi
   fi
 done
 
-unset -f do_alias
 unset func_name kebab_name \
   shadow_cmd shadow_rules \
   shadowed_cmds

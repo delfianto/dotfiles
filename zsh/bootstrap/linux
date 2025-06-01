@@ -1,5 +1,5 @@
-#!/bin/zsh
-# File 01_linux; linux specific alias and environment variables
+# -*- mode: sh -*-
+# Linux specific aliases
 
 # CPU clock and system monitoring
 alias hdmon="sudo hdsentinel"

@@ -1,4 +1,4 @@
-#!/bin/zsh
+# -*- mode: sh -*-
 # File 03_macos; macos specific alias and environment variables
 
 # Initialize homebrew stuff

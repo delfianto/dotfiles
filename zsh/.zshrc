@@ -127,9 +127,7 @@ import \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # --- Load the rest of zshrc files ---
-import "${ZDOTDIR}/bootstrap" \
-  "common.zsh" "${ostype}.zsh"
-
+import "${ZDOTDIR}/bootstrap" "common" "${ostype}"
 unset ostype
 
 # --- Load FZF ---
