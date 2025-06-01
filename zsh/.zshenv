@@ -1,5 +1,43 @@
 # File .zshenv; zsh environment config
 
+# Define a function to source files from the ZDOTDIR directory
+# We unfunction it later in .zshrc
+import() {
+  local base_dir="${1}" # Base directory, can be "" for current dir, or "${ZDOTDIR}/files"
+  shift                 # Remove the first argument from the positional parameters
+
+  for arg in "${@}"; do
+    local file="${base_dir}/${arg}" # Construct the file path
+
+    # If base_dir is empty, it will result in just "/arg", but that works fine.
+    if [[ -n "${base_dir}" ]]; then
+      file="${base_dir}/${arg}"
+    fi
+
+    (( ZSH_DEBUG_INIT )) && print "Attempting to load ${file}..."
+
+    if [[ -f "${file}" && -r "${file}" ]]; then
+      (( ZSH_DEBUG_INIT )) && print "Loading ${file}"
+      source "${file}"
+    else
+      (( ZSH_DEBUG_INIT )) && print "Warning: Could not read ${file}" >&2
+    fi
+  done
+}
+
+# Determine the OS name
+case "$OSTYPE" in
+  linux-gnu*)
+    export OSNAME="linux"
+    ;;
+  darwin*)
+    export OSNAME="macos"
+    ;;
+  *)
+    export OSNAME="unknown"
+    ;;
+esac
+
 # ZSH debug initialization
 export ZSH_DEBUG_INIT="${ZSH_DEBUG_INIT:-0}"
 
@@ -11,30 +49,8 @@ export ZDOTDIR="${ZDOTDIR:-${HOME}/.config/zsh}"
 # Ensure .local/bin is added to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-source_env() {
-  local env_file="$ZDOTDIR/.env.$1"; shift
-
-  if [[ -r "$env_file" ]]; then
-    source "$env_file"
-  elif [[ -f "$env_file" ]]; then
-    print "Error: $env_file is not readable" >&2
-  else
-    print "Warning: $env_file not found" >&2
-  fi
-}
-
 # Source the appropriate .env file based on the OS
-case "$OSTYPE" in
-  linux-gnu*)
-    source_env "linux"
-    ;;
-  darwin*)
-    source_env "macos"
-    ;;
-  *)
-    print "Warning: OS not detected as Linux or macOS (using OSTYPE), no .env file sourced." >&2
-    ;;
-esac
+import "${ZDOTDIR}" ".env.${OSNAME}" ".env.dev"
 
 # Don't keep duplicates and ignore specific sets of command from history
 # https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
@@ -75,6 +91,3 @@ export LESS_TERMCAP_us=$'\E[01;36m'
 if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env ${commands}[(i)lesspipe(|.sh)] %s 2>&-"
 fi
-
-source_env "dev"
-unset -f source_env

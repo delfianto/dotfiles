@@ -5,7 +5,7 @@ if (( "${ZSH_DEBUG_INIT}" )); then
   start_time=$(date +%s.%N)
 fi
 
-# --- Initialize autoloaded functions ---
+# Initialize ZSH autoloaded functions
 autoload_init() {
   for dir in "$@"; do
     local autoload_dir="${ZDOTDIR}/autoload/${dir}"
@@ -22,15 +22,10 @@ autoload_init() {
   done
 }
 
-# Shared functions
 autoload_init "base"
 autoload_init "common"
 autoload_init "devtools"
-
-# OS-specific functions
-ostype=$(ostype)
-autoload_init "${ostype}"
-unset -f autoload_init
+autoload_init "${OSNAME}"
 
 # Set path as array-unique-special (no duplicates)
 typeset -aU path
@@ -40,15 +35,15 @@ autoload -Uz colors compinit regexp-replace zcalc
 compinit -d
 colors
 
-# --- On every prompt, set terminal title to "user@host: cwd" ---
+# On every prompt, set terminal title to "user@host: cwd"
 function set-term-title() { print -Pn '\e]0;%n@%m: %~\a' }
 autoload -U add-zsh-hook
 add-zsh-hook precmd set-term-title
 
-# --- Disable highlighting of text pasted into the command line ---
+# Disable highlighting of text pasted into the command line
 zle_highlight=('paste:none')
 
-# --- ZSH options ---
+# ZSH options
 setopt ALWAYS_TO_END          # full completions move cursor to the end
 setopt APPEND_HISTORY         # immediately append history instead of overwriting
 setopt AUTO_CD                # `dirname` is equivalent to `cd dirname`
@@ -78,18 +73,18 @@ setopt EXTENDED_HISTORY       # write timestamps to history
 setopt INC_APPEND_HISTORY     # history file is updated immediately after a command is entered
 setopt APPENDHISTORY          # ensures that each command entered in the current session is appended to the history file immediately after execution
 
-# --- The following lines were added by compinstall ---
+# The following lines were added by compinstall
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'       # Case insensitive tab completion
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"         # Colored completion (different colors for dirs/files/etc)
 zstyle ':completion:*' rehash true                              # automatically find new executables in path
 
-# --- Speed up completions ---
+# Speed up completions
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
-# --- Keybindings ---
+# Keybindings
 bindkey -e
 bindkey '^[[7~' beginning-of-line                               # Home key
 bindkey '^[[H' beginning-of-line                                # Home key
@@ -120,22 +115,21 @@ bindkey '^[[1;5C' forward-word                                  #
 bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
 bindkey '^[[Z' undo                                             # Shift+tab undo last action
 
-# --- Plugins sections: Enable fish style features ---
+# Plugins sections: Enable fish style features
 import \
   /usr/share/zsh/plugins \
   zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
   zsh-history-substring-search/zsh-history-substring-search.zsh
 
-# --- Load the rest of zshrc files ---
-import "${ZDOTDIR}/bootstrap" "common" "${ostype}"
-unset ostype
+# Load the rest of zshrc files
+import "${ZDOTDIR}/bootstrap" "common" "${OSNAME}"
 
-# --- Load FZF ---
+# Load FZF
 if has_cmd -q fzf; then
   source <(fzf --zsh)
 fi
 
-# --- Load starship ---
+# Load starship
 if has_cmd -q starship; then
   eval "$(starship init zsh)"
 fi
@@ -152,3 +146,5 @@ if (( "${ZSH_DEBUG_INIT}" )); then
   stdout "Shell initialization took ${elapsed_milliseconds} milliseconds."
   unset start_time end_time elapsed_seconds elapsed_milliseconds
 fi
+
+unset -f autoload_init import

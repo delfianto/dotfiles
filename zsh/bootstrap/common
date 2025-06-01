@@ -22,7 +22,7 @@ for func_name in ${(k)functions}; do
     if (( ${shadowed_cmds[(I)${kebab_name}]} )); then
       (( ZSH_DEBUG_INIT )) && stdout "Shadowing command: ${kebab_name}"
       (( ZSH_DEBUG_INIT )) && stdout "Aliased: ${kebab_name} -> ${func_name}"
-      alias "${kebab_name}" "${func_name}"
+      alias "${kebab_name}"="${func_name}"
       continue
     fi
 
@@ -33,7 +33,7 @@ for func_name in ${(k)functions}; do
        [[ "${kebab_name}" != "${func_name}" ]] &&
        ! has_cmd -q "${kebab_name}"; then
       (( ZSH_DEBUG_INIT )) && stdout "Aliased: ${kebab_name} -> ${func_name}"
-      alias "${kebab_name}" "${func_name}"
+      alias "${kebab_name}"="${func_name}"
     fi
   fi
 done
